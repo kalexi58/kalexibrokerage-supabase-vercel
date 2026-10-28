@@ -1,0 +1,8 @@
+ALTER TABLE public.agents ADD COLUMN designation text NOT NULL DEFAULT 'Digital Agent', ADD COLUMN signature_path text, ADD COLUMN company_phone text;
+CREATE TABLE public.agent_messages (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), owner_user_id uuid NOT NULL REFERENCES public.profiles(id), sender_id uuid NOT NULL REFERENCES public.profiles(id), body text NOT NULL DEFAULT '', attachments jsonb NOT NULL DEFAULT '[]'::jsonb, created_at timestamptz NOT NULL DEFAULT now(), CONSTRAINT message_content CHECK (length(body) <= 4000 AND (length(trim(body)) > 0 OR jsonb_array_length(attachments) > 0)));
+GRANT SELECT, INSERT ON public.agent_messages TO authenticated;
+GRANT ALL ON public.agent_messages TO service_role;
+ALTER TABLE public.agent_messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY agent_message_read ON public.agent_messages FOR SELECT TO authenticated USING (owner_user_id = auth.uid() OR public.has_permission(auth.uid(), 'agents.view'));
+CREATE POLICY agent_message_send ON public.agent_messages FOR INSERT TO authenticated WITH CHECK (sender_id = auth.uid() AND ((owner_user_id = auth.uid() AND (EXISTS (SELECT 1 FROM public.agents WHERE user_id = auth.uid()) OR EXISTS (SELECT 1 FROM public.agent_applications WHERE user_id = auth.uid()))) OR public.has_permission(auth.uid(), 'agents.manage')));
+CREATE INDEX agent_messages_thread ON public.agent_messages(owner_user_id, created_at);

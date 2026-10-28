@@ -1,0 +1,1 @@
+CREATE POLICY "applicant reads own" ON public.agent_applications FOR SELECT TO authenticated USING (user_id = auth.uid());

@@ -1,0 +1,11 @@
+# Requested updates
+- [ ] Refresh sign-in with a photographic background and subtle moving network.
+- [ ] Verify agent registration creates credentials and permits pending sign-in.
+- [x] Build Brand Centre with saved templates, dates, signatures and print output.
+- [ ] Add secure token redemption review and payment screen.
+- [ ] Verify requested flows and resolve preview errors.
+- [ ] Improve mobile navigation, legibility and visible sign-in movement.
+- [ ] Add admin agent performance and business-impact dashboard.
+- [ ] Show agents approximate token value in UGX.
+- [ ] Expand ID cards, verification and admin identity editing.
+- [ ] Add private two-way multimedia agent/company messaging.- [x] Admin edits agents and clients; print all receipts; advanced Brand Centre presets.
