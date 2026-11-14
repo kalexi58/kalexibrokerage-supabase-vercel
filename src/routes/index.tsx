@@ -2,9 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { isDigitalAgentAccount } from "@/lib/agents.functions";
 import {
   lookupLoginIdentity,
+  requestPasswordReset,
   recordSignIn,
   signInWithPhone,
   type LoginIdentity,
@@ -52,6 +55,8 @@ function SignInPage() {
   const lookup = useServerFn(lookupLoginIdentity);
   const markSignIn = useServerFn(recordSignIn);
   const phoneSignIn = useServerFn(signInWithPhone);
+  const resetPassword = useServerFn(requestPasswordReset);
+  const resolveAgentAccount = useServerFn(isDigitalAgentAccount);
 
   const [step, setStep] = useState<Step>("email");
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("email");
@@ -59,8 +64,35 @@ function SignInPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [identity, setIdentity] = useState<LoginIdentity | null>(null);
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  async function sendPasswordReset() {
+    setError(null);
+    if (!identifier.trim()) {
+      setError(`Enter your ${loginMethod === "email" ? "email address" : "phone number"} first.`);
+      return;
+    }
+
+    setBusy(true);
+    try {
+      await resetPassword({
+        data: {
+          identifier: identifier.trim(),
+          redirectTo: new URL("/reset-password", window.location.origin).toString(),
+        },
+      });
+      toast.success(
+        "If an account matches those details, a password reset link will be sent to its registered email address.",
+      );
+    } catch (resetError) {
+      console.error("[Kalexi password reset request failed]", resetError);
+      setError("Unable to request a password reset right now. Check the details and try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function submitEmail(e: React.FormEvent) {
     e.preventDefault();
@@ -89,22 +121,21 @@ function SignInPage() {
   }
 
   async function landingRoute() {
-    const { data: userData } = await supabase.auth.getUser();
-    const uid = userData.user?.id;
-    if (!uid) return "/dashboard";
-    const { data: ag } = await supabase
-      .from("agents")
-      .select("id")
-      .eq("user_id", uid)
-      .maybeSingle();
-    if (ag) return "/agent-portal";
-    const { data: ap } = await supabase
-      .from("agent_applications")
-      .select("id")
-      .eq("user_id", uid)
-      .maybeSingle();
-    if (ap) return "/agent-portal";
-    return "/dashboard";
+    const { data: userData, error } = await supabase.auth.getUser();
+    if (error) throw error;
+    if (!userData.user) throw new Error("Your signed-in account could not be verified.");
+    return (await resolveAgentAccount()) ? "/agent-portal" : "/dashboard";
+  }
+
+  async function openWorkspace() {
+    try {
+      await refreshSession();
+      await navigate({ to: await landingRoute(), replace: true });
+    } catch (workspaceError) {
+      console.error("[Kalexi workspace resolution failed]", workspaceError);
+      setBusy(false);
+      setError("Sign-in succeeded, but your workspace could not be verified. Please try again.");
+    }
   }
 
   async function submitPassword(e: React.FormEvent) {
@@ -114,7 +145,7 @@ function SignInPage() {
     try {
       if (loginMethod === "email") {
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: identifier.trim(),
+          email: identifier.trim().toLowerCase(),
           password,
         });
         if (signInError) throw signInError;
@@ -136,8 +167,7 @@ function SignInPage() {
     } catch (error) {
       console.error("[Kalexi login activity could not be recorded]", error);
     }
-    await refreshSession();
-    await navigate({ to: await landingRoute(), replace: true });
+    await openWorkspace();
   }
 
   async function activate(e: React.FormEvent) {
@@ -154,13 +184,13 @@ function SignInPage() {
     setBusy(true);
     try {
       const { error: signUpError } = await supabase.auth.signUp({
-        email: identifier.trim(),
+        email: identifier.trim().toLowerCase(),
         password,
         options: { data: { full_name: "Kalemire Abdulrahuman" } },
       });
       if (signUpError) throw signUpError;
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: identifier.trim(),
+        email: identifier.trim().toLowerCase(),
         password,
       });
       if (signInError) throw signInError;
@@ -179,9 +209,8 @@ function SignInPage() {
     } catch (error) {
       console.error("[Kalexi login activity could not be recorded]", error);
     }
-    await refreshSession();
     toast.success("Super Admin account activated.");
-    await navigate({ to: await landingRoute(), replace: true });
+    await openWorkspace();
   }
 
   return (
@@ -274,7 +303,11 @@ function SignInPage() {
                     required
                     maxLength={255}
                     value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
+                    onChange={(e) =>
+                      setIdentifier(
+                        loginMethod === "email" ? e.target.value.toLowerCase() : e.target.value,
+                      )
+                    }
                     placeholder={loginMethod === "email" ? "name@kalexi.co" : "+256 700 000000"}
                   />
                 </div>
@@ -286,6 +319,14 @@ function SignInPage() {
                 >
                   {busy ? "Checking…" : "Continue"}
                 </Button>
+                <button
+                  type="button"
+                  className="w-full text-sm text-navy-foreground/75 underline underline-offset-4 hover:text-navy-foreground disabled:opacity-50"
+                  onClick={() => void sendPasswordReset()}
+                  disabled={busy}
+                >
+                  Forgot your password?
+                </button>
               </form>
             )}
 
@@ -329,20 +370,44 @@ function SignInPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    autoFocus
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      className="pr-10"
+                      type={passwordVisible ? "text" : "password"}
+                      autoComplete="current-password"
+                      required
+                      autoFocus
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 inline-flex w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+                      aria-label={passwordVisible ? "Hide password" : "Show password"}
+                      aria-pressed={passwordVisible}
+                      onClick={() => setPasswordVisible((visible) => !visible)}
+                    >
+                      {passwordVisible ? (
+                        <EyeOff className="h-4 w-4" aria-hidden="true" />
+                      ) : (
+                        <Eye className="h-4 w-4" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 {error ? <p className="text-sm text-destructive">{error}</p> : null}
                 <Button type="submit" className="w-full" disabled={busy}>
                   {busy ? "Authenticating…" : "Open my workspace"}
                 </Button>
+                <button
+                  type="button"
+                  className="w-full text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground disabled:opacity-50"
+                  onClick={() => void sendPasswordReset()}
+                  disabled={busy}
+                >
+                  Forgot your password?
+                </button>
                 <Button
                   variant="ghost"
                   type="button"

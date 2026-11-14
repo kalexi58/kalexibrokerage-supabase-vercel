@@ -1,0 +1,211 @@
+﻿import { useCallback, useEffect, useState } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import { createClient } from '@supabase/supabase-js'
+
+type Report = {
+  id: string
+  report_date: string
+  generated_at: string
+  report_type: string
+  status: string
+  summary: Record<string, unknown>
+  findings: Array<Record<string, unknown>>
+}
+
+const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
+const key = (
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+) as string | undefined
+
+const db = url && key ? createClient(url, key) : null
+
+function label(value: string) {
+  return value.replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function fmt(value: unknown): string {
+  if (value === null || value === undefined || value === '') return 'Not available'
+  if (typeof value === 'number') return value.toLocaleString()
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
+  if (typeof value === 'object') return JSON.stringify(value)
+  return String(value)
+}
+
+function IntelligencePage() {
+  const [reports, setReports] = useState<Report[]>([])
+  const [selectedId, setSelectedId] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      if (!db) throw new Error('Missing VITE_SUPABASE_URL or Supabase publishable/anon key.')
+
+      const { data: auth, error: authError } = await db.auth.getSession()
+      if (authError) throw authError
+      if (!auth.session) throw new Error('Please sign in before viewing intelligence reports.')
+
+      const { data, error: rpcError } = await db.rpc('get_intelligence_reports', {
+        p_limit: 50,
+      })
+      if (rpcError) throw rpcError
+
+      const rows = (data ?? []) as Report[]
+      setReports(rows)
+      setSelectedId(current => rows.some(r => r.id === current) ? current : rows[0]?.id ?? '')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load reports.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { void refresh() }, [refresh])
+
+  const report = reports.find(r => r.id === selectedId)
+  const summary = report?.summary ?? {}
+  const findings = report?.findings ?? []
+
+  const cards = [
+    ['Total clients', summary.clients_total],
+    ['Active deals', summary.active_deals],
+    ['Open requirements', summary.open_requirements],
+    ['Pending KYC', summary.clients_pending_kyc],
+    ['Deals missing close dates', summary.active_deals_missing_expected_close],
+    ['Transactions missing commission', summary.non_test_transactions_without_commission],
+  ]
+
+  return (
+    <main className="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-8">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Kalexi Brokerage · Management Intelligence</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Intelligence Centre</h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Saved business reports, market demand, deal pipeline and operational risks. Figures come from database reports, not invented dashboard numbers.
+          </p>
+        </div>
+        <button onClick={() => void refresh()} disabled={loading} className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50">
+          {loading ? 'Refreshing…' : 'Refresh intelligence'}
+        </button>
+      </header>
+
+      {error && (
+        <section role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-900">
+          <h2 className="font-semibold">Intelligence connection error</h2>
+          <p className="mt-1 break-words">{error}</p>
+          <p className="mt-2">Check the Supabase session, RPC function permissions and deployed environment variables.</p>
+        </section>
+      )}
+
+      {loading && reports.length === 0 && <p className="rounded-xl border p-6 text-sm text-muted-foreground">Loading reports…</p>}
+
+      {!loading && !error && reports.length === 0 && (
+        <section className="rounded-xl border p-6">
+          <h2 className="text-lg font-semibold">No saved reports</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Run the operational intelligence function in Supabase to create the first report.</p>
+        </section>
+      )}
+
+      {report && (
+        <>
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {cards.map(([title, value]) => (
+              <article key={String(title)} className="rounded-xl border p-5">
+                <p className="text-sm text-muted-foreground">{title}</p>
+                <p className="mt-2 text-3xl font-semibold">{fmt(value)}</p>
+              </article>
+            ))}
+          </section>
+
+          <section className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
+            <aside className="rounded-xl border p-4">
+              <h2 className="font-semibold">Report history</h2>
+              <div className="mt-3 space-y-2">
+                {reports.map(r => (
+                  <button key={r.id} onClick={() => setSelectedId(r.id)} className={`w-full rounded-lg border p-3 text-left ${r.id === selectedId ? 'border-foreground bg-muted' : 'hover:bg-muted/50'}`}>
+                    <span className="block text-sm font-medium">{label(r.report_type)}</span>
+                    <span className="mt-1 block text-xs text-muted-foreground">{r.report_date}</span>
+                    <span className="mt-1 block text-xs">{label(r.status)}</span>
+                  </button>
+                ))}
+              </div>
+            </aside>
+
+            <div className="min-w-0 space-y-6">
+              <section className="rounded-xl border p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-xl font-semibold">{label(report.report_type)}</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Report date: {report.report_date}</p>
+                  </div>
+                  <span className="rounded-full border px-3 py-1 text-xs">{label(report.status)}</span>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">Generated: {new Date(report.generated_at).toLocaleString()}</p>
+                <h3 className="mt-6 font-semibold">Report metrics</h3>
+                <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {Object.entries(summary).filter(([, v]) => v === null || ['string', 'number', 'boolean'].includes(typeof v)).map(([k, v]) => (
+                    <div key={k} className="rounded-lg bg-muted/50 p-3">
+                      <dt className="text-xs text-muted-foreground">{label(k)}</dt>
+                      <dd className="mt-1 break-words text-sm font-medium">{fmt(v)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+
+              {(['deal_pipeline', 'demand'] as const).map(keyName => {
+                const items = summary[keyName]
+                if (!Array.isArray(items) || items.length === 0) return null
+                return (
+                  <section key={keyName} className="rounded-xl border p-5">
+                    <h3 className="font-semibold">{keyName === 'demand' ? 'Sector and location demand' : 'Deal pipeline'}</h3>
+                    <div className="mt-3 space-y-3">
+                      {(items as Record<string, unknown>[]).map((item, i) => (
+                        <article key={i} className="rounded-lg bg-muted/50 p-4">
+                          <p className="font-medium">{fmt(item.sector)}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">Location: {fmt(item.location)} · Status: {fmt(item.status)}</p>
+                          <p className="mt-1 text-sm">Deals/requirements: {fmt(item.deal_count ?? item.open_requirements)}</p>
+                          <p className="mt-1 text-sm">Recorded value/budget: {fmt(item.total_deal_value ?? item.maximum_budget_total)} {fmt(item.currency)}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                )
+              })}
+
+              <section className="rounded-xl border p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h3 className="font-semibold">Operational findings ({findings.length})</h3>
+                  <button onClick={() => window.print()} className="rounded-lg border px-3 py-2 text-sm">Print / Save PDF</button>
+                </div>
+                {findings.length === 0 ? (
+                  <p className="mt-3 text-sm text-muted-foreground">No findings recorded in this report.</p>
+                ) : (
+                  <div className="mt-3 space-y-3">
+                    {findings.map((f, i) => (
+                      <article key={i} className="rounded-lg border p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <h4 className="font-medium">{fmt(f.issue ?? f.finding ?? f.title)}</h4>
+                          <span className="rounded-full border px-2 py-1 text-xs">{fmt(f.severity)}</span>
+                        </div>
+                        <p className="mt-2 text-sm text-muted-foreground">Affected records: {fmt(f.affected_records)}</p>
+                        {f.recommended_action != null && <p className="mt-2 text-sm">Recommended action: {fmt(f.recommended_action)}</p>}
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+          </section>
+        </>
+      )}
+    </main>
+  )
+}
+
+export const Route = createFileRoute('/_authenticated/intelligence')({
+  component: IntelligencePage,
+})

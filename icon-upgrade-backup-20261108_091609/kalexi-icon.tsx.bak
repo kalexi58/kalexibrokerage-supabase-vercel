@@ -1,0 +1,280 @@
+import type { LucideIcon, LucideProps } from "lucide-react";
+
+import {
+  Activity,
+  Archive,
+  ArrowDownLeft,
+  ArrowUpRight,
+  BadgeCheck,
+  Banknote,
+  Bell,
+  Building2,
+  CalendarDays,
+  Check,
+  CheckCircle2,
+  ClipboardCheck,
+  Clock,
+  Coins,
+  CreditCard,
+  FileCheck,
+  FileText,
+  Folder,
+  Handshake,
+  Home,
+  LayoutDashboard,
+  MapPin,
+  Package,
+  Pencil,
+  Plus,
+  Search,
+  Settings,
+  ShieldCheck,
+  Trash2,
+  TrendingUp,
+  Users,
+  Wallet,
+  X,
+  XCircle,
+} from "lucide-react";
+
+export const KALEXI_ICON_COLORS = {
+  primary: "#2563EB",
+  blue: "#2563EB",
+  green: "#16A34A",
+  amber: "#D97706",
+  red: "#DC2626",
+  purple: "#9333EA",
+  cyan: "#0891B2",
+  orange: "#EA580C",
+  slate: "#475569",
+  pink: "#DB2777",
+} as const;
+
+export const KALEXI_ICON_MAP = {
+  dashboard: LayoutDashboard,
+  users: Users,
+  clients: Users,
+  property: Building2,
+  home: Home,
+  calendar: CalendarDays,
+  deals: Handshake,
+  finance: Wallet,
+  payments: CreditCard,
+  money: Banknote,
+  gold: Coins,
+  verification: ShieldCheck,
+  compliance: BadgeCheck,
+  documents: FileText,
+  fileCheck: FileCheck,
+  reception: Bell,
+  operations: Settings,
+  reports: TrendingUp,
+  activity: Activity,
+  archive: Archive,
+  folder: Folder,
+  location: MapPin,
+  package: Package,
+  search: Search,
+  add: Plus,
+  edit: Pencil,
+  delete: Trash2,
+  approve: CheckCircle2,
+  reject: XCircle,
+  check: Check,
+  close: X,
+  clock: Clock,
+  incoming: ArrowDownLeft,
+  outgoing: ArrowUpRight,
+  clipboard: ClipboardCheck,
+} as const;
+
+export type KalexiIconName = keyof typeof KALEXI_ICON_MAP;
+
+const COLOR_BY_ICON: Record<KalexiIconName, string> = {
+  dashboard: "#2563EB",
+  users: "#0891B2",
+  clients: "#0891B2",
+  property: "#DB2777",
+  home: "#DB2777",
+  calendar: "#7C3AED",
+  deals: "#16A34A",
+  finance: "#D97706",
+  payments: "#D97706",
+  money: "#16A34A",
+  gold: "#CA8A04",
+  verification: "#9333EA",
+  compliance: "#9333EA",
+  documents: "#475569",
+  fileCheck: "#16A34A",
+  reception: "#0891B2",
+  operations: "#64748B",
+  reports: "#2563EB",
+  activity: "#0891B2",
+  archive: "#64748B",
+  folder: "#D97706",
+  location: "#DC2626",
+  package: "#EA580C",
+  search: "#64748B",
+  add: "#16A34A",
+  edit: "#2563EB",
+  delete: "#DC2626",
+  approve: "#16A34A",
+  reject: "#DC2626",
+  check: "#16A34A",
+  close: "#DC2626",
+  clock: "#D97706",
+  incoming: "#16A34A",
+  outgoing: "#DC2626",
+  clipboard: "#2563EB",
+};
+
+const BACKGROUND_BY_ICON: Record<KalexiIconName, string> = {
+  dashboard: "#EFF6FF",
+  users: "#ECFEFF",
+  clients: "#ECFEFF",
+  property: "#FCE7F3",
+  home: "#FCE7F3",
+  calendar: "#F3E8FF",
+  deals: "#DCFCE7",
+  finance: "#FEF3C7",
+  payments: "#FEF3C7",
+  money: "#DCFCE7",
+  gold: "#FEF9C3",
+  verification: "#F3E8FF",
+  compliance: "#F3E8FF",
+  documents: "#F1F5F9",
+  fileCheck: "#DCFCE7",
+  reception: "#CFFAFE",
+  operations: "#F1F5F9",
+  reports: "#DBEAFE",
+  activity: "#CFFAFE",
+  archive: "#F1F5F9",
+  folder: "#FEF3C7",
+  location: "#FEE2E2",
+  package: "#FFEDD5",
+  search: "#F1F5F9",
+  add: "#DCFCE7",
+  edit: "#DBEAFE",
+  delete: "#FEE2E2",
+  approve: "#DCFCE7",
+  reject: "#FEE2E2",
+  check: "#DCFCE7",
+  close: "#FEE2E2",
+  clock: "#FEF3C7",
+  incoming: "#DCFCE7",
+  outgoing: "#FEE2E2",
+  clipboard: "#DBEAFE",
+};
+
+type KalexiIconProps = {
+  name: KalexiIconName;
+  size?: number;
+  variant?: "plain" | "soft" | "filled";
+  className?: string;
+  strokeWidth?: number;
+};
+
+export function KalexiIcon({
+  name,
+  size = 20,
+  variant = "plain",
+  className,
+  strokeWidth = 2,
+}: KalexiIconProps) {
+  const Icon = KALEXI_ICON_MAP[name];
+  const color = COLOR_BY_ICON[name];
+
+  if (variant === "plain") {
+    return (
+      <Icon
+        size={size}
+        color={color}
+        strokeWidth={strokeWidth}
+        className={className}
+        aria-hidden="true"
+      />
+    );
+  }
+
+  if (variant === "filled") {
+    return (
+      <span
+        className={`inline-flex shrink-0 items-center justify-center rounded-xl ${className ?? ""}`}
+        style={{
+          width: size + 18,
+          height: size + 18,
+          backgroundColor: color,
+          color: "#FFFFFF",
+        }}
+      >
+        <Icon size={size} color="#FFFFFF" strokeWidth={2.2} aria-hidden="true" />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center justify-center rounded-xl ${className ?? ""}`}
+      style={{
+        width: size + 18,
+        height: size + 18,
+        backgroundColor: BACKGROUND_BY_ICON[name],
+      }}
+    >
+      <Icon size={size} color={color} strokeWidth={2.2} aria-hidden="true" />
+    </span>
+  );
+}
+
+type KalexiHeadingProps = {
+  title: string;
+  subtitle?: string;
+  icon: KalexiIconName;
+  size?: number;
+  children?: React.ReactNode;
+};
+
+export function KalexiPageHeading({
+  title,
+  subtitle,
+  icon,
+  size = 25,
+  children,
+}: KalexiHeadingProps) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex min-w-0 items-center gap-3">
+        <KalexiIcon name={icon} size={size} variant="soft" />
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+          )}
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+export function KalexiSectionHeading({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: KalexiIconName;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2.5">
+        <KalexiIcon name={icon} size={18} />
+        <h2 className="text-base font-semibold">{title}</h2>
+      </div>
+      {children}
+    </div>
+  );
+}

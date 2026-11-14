@@ -35,6 +35,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      calendar_events: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          ends_at: string | null;
+          event_type: string;
+          id: string;
+          location: string | null;
+          requirements: string | null;
+          starts_at: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          ends_at?: string | null;
+          event_type?: string;
+          id?: string;
+          location?: string | null;
+          requirements?: string | null;
+          starts_at: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          ends_at?: string | null;
+          event_type?: string;
+          id?: string;
+          location?: string | null;
+          requirements?: string | null;
+          starts_at?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       system_maintenance: {
         Row: {
           estimated_completion_time: string | null;
@@ -455,6 +497,166 @@ export type Database = {
           },
         ];
       };
+      agent_commission_ledger: {
+        Row: {
+          agent_id: string;
+          agreement_reference: string;
+          calculation_notes: string | null;
+          client_id: string;
+          commission_rate: number;
+          created_at: string;
+          created_by: string | null;
+          currency: string;
+          deal_id: string | null;
+          eligible_fee_amount: number;
+          fee_transaction_id: string;
+          gross_commission: number;
+          id: string;
+          net_payable: number;
+          status: string;
+          withholding_tax: number;
+        };
+        Insert: {
+          agent_id: string;
+          agreement_reference: string;
+          calculation_notes?: string | null;
+          client_id: string;
+          commission_rate: number;
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          deal_id?: string | null;
+          eligible_fee_amount: number;
+          fee_transaction_id: string;
+          gross_commission: number;
+          id?: string;
+          net_payable: number;
+          status?: string;
+          withholding_tax?: number;
+        };
+        Update: {
+          agent_id?: string;
+          agreement_reference?: string;
+          calculation_notes?: string | null;
+          client_id?: string;
+          commission_rate?: number;
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          deal_id?: string | null;
+          eligible_fee_amount?: number;
+          fee_transaction_id?: string;
+          gross_commission?: number;
+          id?: string;
+          net_payable?: number;
+          status?: string;
+          withholding_tax?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_commission_ledger_agent_id_fkey";
+            columns: ["agent_id"];
+            isOneToOne: false;
+            referencedRelation: "agents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_commission_ledger_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_commission_ledger_deal_id_fkey";
+            columns: ["deal_id"];
+            isOneToOne: false;
+            referencedRelation: "deals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_commission_ledger_fee_transaction_id_fkey";
+            columns: ["fee_transaction_id"];
+            isOneToOne: true;
+            referencedRelation: "transactions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agent_commission_payouts: {
+        Row: {
+          agent_id: string;
+          amount: number;
+          created_at: string;
+          currency: string;
+          id: string;
+          processed_at: string | null;
+          processed_by: string | null;
+          status: string;
+        };
+        Insert: {
+          agent_id: string;
+          amount: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          processed_at?: string | null;
+          processed_by?: string | null;
+          status?: string;
+        };
+        Update: {
+          agent_id?: string;
+          amount?: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          processed_at?: string | null;
+          processed_by?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_commission_payouts_agent_id_fkey";
+            columns: ["agent_id"];
+            isOneToOne: false;
+            referencedRelation: "agents";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agent_commission_payout_items: {
+        Row: {
+          amount: number;
+          commission_id: string;
+          payout_id: string;
+        };
+        Insert: {
+          amount: number;
+          commission_id: string;
+          payout_id: string;
+        };
+        Update: {
+          amount?: number;
+          commission_id?: string;
+          payout_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_commission_payout_items_commission_id_fkey";
+            columns: ["commission_id"];
+            isOneToOne: false;
+            referencedRelation: "agent_commission_ledger";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_commission_payout_items_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: false;
+            referencedRelation: "agent_commission_payouts";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       archive_records: {
         Row: {
           archived_at: string;
@@ -566,7 +768,10 @@ export type Database = {
           body: string | null;
           created_at: string;
           created_by: string | null;
+          departments: string[];
           doc_date: string | null;
+          file_path: string | null;
+          file_type: string | null;
           heading: string | null;
           id: string;
           kind: string;
@@ -581,7 +786,10 @@ export type Database = {
           body?: string | null;
           created_at?: string;
           created_by?: string | null;
+          departments?: string[];
           doc_date?: string | null;
+          file_path?: string | null;
+          file_type?: string | null;
           heading?: string | null;
           id?: string;
           kind?: string;
@@ -596,7 +804,10 @@ export type Database = {
           body?: string | null;
           created_at?: string;
           created_by?: string | null;
+          departments?: string[];
           doc_date?: string | null;
+          file_path?: string | null;
+          file_type?: string | null;
           heading?: string | null;
           id?: string;
           kind?: string;
@@ -688,6 +899,204 @@ export type Database = {
           },
         ];
       };
+      properties: {
+        Row: {
+          archive_reason: string | null;
+          archived_at: string | null;
+          archived_by: string | null;
+          asking_price: number | null;
+          assigned_to: string | null;
+          category: string;
+          client_id: string;
+          created_at: string;
+          created_by: string;
+          currency: string;
+          description: string;
+          id: string;
+          location: string;
+          name: string;
+          property_ref: string;
+          status: string;
+          updated_at: string;
+          verification_status: string;
+        };
+        Insert: {
+          archive_reason?: string | null;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          asking_price?: number | null;
+          assigned_to?: string | null;
+          category: string;
+          client_id: string;
+          created_at?: string;
+          created_by: string;
+          currency?: string;
+          description?: string;
+          id?: string;
+          location: string;
+          name: string;
+          property_ref?: string;
+          status?: string;
+          updated_at?: string;
+          verification_status?: string;
+        };
+        Update: {
+          archive_reason?: string | null;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          asking_price?: number | null;
+          assigned_to?: string | null;
+          category?: string;
+          client_id?: string;
+          created_at?: string;
+          created_by?: string;
+          currency?: string;
+          description?: string;
+          id?: string;
+          location?: string;
+          name?: string;
+          property_ref?: string;
+          status?: string;
+          updated_at?: string;
+          verification_status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "properties_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "properties_assigned_to_fkey";
+            columns: ["assigned_to"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      property_files: {
+        Row: {
+          archived_at: string | null;
+          archived_by: string | null;
+          byte_size: number;
+          category: string;
+          created_at: string;
+          display_name: string;
+          id: string;
+          mime_type: string;
+          property_id: string;
+          storage_path: string;
+          uploaded_by: string;
+        };
+        Insert: {
+          archived_at?: string | null;
+          archived_by?: string | null;
+          byte_size: number;
+          category: string;
+          created_at?: string;
+          display_name: string;
+          id?: string;
+          mime_type: string;
+          property_id: string;
+          storage_path: string;
+          uploaded_by: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          archived_by?: string | null;
+          byte_size?: number;
+          category?: string;
+          created_at?: string;
+          display_name?: string;
+          id?: string;
+          mime_type?: string;
+          property_id?: string;
+          storage_path?: string;
+          uploaded_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "property_files_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      property_reviews: {
+        Row: {
+          decision: string;
+          id: string;
+          note: string;
+          property_id: string;
+          reviewed_at: string;
+          reviewed_by: string;
+        };
+        Insert: {
+          decision: string;
+          id?: string;
+          note?: string;
+          property_id: string;
+          reviewed_at?: string;
+          reviewed_by: string;
+        };
+        Update: {
+          decision?: string;
+          id?: string;
+          note?: string;
+          property_id?: string;
+          reviewed_at?: string;
+          reviewed_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "property_reviews_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      property_status_events: {
+        Row: {
+          changed_at: string;
+          changed_by: string;
+          id: string;
+          next_status: string;
+          previous_status: string;
+          property_id: string;
+        };
+        Insert: {
+          changed_at?: string;
+          changed_by: string;
+          id?: string;
+          next_status: string;
+          previous_status: string;
+          property_id: string;
+        };
+        Update: {
+          changed_at?: string;
+          changed_by?: string;
+          id?: string;
+          next_status?: string;
+          previous_status?: string;
+          property_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "property_status_events_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       clients: {
         Row: {
           address: string | null;
@@ -709,6 +1118,7 @@ export type Database = {
           kyc_status: string;
           legal_name: string | null;
           phone: string;
+          photo_path: string | null;
           referral_code: string | null;
           registered_by: string | null;
           requirement: string;
@@ -737,6 +1147,7 @@ export type Database = {
           kyc_status?: string;
           legal_name?: string | null;
           phone: string;
+          photo_path?: string | null;
           referral_code?: string | null;
           registered_by?: string | null;
           requirement: string;
@@ -765,6 +1176,7 @@ export type Database = {
           kyc_status?: string;
           legal_name?: string | null;
           phone?: string;
+          photo_path?: string | null;
           referral_code?: string | null;
           registered_by?: string | null;
           requirement?: string;
@@ -1279,6 +1691,36 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      document_templates: {
+        Row: {
+          created_at: string;
+          departments: string[];
+          file_type: string;
+          id: string;
+          name: string;
+          storage_path: string;
+          uploaded_by: string;
+        };
+        Insert: {
+          created_at?: string;
+          departments?: string[];
+          file_type: string;
+          id?: string;
+          name: string;
+          storage_path: string;
+          uploaded_by: string;
+        };
+        Update: {
+          created_at?: string;
+          departments?: string[];
+          file_type?: string;
+          id?: string;
+          name?: string;
+          storage_path?: string;
+          uploaded_by?: string;
+        };
+        Relationships: [];
       };
       documents: {
         Row: {
@@ -2512,6 +2954,10 @@ export type Database = {
       transactions: {
         Row: {
           amount: number;
+          approval_note: string | null;
+          approval_status: string | null;
+          approved_at: string | null;
+          approved_by: string | null;
           archive_reason: string | null;
           archived_at: string | null;
           archived_by: string | null;
@@ -2532,6 +2978,10 @@ export type Database = {
         };
         Insert: {
           amount: number;
+          approval_note?: string | null;
+          approval_status?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
           archive_reason?: string | null;
           archived_at?: string | null;
           archived_by?: string | null;
@@ -2552,6 +3002,10 @@ export type Database = {
         };
         Update: {
           amount?: number;
+          approval_note?: string | null;
+          approval_status?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
           archive_reason?: string | null;
           archived_at?: string | null;
           archived_by?: string | null;
@@ -2615,6 +3069,30 @@ export type Database = {
             referencedColumns: ["key"];
           },
         ];
+      };
+      user_preferences: {
+        Row: {
+          accent: string;
+          density: string;
+          theme_mode: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          accent?: string;
+          density?: string;
+          theme_mode?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          accent?: string;
+          density?: string;
+          theme_mode?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
       };
       user_roles: {
         Row: {
@@ -2781,14 +3259,254 @@ export type Database = {
           },
         ];
       };
+      finance_accounts: {
+        Row: {
+          account_code: string;
+          account_type: string;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          is_active: boolean;
+          is_system: boolean;
+          name: string;
+          parent_id: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          account_code: string;
+          account_type: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          is_active?: boolean;
+          is_system?: boolean;
+          name: string;
+          parent_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          account_code?: string;
+          account_type?: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          is_active?: boolean;
+          is_system?: boolean;
+          name?: string;
+          parent_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      finance_approval_limits: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          currency: string;
+          id: string;
+          max_amount: number | null;
+          role_key: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          currency: string;
+          id?: string;
+          max_amount?: number | null;
+          role_key: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          id?: string;
+          max_amount?: number | null;
+          role_key?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [];
+      };
+      finance_journal_entries: {
+        Row: {
+          base_currency: string;
+          base_total: number;
+          created_at: string;
+          created_by: string | null;
+          description: string;
+          entry_date: string;
+          id: string;
+          journal_ref: string;
+          posted_at: string | null;
+          posted_by: string | null;
+          request_fingerprint: string;
+          review_note: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          source_id: string | null;
+          source_key: string | null;
+          source_type: string | null;
+          status: string;
+        };
+        Insert: {
+          base_currency: string;
+          base_total: number;
+          created_at?: string;
+          created_by?: string | null;
+          description: string;
+          entry_date?: string;
+          id?: string;
+          journal_ref?: string;
+          posted_at?: string | null;
+          posted_by?: string | null;
+          request_fingerprint: string;
+          review_note?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          source_id?: string | null;
+          source_key?: string | null;
+          source_type?: string | null;
+          status?: string;
+        };
+        Update: {
+          base_currency?: string;
+          base_total?: number;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string;
+          entry_date?: string;
+          id?: string;
+          journal_ref?: string;
+          posted_at?: string | null;
+          posted_by?: string | null;
+          request_fingerprint?: string;
+          review_note?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          source_id?: string | null;
+          source_key?: string | null;
+          source_type?: string | null;
+          status?: string;
+        };
+        Relationships: [];
+      };
+      finance_journal_lines: {
+        Row: {
+          account_id: string;
+          base_credit: number;
+          base_debit: number;
+          credit: number;
+          currency: string;
+          debit: number;
+          description: string | null;
+          exchange_rate: number;
+          id: string;
+          journal_id: string;
+          line_number: number;
+        };
+        Insert: {
+          account_id: string;
+          base_credit: number;
+          base_debit: number;
+          credit?: number;
+          currency: string;
+          debit?: number;
+          description?: string | null;
+          exchange_rate: number;
+          id?: string;
+          journal_id: string;
+          line_number: number;
+        };
+        Update: {
+          account_id?: string;
+          base_credit?: number;
+          base_debit?: number;
+          credit?: number;
+          currency?: string;
+          debit?: number;
+          description?: string | null;
+          exchange_rate?: number;
+          id?: string;
+          journal_id?: string;
+          line_number?: number;
+        };
+        Relationships: [];
+      };
+      finance_settings: {
+        Row: {
+          base_currency: string;
+          singleton: boolean;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          base_currency?: string;
+          singleton?: boolean;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          base_currency?: string;
+          singleton?: boolean;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      create_finance_journal: {
+        Args: {
+          _description: string;
+          _entry_date: string;
+          _lines: Json;
+          _source_id?: string | null;
+          _source_key?: string | null;
+          _source_type?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["finance_journal_entries"]["Row"];
+      };
+      create_agent_commission: {
+        Args: {
+          _agent_id: string;
+          _fee_transaction_id: string;
+          _agreement_reference: string;
+          _withholding_tax: number;
+        };
+        Returns: Database["public"]["Tables"]["agent_commission_ledger"]["Row"];
+      };
       has_permission: {
         Args: { _perm: string; _user_id: string };
         Returns: boolean;
+      };
+      finance_account_balances: {
+        Args: never;
+        Returns: {
+          account_id: string;
+          account_code: string;
+          account_name: string;
+          account_type: string;
+          base_currency: string;
+          total_debits: number;
+          total_credits: number;
+          balance: number;
+        }[];
+      };
+      finance_overview_totals: {
+        Args: { _from?: string | null; _to?: string | null };
+        Returns: {
+          metric: string;
+          currency: string;
+          amount: number;
+          record_count: number;
+        }[];
       };
       has_role: {
         Args: {
@@ -2814,6 +3532,46 @@ export type Database = {
       maintenance_access_allowed: {
         Args: never;
         Returns: boolean;
+      };
+      request_agent_commission_payout: {
+        Args: { _amount: number; _currency: string };
+        Returns: Database["public"]["Tables"]["agent_commission_payouts"]["Row"];
+      };
+      resubmit_finance_transaction: {
+        Args: { _transaction_id: string };
+        Returns: Database["public"]["Tables"]["transactions"]["Row"];
+      };
+      review_finance_journal_entry: {
+        Args: { _decision: string; _journal_id: string; _note?: string | null };
+        Returns: Database["public"]["Tables"]["finance_journal_entries"]["Row"];
+      };
+      review_finance_transaction: {
+        Args: { _decision: string; _note?: string | null; _transaction_id: string };
+        Returns: Database["public"]["Tables"]["transactions"]["Row"];
+      };
+      reverse_finance_journal: {
+        Args: { _journal_id: string; _reason: string };
+        Returns: Database["public"]["Tables"]["finance_journal_entries"]["Row"];
+      };
+      request_agent_token_redemption: {
+        Args: { _tokens: number };
+        Returns: Database["public"]["Tables"]["agent_redemptions"]["Row"];
+      };
+      review_property: {
+        Args: { _decision: string; _note?: string; _property_id: string };
+        Returns: Database["public"]["Tables"]["properties"]["Row"];
+      };
+      set_agent_commission_payout_status: {
+        Args: { _next_status: string; _payout_id: string };
+        Returns: Database["public"]["Tables"]["agent_commission_payouts"]["Row"];
+      };
+      set_agent_redemption_status: {
+        Args: { _next_status: string; _redemption_id: string };
+        Returns: Database["public"]["Tables"]["agent_redemptions"]["Row"];
+      };
+      transition_property_status: {
+        Args: { _next_status: string; _property_id: string };
+        Returns: Database["public"]["Tables"]["properties"]["Row"];
       };
       my_permissions: {
         Args: never;

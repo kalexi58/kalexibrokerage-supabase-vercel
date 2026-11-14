@@ -1,0 +1,41 @@
+﻿Implement the CENTRAL BRAND CONTROL CENTER in this existing Kalexi Brokerage Operating System repository. Make actual code and database changes, not a mock-up, plan, or documentation-only response.
+
+MANDATORY WORKFLOW
+1. Inspect package.json, the application entry points, route tree, authenticated layouts, current settings and branding components, Supabase client, existing database migrations, authorization policies, storage configuration, and global CSS.
+2. Identify the existing authenticated administrator and permission model. Reuse it. Do not invent an administrator email, credentials, database schema, or permission bypass.
+3. Inspect the existing database before adding anything. Reuse an appropriate settings table if present. If none exists, create a properly versioned Supabase migration for a single central brand configuration with secure RLS, administrator-only modification, and safe authenticated reading as required by the application's actual access model.
+4. Preserve existing functionality, routes, database objects, case identifiers, legal terminology, permissions, and workflows.
+5. Implement the feature in the actual application and integrate it with the existing route/navigation system.
+
+REQUIRED BRAND SETTINGS
+Company display name, legal name, short name, tagline, description, vision, mission, core values, about text, contact email, phone, website, office address, footer copyright.
+Primary, secondary, accent, page background, surface, primary text, muted text, border, success, warning, and danger colours.
+Light/dark logos, square app icon, favicon where supported, optional background image.
+Supported font choices, heading/body fonts, button style, border radius, card style, sidebar style, header style, navigation style, compact/comfortable density.
+
+BRAND CONTROL CENTER UI
+Create or upgrade the authenticated Brand Control Center. Include editable fields, validated colour pickers and hex inputs, logo/image upload with type and size restrictions, preview, save, cancel, reset to saved values, restore-defaults confirmation, publish, loading/error/success states, and updated-at/by metadata. Distinguish draft settings from published settings so unsaved changes do not affect the rest of the application. Clearly explain any distinction in the UI.
+
+ARCHITECTURE
+Implement a central typed brand configuration, reusable React context/provider or the existing architectural equivalent, and a useBrand() hook or equivalent.
+Apply semantic CSS variables globally, including:
+--brand-primary, --brand-secondary, --brand-accent, --app-background,
+--surface-background, --text-primary, --text-muted, --border-default,
+--status-success, --status-warning, --status-danger.
+Use validated defaults if loading fails. Do not leave the application blank if the branding request fails.
+Persist settings in Supabase using the existing client and secure access policies. Store asset URLs/paths in the configuration, not image binary contents. Use the existing Supabase Storage setup if available; if a storage bucket or policies are needed, add an appropriate migration and document required deployment steps. Never expose a service-role key in client code.
+
+APPLICATION-WIDE INTEGRATION
+Audit login/authentication, sidebar, header, dashboard, search, research, risk intelligence, verification, due diligence, clients/counterparties, finance, operations, forms, buttons, cards, modals, notifications, loading/error/empty states, printable reports, PDF exports, generated documents, browser title and favicon where those features exist.
+Replace hard-coded branding with central configuration wherever appropriate. Preserve legitimate product names, module labels, transaction identifiers, database names and legal terminology. Do not blindly replace every occurrence of "Kalexi". Reuse configured company name, logo and tagline consistently. Maintain mobile responsiveness, accessible contrast, focus states and readable controls.
+
+QUALITY AND SAFETY
+- Do not replace the existing application with a new scaffold.
+- Do not remove features or silently disable authentication, RLS or permissions.
+- Do not use mock data for settings persistence.
+- Do not claim storage, database migrations or deployment succeeded unless actually completed.
+- Avoid unrelated refactors and unnecessary dependencies.
+- Create a change summary and list any migration/deployment steps that cannot safely be completed automatically.
+- Run npm.cmd run build after implementation and fix any errors caused by your changes.
+- If the build fails, report the actual error and do not claim success.
+- Do not deploy to production or run destructive database commands.

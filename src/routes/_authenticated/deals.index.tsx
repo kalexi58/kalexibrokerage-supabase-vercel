@@ -58,6 +58,7 @@ function DealsPage() {
   const access = session?.access;
   const [term, setTerm] = useState("");
   const [sector, setSector] = useState("all");
+  const [stage, setStage] = useState("all");
   const [view, setView] = useState<"board" | "list">("board");
 
   const deals = useQuery({
@@ -91,6 +92,7 @@ function DealsPage() {
   }
 
   const rows = deals.data ?? [];
+  const visibleRows = stage === "all" ? rows : rows.filter((d) => d.stage === stage);
   const totalValue = rows.reduce((sum, d) => sum + Number(d.value ?? 0), 0);
 
   return (
@@ -146,6 +148,19 @@ function DealsPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={stage} onValueChange={setStage}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Stage" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All stages</SelectItem>
+            {BOARD_STAGES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {DEAL_STAGE_LABEL[s as DealStage]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="ml-auto flex rounded-md border p-0.5">
           {(["board", "list"] as const).map((v) => (
             <button
@@ -163,15 +178,15 @@ function DealsPage() {
 
       {deals.isLoading ? (
         <p className="text-sm text-muted-foreground">Loading pipeline…</p>
-      ) : rows.length === 0 ? (
+      ) : visibleRows.length === 0 ? (
         <EmptyState
-          title="No deals in the pipeline"
-          hint="Open a deal from a matched requirement or create one directly."
+          title={stage === "closed" ? "No closed deals found" : "No deals in the pipeline"}
+          hint={stage === "closed" ? "Closed deals will appear here." : "Open a deal from a matched requirement or create one directly."}
         />
       ) : view === "board" ? (
         <div className="flex gap-3 overflow-x-auto pb-4">
           {BOARD_STAGES.map((stage) => {
-            const stageDeals = rows.filter((d) => d.stage === stage);
+            const stageDeals = visibleRows.filter((d) => d.stage === stage);
             return (
               <div key={stage} className="w-64 shrink-0 rounded-lg border bg-muted/30">
                 <header className="flex items-center justify-between border-b px-3 py-2">
@@ -220,7 +235,7 @@ function DealsPage() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((d) => (
+              {visibleRows.map((d) => (
                 <tr key={d.id} className="border-t">
                   <td className="px-4 py-2">
                     <Link

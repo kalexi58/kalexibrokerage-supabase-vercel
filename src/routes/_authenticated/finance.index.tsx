@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createAgentCommission } from "@/lib/agent-commission.functions";
+import { groupAmountsByCurrency } from "@/lib/finance-accounting";
 
 export const Route = createFileRoute("/_authenticated/finance/")({
   head: () => ({
@@ -38,7 +41,8 @@ export const Route = createFileRoute("/_authenticated/finance/")({
 });
 
 const TX_STATUSES = ["pending", "cleared", "failed", "archived"];
-const INVOICE_STATUSES = ["pending", "paid", "overdue", "cancelled", "archived"];
+const INVOICE_FILTER_STATUSES = ["open", "pending", "paid", "overdue", "cancelled", "archived"];
+const INVOICE_ROW_STATUSES = ["pending", "paid", "overdue", "cancelled", "archived"];
 const COMMISSION_STATUSES = ["pending", "approved", "paid", "archived"];
 
 interface TxRow {
@@ -54,7 +58,9 @@ interface TxRow {
   commission_amount: number | null;
   occurred_on: string;
   status: string;
-  clients: { full_name: string } | null;
+  approval_status: string | null;
+  created_by: string | null;
+  clients: { full_name: string; agent_id: string | null } | null;
   deals: { title: string } | null;
 }
 
@@ -118,30 +124,63 @@ function FinancePage() {
   const access = session?.access;
   const qc = useQueryClient();
   const [tab, setTab] = useState("transactions");
-  const [status, setStatus] = useState("all");
+  const [transactionStatus, setTransactionStatus] = useState("all");
+  const [invoiceStatus, setInvoiceStatus] = useState("all");
+  const [commissionStatus, setCommissionStatus] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [txOpen, setTxOpen] = useState(false);
   const [invOpen, setInvOpen] = useState(false);
   const [comOpen, setComOpen] = useState(false);
+  const [commissionBusyId, setCommissionBusyId] = useState<string | null>(null);
+  const createAgentCommissionFn = useServerFn(createAgentCommission);
 
   const canView = allows(access, "finance.view");
   const canCreate = allows(access, "finance.create");
   const canEdit = allows(access, "finance.edit");
 
+  const overview = useQuery({
+    queryKey: ["finance-overview", from, to],
+    enabled: canView,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("finance_overview_totals", {
+        _from: from || null,
+        _to: to || null,
+      });
+      if (error) {
+        console.error("[finance] failed to load overview totals", {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw error;
+      }
+      const totals = data ?? [];
+      for (const metric of ["collected_volume", "open_invoice_value", "recorded_commissions", "awaiting_approval"]) {
+        groupAmountsByCurrency(
+          totals
+            .filter((row) => row.metric === metric)
+            .map((row) => ({ currency: row.currency, amount: row.amount })),
+        );
+      }
+      return totals;
+    },
+  });
+
   const transactions = useQuery({
-    queryKey: ["transactions", status, from, to],
+    queryKey: ["transactions", transactionStatus, from, to],
     enabled: canView,
     queryFn: async () => {
       let query = supabase
         .from("transactions")
         .select(
-          "id, transaction_ref, client_id, deal_id, amount, currency, payment_method, payment_reference, purpose, commission_amount, occurred_on, status, clients(full_name), deals(title)",
+          "id, transaction_ref, client_id, deal_id, amount, currency, payment_method, payment_reference, purpose, commission_amount, occurred_on, status, approval_status, created_by, clients(full_name,agent_id), deals(title)",
         )
         .is("archived_at", null)
         .order("occurred_on", { ascending: false })
         .limit(300);
-      if (status !== "all") query = query.eq("status", status);
+      if (transactionStatus !== "all") query = query.eq("status", transactionStatus);
       if (from) query = query.gte("occurred_on", from);
       if (to) query = query.lte("occurred_on", to);
       const { data, error } = await query;
@@ -151,7 +190,7 @@ function FinancePage() {
   });
 
   const invoices = useQuery({
-    queryKey: ["invoices", status, from, to],
+    queryKey: ["invoices", invoiceStatus, from, to],
     enabled: canView,
     queryFn: async () => {
       let query = supabase
@@ -162,7 +201,8 @@ function FinancePage() {
         .is("archived_at", null)
         .order("created_at", { ascending: false })
         .limit(300);
-      if (status !== "all") query = query.eq("status", status);
+      if (invoiceStatus === "open") query = query.in("status", ["pending", "overdue"]);
+      else if (invoiceStatus !== "all") query = query.eq("status", invoiceStatus);
       if (from) query = query.gte("due_date", from);
       if (to) query = query.lte("due_date", to);
       const { data, error } = await query;
@@ -172,7 +212,7 @@ function FinancePage() {
   });
 
   const commissions = useQuery({
-    queryKey: ["commissions", status],
+    queryKey: ["commissions", commissionStatus],
     enabled: canView,
     queryFn: async () => {
       let query = supabase
@@ -183,7 +223,7 @@ function FinancePage() {
         .is("archived_at", null)
         .order("created_at", { ascending: false })
         .limit(300);
-      if (status !== "all") query = query.eq("status", status);
+      if (commissionStatus !== "all") query = query.eq("status", commissionStatus);
       const { data, error } = await query;
       if (error) throw error;
       return (data ?? []) as unknown as CommissionRow[];
@@ -202,7 +242,22 @@ function FinancePage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const setInvoiceStatus = useMutation({
+  const resubmitTransaction = useMutation({
+    mutationFn: async (transactionId: string) => {
+      const { error } = await supabase.rpc("resubmit_finance_transaction", {
+        _transaction_id: transactionId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Transaction resubmitted for approval.");
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["finance-approval-transactions"] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const updateInvoiceStatus = useMutation({
     mutationFn: async ({ id, value }: { id: string; value: string }) => {
       const { error } = await supabase.from("invoices").update({ status: value }).eq("id", id);
       if (error) throw error;
@@ -214,7 +269,7 @@ function FinancePage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const setCommissionStatus = useMutation({
+  const updateCommissionStatus = useMutation({
     mutationFn: async ({ id, value }: { id: string; value: string }) => {
       const { error } = await supabase.from("commissions").update({ status: value }).eq("id", id);
       if (error) throw error;
@@ -263,50 +318,101 @@ function FinancePage() {
   const invRows = invoices.data ?? [];
   const comRows = commissions.data ?? [];
 
-  const totalReceived = txRows
-    .filter((t) => t.status === "cleared")
-    .reduce((sum, t) => sum + Number(t.amount ?? 0), 0);
-  const commissionEarned = comRows
-    .filter((c) => c.status !== "archived")
-    .reduce((sum, c) => sum + Number(c.amount ?? 0), 0);
-  const outstandingInvoices = invRows
-    .filter((i) => i.status === "pending" || i.status === "overdue")
-    .reduce((sum, i) => sum + Number(i.amount ?? 0), 0);
+  const totalsFor = (metric: string) =>
+    groupAmountsByCurrency(
+      (overview.data ?? [])
+        .filter((row) => row.metric === metric)
+        .map((row) => ({ currency: row.currency, amount: row.amount })),
+    );
+  const totalReceived = totalsFor("collected_volume");
+  const recordedCommissions = totalsFor("recorded_commissions");
+  const openInvoiceValue = totalsFor("open_invoice_value");
+  const awaitingApproval = totalsFor("awaiting_approval");
+  const formatCurrencyTotals = (totals: { currency: string; amount: number }[]) =>
+    totals.length
+      ? totals.map((total) => formatMoney(total.amount, total.currency)).join(" · ")
+      : "—";
 
   return (
     <AppShell>
       <PageHeader
-        title="Transactions"
-        description="Financial movements, invoices and commissions across every brokered deal."
+        title="Finance & Accounts"
+        description="A currency-safe overview and operational register for recorded financial activity."
         actions={
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" asChild>
-              <Link to="/finance/receipts">Receipts</Link>
+              <Link to="/finance/receipts" search={{ transactionId: undefined }}>Receipts</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/finance/approvals">Approvals</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/finance/ledger">General ledger</Link>
             </Button>
           </div>
         }
       />
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border bg-card p-4">
+      {overview.isError ? (
+        <p className="mb-4 rounded-md border border-destructive/40 p-3 text-sm text-destructive">
+          Financial overview totals could not be loaded. Refresh the page or contact Finance.
+        </p>
+      ) : null}
+      <div className="mb-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left hover:border-primary/50"
+          onClick={() => {
+            setTab("transactions");
+            setTransactionStatus("cleared");
+          }}
+        >
           <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-            Total received
+            Cleared transaction volume
           </p>
-          <p className="mt-1 text-2xl font-semibold">{formatMoney(totalReceived, "UGX")}</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4">
+          <p className="mt-1 text-lg font-semibold">{formatCurrencyTotals(totalReceived)}</p>
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left hover:border-primary/50"
+          onClick={() => {
+            setTab("commissions");
+            setCommissionStatus("all");
+          }}
+        >
           <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-            Commission earned
+            Recorded commissions
           </p>
-          <p className="mt-1 text-2xl font-semibold">{formatMoney(commissionEarned, "UGX")}</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4">
+          <p className="mt-1 text-lg font-semibold">{formatCurrencyTotals(recordedCommissions)}</p>
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left hover:border-primary/50"
+          onClick={() => {
+            setTab("invoices");
+            setInvoiceStatus("open");
+          }}
+        >
           <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-            Outstanding invoices
+            Open invoice value
           </p>
-          <p className="mt-1 text-2xl font-semibold">{formatMoney(outstandingInvoices, "UGX")}</p>
-        </div>
+          <p className="mt-1 text-lg font-semibold">{formatCurrencyTotals(openInvoiceValue)}</p>
+        </button>
+        <Link
+          to="/finance/approvals"
+          className="rounded-lg border bg-card p-4 text-left hover:border-primary/50"
+        >
+          <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+            Awaiting transaction approval
+          </p>
+          <p className="mt-1 text-lg font-semibold">{formatCurrencyTotals(awaitingApproval)}</p>
+        </Link>
       </div>
+      <p className="mb-5 text-xs text-muted-foreground">
+        Amounts are grouped by currency, not added across currencies. Invoice value is the full face
+        value of pending and overdue invoices; partial-payment allocation and expense categorization
+        are not yet modeled.
+      </p>
 
       <Tabs value={tab} onValueChange={setTab}>
         <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -315,7 +421,20 @@ function FinancePage() {
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
             <TabsTrigger value="commissions">Commissions</TabsTrigger>
           </TabsList>
-          <Select value={status} onValueChange={setStatus}>
+          <Select
+            value={
+              tab === "transactions"
+                ? transactionStatus
+                : tab === "invoices"
+                  ? invoiceStatus
+                  : commissionStatus
+            }
+            onValueChange={(value) => {
+              if (tab === "transactions") setTransactionStatus(value);
+              else if (tab === "invoices") setInvoiceStatus(value);
+              else setCommissionStatus(value);
+            }}
+          >
             <SelectTrigger className="w-40">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -324,11 +443,11 @@ function FinancePage() {
               {(tab === "transactions"
                 ? TX_STATUSES
                 : tab === "invoices"
-                  ? INVOICE_STATUSES
+                  ? INVOICE_FILTER_STATUSES
                   : COMMISSION_STATUSES
               ).map((s) => (
                 <SelectItem key={s} value={s}>
-                  {titleCase(s)}
+                  {tab === "invoices" && s === "open" ? "Open (pending/overdue)" : titleCase(s)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -384,11 +503,14 @@ function FinancePage() {
                     <th className="px-4 py-2">Commission</th>
                     <th className="px-4 py-2">Date</th>
                     <th className="px-4 py-2">Status</th>
+                    <th className="px-4 py-2">Approval</th>
                     <th className="px-4 py-2" />
                   </tr>
                 </thead>
                 <tbody>
-                  {txRows.map((t) => (
+                  {txRows.map((t) => {
+                    const referredAgentId = t.clients?.agent_id;
+                    return (
                     <tr key={t.id} className="border-t">
                       <td className="px-4 py-2 ref-mono text-xs">{t.transaction_ref}</td>
                       <td className="px-4 py-2">
@@ -400,7 +522,7 @@ function FinancePage() {
                       <td className="px-4 py-2">{formatMoney(t.commission_amount, t.currency)}</td>
                       <td className="px-4 py-2">{formatDate(t.occurred_on)}</td>
                       <td className="px-4 py-2">
-                        {canEdit ? (
+                        {canEdit && (t.approval_status === null || t.approval_status === "approved") ? (
                           <Select
                             value={t.status}
                             onValueChange={(v) => setTxStatus.mutate({ id: t.id, value: v })}
@@ -421,6 +543,71 @@ function FinancePage() {
                         )}
                       </td>
                       <td className="px-4 py-2">
+                        {t.approval_status ? (
+                          <StatusPill value={t.approval_status} />
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Legacy</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        {["rejected", "changes_requested"].includes(t.approval_status ?? "") &&
+                        (t.created_by === session?.userId || canEdit) ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={resubmitTransaction.isPending}
+                            onClick={() => resubmitTransaction.mutate(t.id)}
+                          >
+                            Resubmit
+                          </Button>
+                        ) : null}
+                        {canCreate &&
+                        t.status === "cleared" &&
+                        t.purpose === "KALEXI_BROKERAGE_FEE_RECEIPT" &&
+                        referredAgentId ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={commissionBusyId === t.id}
+                            onClick={async () => {
+                              const agreementReference = window.prompt(
+                                "Enter the accepted agent commission agreement reference:",
+                              );
+                              if (agreementReference === null) return;
+                              const withholdingInput = window.prompt(
+                                `Enter the finance-verified withholding tax amount in ${t.currency} (enter 0 if none):`,
+                              );
+                              if (withholdingInput === null) return;
+                              if (!/^\d+(?:\.\d{1,2})?$/.test(withholdingInput.trim())) {
+                                toast.error("Enter a non-negative withholding amount with up to two decimals.");
+                                return;
+                              }
+                              const withholdingTax = Number(withholdingInput);
+                              setCommissionBusyId(t.id);
+                              try {
+                                await createAgentCommissionFn({
+                                  data: {
+                                    agentId: referredAgentId,
+                                    feeTransactionId: t.id,
+                                    agreementReference,
+                                    withholdingTax,
+                                  },
+                                });
+                                toast.success("Agent commission recorded.");
+                              } catch (error) {
+                                toast.error(
+                                  error instanceof Error
+                                    ? error.message
+                                    : "Agent commission could not be recorded.",
+                                );
+                              } finally {
+                                setCommissionBusyId(null);
+                              }
+                            }}
+                          >
+                            Record agent commission
+                          </Button>
+                        ) : null}
                         {allows(access, "finance.edit") ? (
                           <Button
                             size="sm"
@@ -432,7 +619,8 @@ function FinancePage() {
                         ) : null}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -476,13 +664,13 @@ function FinancePage() {
                         {canEdit ? (
                           <Select
                             value={i.status}
-                            onValueChange={(v) => setInvoiceStatus.mutate({ id: i.id, value: v })}
+                            onValueChange={(v) => updateInvoiceStatus.mutate({ id: i.id, value: v })}
                           >
                             <SelectTrigger className="h-8 w-32 text-xs">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {INVOICE_STATUSES.map((s) => (
+                              {INVOICE_ROW_STATUSES.map((s) => (
                                 <SelectItem key={s} value={s}>
                                   {titleCase(s)}
                                 </SelectItem>
@@ -547,7 +735,7 @@ function FinancePage() {
                           <Select
                             value={c.status}
                             onValueChange={(v) =>
-                              setCommissionStatus.mutate({ id: c.id, value: v })
+                              updateCommissionStatus.mutate({ id: c.id, value: v })
                             }
                           >
                             <SelectTrigger className="h-8 w-32 text-xs">
@@ -639,13 +827,20 @@ function NewTransactionDialog({
   const create = useMutation({
     mutationFn: async () => {
       if (!purpose.trim()) throw new Error("Purpose is required.");
-      if (!amount) throw new Error("Amount is required.");
-      const { data, error } = await supabase
+      const transactionAmount = Number(amount);
+      if (!Number.isFinite(transactionAmount) || transactionAmount <= 0) {
+        throw new Error("Enter a transaction amount greater than zero.");
+      }
+      if (!session) throw new Error("Your session expired. Sign in again.");
+      if (commissionAmount && (!Number.isFinite(Number(commissionAmount)) || Number(commissionAmount) < 0)) {
+        throw new Error("Commission amount cannot be negative.");
+      }
+      const { error } = await supabase
         .from("transactions")
         .insert({
           client_id: clientId || null,
           deal_id: dealId || null,
-          amount: Number(amount),
+          amount: transactionAmount,
           currency,
           payment_method: paymentMethod || null,
           payment_reference: paymentReference || null,
@@ -653,25 +848,12 @@ function NewTransactionDialog({
           commission_amount: commissionAmount ? Number(commissionAmount) : null,
           occurred_on: occurredOn,
           status: "pending",
-          created_by: session?.userId ?? null,
-        })
-        .select("id, transaction_ref")
-        .single();
-      if (error) throw error;
-      if (session) {
-        await logAudit({
-          actorId: session.userId,
-          actorEmail: session.email,
-          action: "transaction.created",
-          entityType: "transactions",
-          entityId: data.id,
-          newValue: { transaction_ref: data.transaction_ref },
+          created_by: session.userId,
         });
-      }
-      return data;
+      if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Transaction recorded.");
+      toast.success("Transaction submitted for approval.");
       setClientId("");
       setDealId("");
       setAmount("");
@@ -728,7 +910,7 @@ function NewTransactionDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Amount</Label>
-              <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+              <Input type="number" min="0.01" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Currency</Label>
@@ -764,6 +946,8 @@ function NewTransactionDialog({
               <Label>Commission amount</Label>
               <Input
                 type="number"
+                min="0"
+                step="0.01"
                 value={commissionAmount}
                 onChange={(e) => setCommissionAmount(e.target.value)}
               />

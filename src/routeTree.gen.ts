@@ -12,10 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAgentPortalRouteImport } from './routes/_authenticated/agent-portal'
 import { Route as AuthenticatedBrandRouteImport } from './routes/_authenticated/brand'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEmployeeIntelligenceRouteImport } from './routes/_authenticated/employee-intelligence'
+import { Route as AuthenticatedHolidaysRouteImport } from './routes/_authenticated/holidays'
+import { Route as AuthenticatedIntelligenceRouteImport } from './routes/_authenticated/intelligence'
+import { Route as AuthenticatedIntelligenceMonitorRouteImport } from './routes/_authenticated/intelligence-monitor'
+import { Route as AuthenticatedMyAvailabilityRouteImport } from './routes/_authenticated/my-availability'
+import { Route as AuthenticatedPageDirectoryRouteImport } from './routes/_authenticated/page-directory'
 import { Route as FTokenRouteImport } from './routes/f.$token'
 import { Route as JoinTokenRouteImport } from './routes/join.$token'
 import { Route as RCodeRouteImport } from './routes/r.$code'
@@ -33,6 +41,7 @@ import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedClientsNewRouteImport } from './routes/_authenticated/clients.new'
 import { Route as AuthenticatedDealsIndexRouteImport } from './routes/_authenticated/deals.index'
 import { Route as AuthenticatedDealsNewRouteImport } from './routes/_authenticated/deals.new'
+import { Route as AuthenticatedDocumentTemplatesRouteImport } from './routes/_authenticated/document.templates'
 import { Route as AuthenticatedDocumentsIndexRouteImport } from './routes/_authenticated/documents.index'
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated/finance.index'
 import { Route as AuthenticatedFormsIndexRouteImport } from './routes/_authenticated/forms.index'
@@ -41,9 +50,15 @@ import { Route as AuthenticatedMediaIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedObjectivesIndexRouteImport } from './routes/_authenticated/objectives.index'
 import { Route as AuthenticatedOpportunitiesIndexRouteImport } from './routes/_authenticated/opportunities.index'
 import { Route as AuthenticatedOpportunitiesNewRouteImport } from './routes/_authenticated/opportunities.new'
+import { Route as AuthenticatedPropertiesIndexRouteImport } from './routes/_authenticated/properties.index'
+import { Route as AuthenticatedPropertiesNewRouteImport } from './routes/_authenticated/properties.new'
+import { Route as AuthenticatedReceptionSchedulingRouteImport } from './routes/_authenticated/reception.scheduling'
 import { Route as AuthenticatedRequirementsIndexRouteImport } from './routes/_authenticated/requirements.index'
 import { Route as AuthenticatedRequirementsNewRouteImport } from './routes/_authenticated/requirements.new'
 import { Route as AuthenticatedResearchIndexRouteImport } from './routes/_authenticated/research.index'
+import { Route as AuthenticatedResearchRioTimesRouteImport } from './routes/_authenticated/research/rio-times'
+import { Route as AuthenticatedResearchRioTimesDdrRouteImport } from './routes/_authenticated/research/rio-times-ddr'
+import { Route as AuthenticatedResearchUbcRouteImport } from './routes/_authenticated/research/ubc'
 import { Route as AuthenticatedRiskIndexRouteImport } from './routes/_authenticated/risk.index'
 import { Route as AuthenticatedRiskSearchRouteImport } from './routes/_authenticated/risk.search'
 import { Route as AuthenticatedVerificationIndexRouteImport } from './routes/_authenticated/verification.index'
@@ -51,11 +66,14 @@ import { Route as AgentVerifyTokenRouteImport } from './routes/agent.verify.$tok
 import { Route as AuthenticatedClientsClientIdIndexRouteImport } from './routes/_authenticated/clients.$clientId.index'
 import { Route as AuthenticatedClientsClientIdAcknowledgementRouteImport } from './routes/_authenticated/clients.$clientId.acknowledgement'
 import { Route as AuthenticatedDealsDealIdIndexRouteImport } from './routes/_authenticated/deals.$dealId.index'
+import { Route as AuthenticatedFinanceApprovalsIndexRouteImport } from './routes/_authenticated/finance.approvals.index'
+import { Route as AuthenticatedFinanceLedgerIndexRouteImport } from './routes/_authenticated/finance.ledger.index'
 import { Route as AuthenticatedFinanceReceiptsIndexRouteImport } from './routes/_authenticated/finance.receipts.index'
 import { Route as AuthenticatedFinanceReceiptsReceiptIdRouteImport } from './routes/_authenticated/finance.receipts.$receiptId'
 import { Route as AuthenticatedFinanceReceiptsPrintRouteImport } from './routes/_authenticated/finance.receipts.print'
 import { Route as AuthenticatedFormsFormIdIndexRouteImport } from './routes/_authenticated/forms.$formId.index'
 import { Route as AuthenticatedOpportunitiesOpportunityIdIndexRouteImport } from './routes/_authenticated/opportunities.$opportunityId.index'
+import { Route as AuthenticatedPropertiesPropertyIdIndexRouteImport } from './routes/_authenticated/properties.$propertyId.index'
 import { Route as AuthenticatedRequirementsRequirementIdIndexRouteImport } from './routes/_authenticated/requirements.$requirementId.index'
 import { Route as AuthenticatedResearchCaseIdIndexRouteImport } from './routes/_authenticated/research.$caseId.index'
 import { Route as AuthenticatedRiskCaseIdIndexRouteImport } from './routes/_authenticated/risk.$caseId.index'
@@ -75,6 +93,11 @@ const MaintenanceRoute = MaintenanceRouteImport.update({
   path: '/maintenance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -91,11 +114,51 @@ const AuthenticatedBrandRoute = AuthenticatedBrandRouteImport.update({
   path: '/brand',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEmployeeIntelligenceRoute =
+  AuthenticatedEmployeeIntelligenceRouteImport.update({
+    id: '/employee-intelligence',
+    path: '/employee-intelligence',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedHolidaysRoute = AuthenticatedHolidaysRouteImport.update({
+  id: '/holidays',
+  path: '/holidays',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIntelligenceRoute =
+  AuthenticatedIntelligenceRouteImport.update({
+    id: '/intelligence',
+    path: '/intelligence',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedIntelligenceMonitorRoute =
+  AuthenticatedIntelligenceMonitorRouteImport.update({
+    id: '/intelligence-monitor',
+    path: '/intelligence-monitor',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMyAvailabilityRoute =
+  AuthenticatedMyAvailabilityRouteImport.update({
+    id: '/my-availability',
+    path: '/my-availability',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPageDirectoryRoute =
+  AuthenticatedPageDirectoryRouteImport.update({
+    id: '/page-directory',
+    path: '/page-directory',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const FTokenRoute = FTokenRouteImport.update({
   id: '/f/$token',
   path: '/f/$token',
@@ -187,6 +250,12 @@ const AuthenticatedDealsNewRoute = AuthenticatedDealsNewRouteImport.update({
   path: '/deals/new',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDocumentTemplatesRoute =
+  AuthenticatedDocumentTemplatesRouteImport.update({
+    id: '/document/templates',
+    path: '/document/templates',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDocumentsIndexRoute =
   AuthenticatedDocumentsIndexRouteImport.update({
     id: '/documents/',
@@ -233,6 +302,24 @@ const AuthenticatedOpportunitiesNewRoute =
     path: '/opportunities/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPropertiesIndexRoute =
+  AuthenticatedPropertiesIndexRouteImport.update({
+    id: '/properties/',
+    path: '/properties/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPropertiesNewRoute =
+  AuthenticatedPropertiesNewRouteImport.update({
+    id: '/properties/new',
+    path: '/properties/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReceptionSchedulingRoute =
+  AuthenticatedReceptionSchedulingRouteImport.update({
+    id: '/reception/scheduling',
+    path: '/reception/scheduling',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRequirementsIndexRoute =
   AuthenticatedRequirementsIndexRouteImport.update({
     id: '/requirements/',
@@ -249,6 +336,24 @@ const AuthenticatedResearchIndexRoute =
   AuthenticatedResearchIndexRouteImport.update({
     id: '/research/',
     path: '/research/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedResearchRioTimesRoute =
+  AuthenticatedResearchRioTimesRouteImport.update({
+    id: '/research/rio-times',
+    path: '/research/rio-times',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedResearchRioTimesDdrRoute =
+  AuthenticatedResearchRioTimesDdrRouteImport.update({
+    id: '/research/rio-times-ddr',
+    path: '/research/rio-times-ddr',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedResearchUbcRoute =
+  AuthenticatedResearchUbcRouteImport.update({
+    id: '/research/ubc',
+    path: '/research/ubc',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRiskIndexRoute = AuthenticatedRiskIndexRouteImport.update({
@@ -290,6 +395,18 @@ const AuthenticatedDealsDealIdIndexRoute =
     path: '/deals/$dealId/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFinanceApprovalsIndexRoute =
+  AuthenticatedFinanceApprovalsIndexRouteImport.update({
+    id: '/finance/approvals/',
+    path: '/finance/approvals/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceLedgerIndexRoute =
+  AuthenticatedFinanceLedgerIndexRouteImport.update({
+    id: '/finance/ledger/',
+    path: '/finance/ledger/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceReceiptsIndexRoute =
   AuthenticatedFinanceReceiptsIndexRouteImport.update({
     id: '/finance/receipts/',
@@ -320,6 +437,12 @@ const AuthenticatedOpportunitiesOpportunityIdIndexRoute =
     path: '/opportunities/$opportunityId/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPropertiesPropertyIdIndexRoute =
+  AuthenticatedPropertiesPropertyIdIndexRouteImport.update({
+    id: '/properties/$propertyId/',
+    path: '/properties/$propertyId/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRequirementsRequirementIdIndexRoute =
   AuthenticatedRequirementsRequirementIdIndexRouteImport.update({
     id: '/requirements/$requirementId/',
@@ -348,10 +471,18 @@ const AuthenticatedVerificationVerificationIdIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/maintenance': typeof MaintenanceRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/account': typeof AuthenticatedAccountRoute
   '/agent-portal': typeof AuthenticatedAgentPortalRoute
   '/brand': typeof AuthenticatedBrandRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/employee-intelligence': typeof AuthenticatedEmployeeIntelligenceRoute
+  '/holidays': typeof AuthenticatedHolidaysRoute
+  '/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/intelligence-monitor': typeof AuthenticatedIntelligenceMonitorRoute
+  '/my-availability': typeof AuthenticatedMyAvailabilityRoute
+  '/page-directory': typeof AuthenticatedPageDirectoryRoute
   '/f/$token': typeof FTokenRoute
   '/join/$token': typeof JoinTokenRoute
   '/r/$code': typeof RCodeRoute
@@ -364,8 +495,14 @@ export interface FileRoutesByFullPath {
   '/agents/redemptions': typeof AuthenticatedAgentsRedemptionsRoute
   '/clients/new': typeof AuthenticatedClientsNewRoute
   '/deals/new': typeof AuthenticatedDealsNewRoute
+  '/document/templates': typeof AuthenticatedDocumentTemplatesRoute
   '/opportunities/new': typeof AuthenticatedOpportunitiesNewRoute
+  '/properties/new': typeof AuthenticatedPropertiesNewRoute
+  '/reception/scheduling': typeof AuthenticatedReceptionSchedulingRoute
   '/requirements/new': typeof AuthenticatedRequirementsNewRoute
+  '/research/rio-times': typeof AuthenticatedResearchRioTimesRoute
+  '/research/rio-times-ddr': typeof AuthenticatedResearchRioTimesDdrRoute
+  '/research/ubc': typeof AuthenticatedResearchUbcRoute
   '/risk/search': typeof AuthenticatedRiskSearchRoute
   '/agent/verify/$token': typeof AgentVerifyTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -380,6 +517,7 @@ export interface FileRoutesByFullPath {
   '/media/': typeof AuthenticatedMediaIndexRoute
   '/objectives/': typeof AuthenticatedObjectivesIndexRoute
   '/opportunities/': typeof AuthenticatedOpportunitiesIndexRoute
+  '/properties/': typeof AuthenticatedPropertiesIndexRoute
   '/requirements/': typeof AuthenticatedRequirementsIndexRoute
   '/research/': typeof AuthenticatedResearchIndexRoute
   '/risk/': typeof AuthenticatedRiskIndexRoute
@@ -389,9 +527,12 @@ export interface FileRoutesByFullPath {
   '/finance/receipts/print': typeof AuthenticatedFinanceReceiptsPrintRoute
   '/clients/$clientId/': typeof AuthenticatedClientsClientIdIndexRoute
   '/deals/$dealId/': typeof AuthenticatedDealsDealIdIndexRoute
+  '/finance/approvals/': typeof AuthenticatedFinanceApprovalsIndexRoute
+  '/finance/ledger/': typeof AuthenticatedFinanceLedgerIndexRoute
   '/finance/receipts/': typeof AuthenticatedFinanceReceiptsIndexRoute
   '/forms/$formId/': typeof AuthenticatedFormsFormIdIndexRoute
   '/opportunities/$opportunityId/': typeof AuthenticatedOpportunitiesOpportunityIdIndexRoute
+  '/properties/$propertyId/': typeof AuthenticatedPropertiesPropertyIdIndexRoute
   '/requirements/$requirementId/': typeof AuthenticatedRequirementsRequirementIdIndexRoute
   '/research/$caseId/': typeof AuthenticatedResearchCaseIdIndexRoute
   '/risk/$caseId/': typeof AuthenticatedRiskCaseIdIndexRoute
@@ -400,10 +541,18 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/maintenance': typeof MaintenanceRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/account': typeof AuthenticatedAccountRoute
   '/agent-portal': typeof AuthenticatedAgentPortalRoute
   '/brand': typeof AuthenticatedBrandRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/employee-intelligence': typeof AuthenticatedEmployeeIntelligenceRoute
+  '/holidays': typeof AuthenticatedHolidaysRoute
+  '/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/intelligence-monitor': typeof AuthenticatedIntelligenceMonitorRoute
+  '/my-availability': typeof AuthenticatedMyAvailabilityRoute
+  '/page-directory': typeof AuthenticatedPageDirectoryRoute
   '/f/$token': typeof FTokenRoute
   '/join/$token': typeof JoinTokenRoute
   '/r/$code': typeof RCodeRoute
@@ -416,8 +565,14 @@ export interface FileRoutesByTo {
   '/agents/redemptions': typeof AuthenticatedAgentsRedemptionsRoute
   '/clients/new': typeof AuthenticatedClientsNewRoute
   '/deals/new': typeof AuthenticatedDealsNewRoute
+  '/document/templates': typeof AuthenticatedDocumentTemplatesRoute
   '/opportunities/new': typeof AuthenticatedOpportunitiesNewRoute
+  '/properties/new': typeof AuthenticatedPropertiesNewRoute
+  '/reception/scheduling': typeof AuthenticatedReceptionSchedulingRoute
   '/requirements/new': typeof AuthenticatedRequirementsNewRoute
+  '/research/rio-times': typeof AuthenticatedResearchRioTimesRoute
+  '/research/rio-times-ddr': typeof AuthenticatedResearchRioTimesDdrRoute
+  '/research/ubc': typeof AuthenticatedResearchUbcRoute
   '/risk/search': typeof AuthenticatedRiskSearchRoute
   '/agent/verify/$token': typeof AgentVerifyTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -432,6 +587,7 @@ export interface FileRoutesByTo {
   '/media': typeof AuthenticatedMediaIndexRoute
   '/objectives': typeof AuthenticatedObjectivesIndexRoute
   '/opportunities': typeof AuthenticatedOpportunitiesIndexRoute
+  '/properties': typeof AuthenticatedPropertiesIndexRoute
   '/requirements': typeof AuthenticatedRequirementsIndexRoute
   '/research': typeof AuthenticatedResearchIndexRoute
   '/risk': typeof AuthenticatedRiskIndexRoute
@@ -441,9 +597,12 @@ export interface FileRoutesByTo {
   '/finance/receipts/print': typeof AuthenticatedFinanceReceiptsPrintRoute
   '/clients/$clientId': typeof AuthenticatedClientsClientIdIndexRoute
   '/deals/$dealId': typeof AuthenticatedDealsDealIdIndexRoute
+  '/finance/approvals': typeof AuthenticatedFinanceApprovalsIndexRoute
+  '/finance/ledger': typeof AuthenticatedFinanceLedgerIndexRoute
   '/finance/receipts': typeof AuthenticatedFinanceReceiptsIndexRoute
   '/forms/$formId': typeof AuthenticatedFormsFormIdIndexRoute
   '/opportunities/$opportunityId': typeof AuthenticatedOpportunitiesOpportunityIdIndexRoute
+  '/properties/$propertyId': typeof AuthenticatedPropertiesPropertyIdIndexRoute
   '/requirements/$requirementId': typeof AuthenticatedRequirementsRequirementIdIndexRoute
   '/research/$caseId': typeof AuthenticatedResearchCaseIdIndexRoute
   '/risk/$caseId': typeof AuthenticatedRiskCaseIdIndexRoute
@@ -454,10 +613,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/maintenance': typeof MaintenanceRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/agent-portal': typeof AuthenticatedAgentPortalRoute
   '/_authenticated/brand': typeof AuthenticatedBrandRoute
+  '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/employee-intelligence': typeof AuthenticatedEmployeeIntelligenceRoute
+  '/_authenticated/holidays': typeof AuthenticatedHolidaysRoute
+  '/_authenticated/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/_authenticated/intelligence-monitor': typeof AuthenticatedIntelligenceMonitorRoute
+  '/_authenticated/my-availability': typeof AuthenticatedMyAvailabilityRoute
+  '/_authenticated/page-directory': typeof AuthenticatedPageDirectoryRoute
   '/f/$token': typeof FTokenRoute
   '/join/$token': typeof JoinTokenRoute
   '/r/$code': typeof RCodeRoute
@@ -470,8 +637,14 @@ export interface FileRoutesById {
   '/_authenticated/agents/redemptions': typeof AuthenticatedAgentsRedemptionsRoute
   '/_authenticated/clients/new': typeof AuthenticatedClientsNewRoute
   '/_authenticated/deals/new': typeof AuthenticatedDealsNewRoute
+  '/_authenticated/document/templates': typeof AuthenticatedDocumentTemplatesRoute
   '/_authenticated/opportunities/new': typeof AuthenticatedOpportunitiesNewRoute
+  '/_authenticated/properties/new': typeof AuthenticatedPropertiesNewRoute
+  '/_authenticated/reception/scheduling': typeof AuthenticatedReceptionSchedulingRoute
   '/_authenticated/requirements/new': typeof AuthenticatedRequirementsNewRoute
+  '/_authenticated/research/rio-times': typeof AuthenticatedResearchRioTimesRoute
+  '/_authenticated/research/rio-times-ddr': typeof AuthenticatedResearchRioTimesDdrRoute
+  '/_authenticated/research/ubc': typeof AuthenticatedResearchUbcRoute
   '/_authenticated/risk/search': typeof AuthenticatedRiskSearchRoute
   '/agent/verify/$token': typeof AgentVerifyTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -486,6 +659,7 @@ export interface FileRoutesById {
   '/_authenticated/media/': typeof AuthenticatedMediaIndexRoute
   '/_authenticated/objectives/': typeof AuthenticatedObjectivesIndexRoute
   '/_authenticated/opportunities/': typeof AuthenticatedOpportunitiesIndexRoute
+  '/_authenticated/properties/': typeof AuthenticatedPropertiesIndexRoute
   '/_authenticated/requirements/': typeof AuthenticatedRequirementsIndexRoute
   '/_authenticated/research/': typeof AuthenticatedResearchIndexRoute
   '/_authenticated/risk/': typeof AuthenticatedRiskIndexRoute
@@ -495,9 +669,12 @@ export interface FileRoutesById {
   '/_authenticated/finance/receipts/print': typeof AuthenticatedFinanceReceiptsPrintRoute
   '/_authenticated/clients/$clientId/': typeof AuthenticatedClientsClientIdIndexRoute
   '/_authenticated/deals/$dealId/': typeof AuthenticatedDealsDealIdIndexRoute
+  '/_authenticated/finance/approvals/': typeof AuthenticatedFinanceApprovalsIndexRoute
+  '/_authenticated/finance/ledger/': typeof AuthenticatedFinanceLedgerIndexRoute
   '/_authenticated/finance/receipts/': typeof AuthenticatedFinanceReceiptsIndexRoute
   '/_authenticated/forms/$formId/': typeof AuthenticatedFormsFormIdIndexRoute
   '/_authenticated/opportunities/$opportunityId/': typeof AuthenticatedOpportunitiesOpportunityIdIndexRoute
+  '/_authenticated/properties/$propertyId/': typeof AuthenticatedPropertiesPropertyIdIndexRoute
   '/_authenticated/requirements/$requirementId/': typeof AuthenticatedRequirementsRequirementIdIndexRoute
   '/_authenticated/research/$caseId/': typeof AuthenticatedResearchCaseIdIndexRoute
   '/_authenticated/risk/$caseId/': typeof AuthenticatedRiskCaseIdIndexRoute
@@ -508,10 +685,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/maintenance'
+    | '/reset-password'
     | '/account'
     | '/agent-portal'
     | '/brand'
+    | '/calendar'
     | '/dashboard'
+    | '/employee-intelligence'
+    | '/holidays'
+    | '/intelligence'
+    | '/intelligence-monitor'
+    | '/my-availability'
+    | '/page-directory'
     | '/f/$token'
     | '/join/$token'
     | '/r/$code'
@@ -524,8 +709,14 @@ export interface FileRouteTypes {
     | '/agents/redemptions'
     | '/clients/new'
     | '/deals/new'
+    | '/document/templates'
     | '/opportunities/new'
+    | '/properties/new'
+    | '/reception/scheduling'
     | '/requirements/new'
+    | '/research/rio-times'
+    | '/research/rio-times-ddr'
+    | '/research/ubc'
     | '/risk/search'
     | '/agent/verify/$token'
     | '/admin/'
@@ -540,6 +731,7 @@ export interface FileRouteTypes {
     | '/media/'
     | '/objectives/'
     | '/opportunities/'
+    | '/properties/'
     | '/requirements/'
     | '/research/'
     | '/risk/'
@@ -549,9 +741,12 @@ export interface FileRouteTypes {
     | '/finance/receipts/print'
     | '/clients/$clientId/'
     | '/deals/$dealId/'
+    | '/finance/approvals/'
+    | '/finance/ledger/'
     | '/finance/receipts/'
     | '/forms/$formId/'
     | '/opportunities/$opportunityId/'
+    | '/properties/$propertyId/'
     | '/requirements/$requirementId/'
     | '/research/$caseId/'
     | '/risk/$caseId/'
@@ -560,10 +755,18 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/maintenance'
+    | '/reset-password'
     | '/account'
     | '/agent-portal'
     | '/brand'
+    | '/calendar'
     | '/dashboard'
+    | '/employee-intelligence'
+    | '/holidays'
+    | '/intelligence'
+    | '/intelligence-monitor'
+    | '/my-availability'
+    | '/page-directory'
     | '/f/$token'
     | '/join/$token'
     | '/r/$code'
@@ -576,8 +779,14 @@ export interface FileRouteTypes {
     | '/agents/redemptions'
     | '/clients/new'
     | '/deals/new'
+    | '/document/templates'
     | '/opportunities/new'
+    | '/properties/new'
+    | '/reception/scheduling'
     | '/requirements/new'
+    | '/research/rio-times'
+    | '/research/rio-times-ddr'
+    | '/research/ubc'
     | '/risk/search'
     | '/agent/verify/$token'
     | '/admin'
@@ -592,6 +801,7 @@ export interface FileRouteTypes {
     | '/media'
     | '/objectives'
     | '/opportunities'
+    | '/properties'
     | '/requirements'
     | '/research'
     | '/risk'
@@ -601,9 +811,12 @@ export interface FileRouteTypes {
     | '/finance/receipts/print'
     | '/clients/$clientId'
     | '/deals/$dealId'
+    | '/finance/approvals'
+    | '/finance/ledger'
     | '/finance/receipts'
     | '/forms/$formId'
     | '/opportunities/$opportunityId'
+    | '/properties/$propertyId'
     | '/requirements/$requirementId'
     | '/research/$caseId'
     | '/risk/$caseId'
@@ -613,10 +826,18 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/maintenance'
+    | '/reset-password'
     | '/_authenticated/account'
     | '/_authenticated/agent-portal'
     | '/_authenticated/brand'
+    | '/_authenticated/calendar'
     | '/_authenticated/dashboard'
+    | '/_authenticated/employee-intelligence'
+    | '/_authenticated/holidays'
+    | '/_authenticated/intelligence'
+    | '/_authenticated/intelligence-monitor'
+    | '/_authenticated/my-availability'
+    | '/_authenticated/page-directory'
     | '/f/$token'
     | '/join/$token'
     | '/r/$code'
@@ -629,8 +850,14 @@ export interface FileRouteTypes {
     | '/_authenticated/agents/redemptions'
     | '/_authenticated/clients/new'
     | '/_authenticated/deals/new'
+    | '/_authenticated/document/templates'
     | '/_authenticated/opportunities/new'
+    | '/_authenticated/properties/new'
+    | '/_authenticated/reception/scheduling'
     | '/_authenticated/requirements/new'
+    | '/_authenticated/research/rio-times'
+    | '/_authenticated/research/rio-times-ddr'
+    | '/_authenticated/research/ubc'
     | '/_authenticated/risk/search'
     | '/agent/verify/$token'
     | '/_authenticated/admin/'
@@ -645,6 +872,7 @@ export interface FileRouteTypes {
     | '/_authenticated/media/'
     | '/_authenticated/objectives/'
     | '/_authenticated/opportunities/'
+    | '/_authenticated/properties/'
     | '/_authenticated/requirements/'
     | '/_authenticated/research/'
     | '/_authenticated/risk/'
@@ -654,9 +882,12 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/receipts/print'
     | '/_authenticated/clients/$clientId/'
     | '/_authenticated/deals/$dealId/'
+    | '/_authenticated/finance/approvals/'
+    | '/_authenticated/finance/ledger/'
     | '/_authenticated/finance/receipts/'
     | '/_authenticated/forms/$formId/'
     | '/_authenticated/opportunities/$opportunityId/'
+    | '/_authenticated/properties/$propertyId/'
     | '/_authenticated/requirements/$requirementId/'
     | '/_authenticated/research/$caseId/'
     | '/_authenticated/risk/$caseId/'
@@ -667,6 +898,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   MaintenanceRoute: typeof MaintenanceRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   FTokenRoute: typeof FTokenRoute
   JoinTokenRoute: typeof JoinTokenRoute
   RCodeRoute: typeof RCodeRoute
@@ -697,6 +929,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MaintenanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/account': {
       id: '/_authenticated/account'
       path: '/account'
@@ -718,11 +957,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBrandRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/employee-intelligence': {
+      id: '/_authenticated/employee-intelligence'
+      path: '/employee-intelligence'
+      fullPath: '/employee-intelligence'
+      preLoaderRoute: typeof AuthenticatedEmployeeIntelligenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/holidays': {
+      id: '/_authenticated/holidays'
+      path: '/holidays'
+      fullPath: '/holidays'
+      preLoaderRoute: typeof AuthenticatedHolidaysRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/intelligence': {
+      id: '/_authenticated/intelligence'
+      path: '/intelligence'
+      fullPath: '/intelligence'
+      preLoaderRoute: typeof AuthenticatedIntelligenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/intelligence-monitor': {
+      id: '/_authenticated/intelligence-monitor'
+      path: '/intelligence-monitor'
+      fullPath: '/intelligence-monitor'
+      preLoaderRoute: typeof AuthenticatedIntelligenceMonitorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-availability': {
+      id: '/_authenticated/my-availability'
+      path: '/my-availability'
+      fullPath: '/my-availability'
+      preLoaderRoute: typeof AuthenticatedMyAvailabilityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/page-directory': {
+      id: '/_authenticated/page-directory'
+      path: '/page-directory'
+      fullPath: '/page-directory'
+      preLoaderRoute: typeof AuthenticatedPageDirectoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/f/$token': {
@@ -844,6 +1132,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDealsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/document/templates': {
+      id: '/_authenticated/document/templates'
+      path: '/document/templates'
+      fullPath: '/document/templates'
+      preLoaderRoute: typeof AuthenticatedDocumentTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/documents/': {
       id: '/_authenticated/documents/'
       path: '/documents'
@@ -900,6 +1195,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOpportunitiesNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/properties/': {
+      id: '/_authenticated/properties/'
+      path: '/properties'
+      fullPath: '/properties/'
+      preLoaderRoute: typeof AuthenticatedPropertiesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/properties/new': {
+      id: '/_authenticated/properties/new'
+      path: '/properties/new'
+      fullPath: '/properties/new'
+      preLoaderRoute: typeof AuthenticatedPropertiesNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reception/scheduling': {
+      id: '/_authenticated/reception/scheduling'
+      path: '/reception/scheduling'
+      fullPath: '/reception/scheduling'
+      preLoaderRoute: typeof AuthenticatedReceptionSchedulingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/requirements/': {
       id: '/_authenticated/requirements/'
       path: '/requirements'
@@ -919,6 +1235,27 @@ declare module '@tanstack/react-router' {
       path: '/research'
       fullPath: '/research/'
       preLoaderRoute: typeof AuthenticatedResearchIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/research/rio-times': {
+      id: '/_authenticated/research/rio-times'
+      path: '/research/rio-times'
+      fullPath: '/research/rio-times'
+      preLoaderRoute: typeof AuthenticatedResearchRioTimesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/research/rio-times-ddr': {
+      id: '/_authenticated/research/rio-times-ddr'
+      path: '/research/rio-times-ddr'
+      fullPath: '/research/rio-times-ddr'
+      preLoaderRoute: typeof AuthenticatedResearchRioTimesDdrRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/research/ubc': {
+      id: '/_authenticated/research/ubc'
+      path: '/research/ubc'
+      fullPath: '/research/ubc'
+      preLoaderRoute: typeof AuthenticatedResearchUbcRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/risk/': {
@@ -970,6 +1307,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDealsDealIdIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/finance/approvals/': {
+      id: '/_authenticated/finance/approvals/'
+      path: '/finance/approvals'
+      fullPath: '/finance/approvals/'
+      preLoaderRoute: typeof AuthenticatedFinanceApprovalsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/ledger/': {
+      id: '/_authenticated/finance/ledger/'
+      path: '/finance/ledger'
+      fullPath: '/finance/ledger/'
+      preLoaderRoute: typeof AuthenticatedFinanceLedgerIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/finance/receipts/': {
       id: '/_authenticated/finance/receipts/'
       path: '/finance/receipts'
@@ -1003,6 +1354,13 @@ declare module '@tanstack/react-router' {
       path: '/opportunities/$opportunityId'
       fullPath: '/opportunities/$opportunityId/'
       preLoaderRoute: typeof AuthenticatedOpportunitiesOpportunityIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/properties/$propertyId/': {
+      id: '/_authenticated/properties/$propertyId/'
+      path: '/properties/$propertyId'
+      fullPath: '/properties/$propertyId/'
+      preLoaderRoute: typeof AuthenticatedPropertiesPropertyIdIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/requirements/$requirementId/': {
@@ -1040,7 +1398,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAgentPortalRoute: typeof AuthenticatedAgentPortalRoute
   AuthenticatedBrandRoute: typeof AuthenticatedBrandRoute
+  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEmployeeIntelligenceRoute: typeof AuthenticatedEmployeeIntelligenceRoute
+  AuthenticatedHolidaysRoute: typeof AuthenticatedHolidaysRoute
+  AuthenticatedIntelligenceRoute: typeof AuthenticatedIntelligenceRoute
+  AuthenticatedIntelligenceMonitorRoute: typeof AuthenticatedIntelligenceMonitorRoute
+  AuthenticatedMyAvailabilityRoute: typeof AuthenticatedMyAvailabilityRoute
+  AuthenticatedPageDirectoryRoute: typeof AuthenticatedPageDirectoryRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminMaintenanceRoute: typeof AuthenticatedAdminMaintenanceRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
@@ -1049,8 +1414,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentsRedemptionsRoute: typeof AuthenticatedAgentsRedemptionsRoute
   AuthenticatedClientsNewRoute: typeof AuthenticatedClientsNewRoute
   AuthenticatedDealsNewRoute: typeof AuthenticatedDealsNewRoute
+  AuthenticatedDocumentTemplatesRoute: typeof AuthenticatedDocumentTemplatesRoute
   AuthenticatedOpportunitiesNewRoute: typeof AuthenticatedOpportunitiesNewRoute
+  AuthenticatedPropertiesNewRoute: typeof AuthenticatedPropertiesNewRoute
+  AuthenticatedReceptionSchedulingRoute: typeof AuthenticatedReceptionSchedulingRoute
   AuthenticatedRequirementsNewRoute: typeof AuthenticatedRequirementsNewRoute
+  AuthenticatedResearchRioTimesRoute: typeof AuthenticatedResearchRioTimesRoute
+  AuthenticatedResearchRioTimesDdrRoute: typeof AuthenticatedResearchRioTimesDdrRoute
+  AuthenticatedResearchUbcRoute: typeof AuthenticatedResearchUbcRoute
   AuthenticatedRiskSearchRoute: typeof AuthenticatedRiskSearchRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAgentsIndexRoute: typeof AuthenticatedAgentsIndexRoute
@@ -1064,6 +1435,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMediaIndexRoute: typeof AuthenticatedMediaIndexRoute
   AuthenticatedObjectivesIndexRoute: typeof AuthenticatedObjectivesIndexRoute
   AuthenticatedOpportunitiesIndexRoute: typeof AuthenticatedOpportunitiesIndexRoute
+  AuthenticatedPropertiesIndexRoute: typeof AuthenticatedPropertiesIndexRoute
   AuthenticatedRequirementsIndexRoute: typeof AuthenticatedRequirementsIndexRoute
   AuthenticatedResearchIndexRoute: typeof AuthenticatedResearchIndexRoute
   AuthenticatedRiskIndexRoute: typeof AuthenticatedRiskIndexRoute
@@ -1073,9 +1445,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceReceiptsPrintRoute: typeof AuthenticatedFinanceReceiptsPrintRoute
   AuthenticatedClientsClientIdIndexRoute: typeof AuthenticatedClientsClientIdIndexRoute
   AuthenticatedDealsDealIdIndexRoute: typeof AuthenticatedDealsDealIdIndexRoute
+  AuthenticatedFinanceApprovalsIndexRoute: typeof AuthenticatedFinanceApprovalsIndexRoute
+  AuthenticatedFinanceLedgerIndexRoute: typeof AuthenticatedFinanceLedgerIndexRoute
   AuthenticatedFinanceReceiptsIndexRoute: typeof AuthenticatedFinanceReceiptsIndexRoute
   AuthenticatedFormsFormIdIndexRoute: typeof AuthenticatedFormsFormIdIndexRoute
   AuthenticatedOpportunitiesOpportunityIdIndexRoute: typeof AuthenticatedOpportunitiesOpportunityIdIndexRoute
+  AuthenticatedPropertiesPropertyIdIndexRoute: typeof AuthenticatedPropertiesPropertyIdIndexRoute
   AuthenticatedRequirementsRequirementIdIndexRoute: typeof AuthenticatedRequirementsRequirementIdIndexRoute
   AuthenticatedResearchCaseIdIndexRoute: typeof AuthenticatedResearchCaseIdIndexRoute
   AuthenticatedRiskCaseIdIndexRoute: typeof AuthenticatedRiskCaseIdIndexRoute
@@ -1086,7 +1461,15 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAgentPortalRoute: AuthenticatedAgentPortalRoute,
   AuthenticatedBrandRoute: AuthenticatedBrandRoute,
+  AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEmployeeIntelligenceRoute:
+    AuthenticatedEmployeeIntelligenceRoute,
+  AuthenticatedHolidaysRoute: AuthenticatedHolidaysRoute,
+  AuthenticatedIntelligenceRoute: AuthenticatedIntelligenceRoute,
+  AuthenticatedIntelligenceMonitorRoute: AuthenticatedIntelligenceMonitorRoute,
+  AuthenticatedMyAvailabilityRoute: AuthenticatedMyAvailabilityRoute,
+  AuthenticatedPageDirectoryRoute: AuthenticatedPageDirectoryRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminMaintenanceRoute: AuthenticatedAdminMaintenanceRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
@@ -1095,8 +1478,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentsRedemptionsRoute: AuthenticatedAgentsRedemptionsRoute,
   AuthenticatedClientsNewRoute: AuthenticatedClientsNewRoute,
   AuthenticatedDealsNewRoute: AuthenticatedDealsNewRoute,
+  AuthenticatedDocumentTemplatesRoute: AuthenticatedDocumentTemplatesRoute,
   AuthenticatedOpportunitiesNewRoute: AuthenticatedOpportunitiesNewRoute,
+  AuthenticatedPropertiesNewRoute: AuthenticatedPropertiesNewRoute,
+  AuthenticatedReceptionSchedulingRoute: AuthenticatedReceptionSchedulingRoute,
   AuthenticatedRequirementsNewRoute: AuthenticatedRequirementsNewRoute,
+  AuthenticatedResearchRioTimesRoute: AuthenticatedResearchRioTimesRoute,
+  AuthenticatedResearchRioTimesDdrRoute: AuthenticatedResearchRioTimesDdrRoute,
+  AuthenticatedResearchUbcRoute: AuthenticatedResearchUbcRoute,
   AuthenticatedRiskSearchRoute: AuthenticatedRiskSearchRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAgentsIndexRoute: AuthenticatedAgentsIndexRoute,
@@ -1110,6 +1499,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMediaIndexRoute: AuthenticatedMediaIndexRoute,
   AuthenticatedObjectivesIndexRoute: AuthenticatedObjectivesIndexRoute,
   AuthenticatedOpportunitiesIndexRoute: AuthenticatedOpportunitiesIndexRoute,
+  AuthenticatedPropertiesIndexRoute: AuthenticatedPropertiesIndexRoute,
   AuthenticatedRequirementsIndexRoute: AuthenticatedRequirementsIndexRoute,
   AuthenticatedResearchIndexRoute: AuthenticatedResearchIndexRoute,
   AuthenticatedRiskIndexRoute: AuthenticatedRiskIndexRoute,
@@ -1123,11 +1513,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientsClientIdIndexRoute:
     AuthenticatedClientsClientIdIndexRoute,
   AuthenticatedDealsDealIdIndexRoute: AuthenticatedDealsDealIdIndexRoute,
+  AuthenticatedFinanceApprovalsIndexRoute:
+    AuthenticatedFinanceApprovalsIndexRoute,
+  AuthenticatedFinanceLedgerIndexRoute: AuthenticatedFinanceLedgerIndexRoute,
   AuthenticatedFinanceReceiptsIndexRoute:
     AuthenticatedFinanceReceiptsIndexRoute,
   AuthenticatedFormsFormIdIndexRoute: AuthenticatedFormsFormIdIndexRoute,
   AuthenticatedOpportunitiesOpportunityIdIndexRoute:
     AuthenticatedOpportunitiesOpportunityIdIndexRoute,
+  AuthenticatedPropertiesPropertyIdIndexRoute:
+    AuthenticatedPropertiesPropertyIdIndexRoute,
   AuthenticatedRequirementsRequirementIdIndexRoute:
     AuthenticatedRequirementsRequirementIdIndexRoute,
   AuthenticatedResearchCaseIdIndexRoute: AuthenticatedResearchCaseIdIndexRoute,
@@ -1143,6 +1538,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   MaintenanceRoute: MaintenanceRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   FTokenRoute: FTokenRoute,
   JoinTokenRoute: JoinTokenRoute,
   RCodeRoute: RCodeRoute,

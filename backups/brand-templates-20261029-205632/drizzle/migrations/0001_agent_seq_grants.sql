@@ -1,0 +1,1 @@
+GRANT USAGE, SELECT ON SEQUENCE public.agent_app_seq, public.agent_code_seq TO service_role, authenticated;

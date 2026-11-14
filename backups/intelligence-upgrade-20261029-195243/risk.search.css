@@ -1,0 +1,180 @@
+:root {
+  --kalexi-ink: #14243b;
+  --kalexi-navy: #10233f;
+  --kalexi-blue: #315be8;
+  --kalexi-cyan: #38bdf8;
+  --kalexi-green: #10b981;
+  --kalexi-surface: #ffffff;
+  --kalexi-muted: #64748b;
+  --kalexi-border: #e2e8f0;
+}
+
+.risk-intelligence-shell {
+  width: 100%;
+  max-width: none !important;
+  min-width: 0;
+  min-height: calc(100dvh - 5rem);
+  height: auto !important;
+  max-height: none !important;
+  color: var(--kalexi-ink);
+  animation: kalexi-enter .35s ease-out both;
+}
+
+.risk-intelligence-shell * {
+  min-width: 0;
+}
+
+.risk-intelligence-shell .ri-scroll {
+  min-height: 0;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  padding-bottom: 2rem;
+}
+
+.risk-intelligence-shell main,
+.risk-intelligence-shell section,
+.risk-intelligence-shell article {
+  scroll-margin-top: 1rem;
+}
+
+.risk-intelligence-shell input,
+.risk-intelligence-shell textarea,
+.risk-intelligence-shell select {
+  min-height: 44px;
+  border-radius: 12px;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.risk-intelligence-shell input:focus,
+.risk-intelligence-shell textarea:focus,
+.risk-intelligence-shell select:focus {
+  outline: none;
+  border-color: var(--kalexi-blue);
+  box-shadow: 0 0 0 3px rgb(49 91 232 / 13%);
+}
+
+.risk-intelligence-shell button {
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    background-color .18s ease,
+    border-color .18s ease;
+}
+
+.risk-intelligence-shell button:hover {
+  transform: translateY(-1px);
+}
+
+.risk-intelligence-shell button:active {
+  transform: translateY(0) scale(.985);
+}
+
+.risk-intelligence-shell .ri-primary {
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, #315be8, #5145cd);
+  color: white;
+  box-shadow: 0 5px 14px rgb(49 91 232 / 18%);
+}
+
+.risk-intelligence-shell .ri-primary:hover {
+  box-shadow: 0 8px 22px rgb(49 91 232 / 25%);
+}
+
+.risk-intelligence-shell .ri-tab-active {
+  border-color: rgb(49 91 232 / 20%);
+  background: linear-gradient(135deg, #eef2ff, #f0f9ff);
+  color: #2346c5;
+}
+
+.risk-intelligence-shell article,
+.risk-intelligence-shell .rounded-xl,
+.risk-intelligence-shell .rounded-2xl {
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease,
+    background-color .2s ease;
+}
+
+.risk-intelligence-shell article:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 6%);
+}
+
+.risk-intelligence-shell .ri-field {
+  border: 1px solid var(--kalexi-border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.risk-intelligence-shell .ri-button {
+  border-radius: 11px;
+}
+
+.risk-intelligence-shell :focus-visible {
+  outline: 3px solid rgb(56 189 248 / 65%);
+  outline-offset: 2px;
+}
+
+.risk-intelligence-shell svg {
+  flex-shrink: 0;
+}
+
+.risk-intelligence-shell .animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.risk-intelligence-shell .ri-scroll::-webkit-scrollbar,
+.risk-intelligence-shell::-webkit-scrollbar {
+  width: 8px;
+}
+
+.risk-intelligence-shell .ri-scroll::-webkit-scrollbar-thumb,
+.risk-intelligence-shell::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background: #cbd5e1;
+}
+
+@keyframes kalexi-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .risk-intelligence-shell,
+  .risk-intelligence-shell * {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .risk-intelligence-shell {
+    min-height: calc(100dvh - 4rem);
+    padding-inline: 0;
+  }
+
+  .risk-intelligence-shell .ri-scroll {
+    padding-inline: .25rem;
+  }
+
+  .risk-intelligence-shell button {
+    min-height: 40px;
+  }
+}
+
+@media print {
+  .risk-intelligence-shell {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    animation: none !important;
+  }
+
+  .risk-intelligence-shell .ri-scroll {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}

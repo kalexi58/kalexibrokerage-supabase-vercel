@@ -1,4 +1,4 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -103,6 +103,52 @@ function DealDetailPage() {
         .is("archived_at", null)
         .order("occurred_at", { ascending: false });
       return data ?? [];
+    },
+  });
+
+  const dealTransactions = useQuery({
+    queryKey: ["deal-transactions", dealId],
+    enabled: allows(access, "finance.view"),
+    queryFn: async () => {
+      const { data: transactions, error } = await supabase
+        .from("transactions")
+        .select("id, transaction_ref, amount, currency, status, purpose, occurred_on")
+        .eq("deal_id", dealId)
+        .is("archived_at", null)
+        .order("occurred_on", { ascending: false });
+      if (error) {
+        console.error("[deal] failed to load linked transactions", {
+          dealId,
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw error;
+      }
+
+      const transactionRows = transactions ?? [];
+      if (transactionRows.length === 0) return [];
+
+      const { data: receipts, error: receiptError } = await supabase
+        .from("receipts")
+        .select("id, receipt_ref, transaction_id, archived_at")
+        .in("transaction_id", transactionRows.map((transaction) => transaction.id))
+      if (receiptError) {
+        console.error("[deal] failed to load receipts for linked transactions", {
+          dealId,
+          code: receiptError.code,
+          message: receiptError.message,
+          details: receiptError.details,
+          hint: receiptError.hint,
+        });
+        throw receiptError;
+      }
+
+      return transactionRows.map((transaction) => ({
+        ...transaction,
+        receipt: (receipts ?? []).find((receipt) => receipt.transaction_id === transaction.id) ?? null,
+      }));
     },
   });
 
@@ -220,6 +266,58 @@ function DealDetailPage() {
 
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="space-y-5 lg:col-span-2">
+          {allows(access, "finance.view") ? (
+            <Panel title="Payments & receipts">
+              {dealTransactions.isLoading ? (
+                <p className="text-sm text-muted-foreground">Loading linked payments…</p>
+              ) : dealTransactions.isError ? (
+                <p className="text-sm text-destructive">Payments could not be loaded. Retry the page or contact Finance.</p>
+              ) : (dealTransactions.data ?? []).length === 0 ? (
+                <EmptyState title="No payments recorded for this deal" />
+              ) : (
+                <div className="space-y-2">
+                  {(dealTransactions.data ?? []).map((transaction) => (
+                    <div key={transaction.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {transaction.transaction_ref} · {formatMoney(transaction.amount, transaction.currency)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {transaction.purpose} · {formatDate(transaction.occurred_on)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <StatusPill value={transaction.status} />
+                        {transaction.receipt ? (
+                          transaction.receipt.archived_at ? (
+                            <span className="text-xs text-muted-foreground">
+                              {transaction.receipt.receipt_ref} · archived
+                            </span>
+                          ) : (
+                            <Link
+                              to="/finance/receipts/$receiptId"
+                              params={{ receiptId: transaction.receipt.id }}
+                              className="text-xs text-primary hover:underline"
+                            >
+                              {transaction.receipt.receipt_ref}
+                            </Link>
+                          )
+                        ) : transaction.status === "cleared" && allows(access, "finance.create") ? (
+                          <Link
+                            to="/finance/receipts"
+                            search={{ transactionId: transaction.id }}
+                            className="text-xs text-primary hover:underline"
+                          >
+                            Issue receipt
+                          </Link>
+                        ) : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Panel>
+          ) : null}
           <Panel title="Offers">
             {canEdit ? <OfferForm dealId={dealId} currency={d['currency']} /> : null}
             <div className="mt-4 space-y-2">

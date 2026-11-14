@@ -132,6 +132,76 @@ export const createBrandSignatureUpload = createServerFn({ method: "POST" })
     return { path, token: upload.token };
   });
 
+export const createBrandDocumentTemplateUpload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ extension: z.enum(["docx", "pdf"]) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: staff, error: staffError } = await context.supabase.rpc("is_active_staff", {
+      _user_id: context.userId,
+    });
+    if (staffError) throw new Error("Could not verify staff access for template import.");
+    if (!staff) throw new Error("Active staff access is required to import templates.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const path = `brand-templates/${context.userId}/${crypto.randomUUID()}.${data.extension}`;
+    const { data: upload, error } = await supabaseAdmin.storage
+      .from("kalexi-vault")
+      .createSignedUploadUrl(path);
+    if (error || !upload) {
+      console.error("[brand templates] Could not prepare the document template upload.", error);
+      throw new Error("Could not prepare the document template upload.");
+    }
+    return { path, token: upload.token };
+  });
+
+export const getBrandDocumentTemplateFile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: template, error } = await context.supabase
+      .from("brand_templates")
+      .select("file_path")
+      .eq("id", data.id)
+      .single();
+    if (error || !template?.file_path) {
+      throw new Error("The document template is not available to your account.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed, error: signingError } = await supabaseAdmin.storage
+      .from("kalexi-vault")
+      .createSignedUrl(template.file_path, 900);
+    if (signingError || !signed) {
+      console.error("[brand templates] Could not sign the saved document template.", signingError);
+      throw new Error("Could not load the saved document template.");
+    }
+    return { signedUrl: signed.signedUrl };
+  });
+
+export const deleteBrandDocumentTemplateUpload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ path: z.string().min(1).max(500) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    if (!data.path.startsWith(`brand-templates/${context.userId}/`)) {
+      throw new Error("The uploaded template path is invalid.");
+    }
+    const { data: staff, error: staffError } = await context.supabase.rpc("is_active_staff", {
+      _user_id: context.userId,
+    });
+    if (staffError) throw new Error("Could not verify staff access for template cleanup.");
+    if (!staff) throw new Error("Active staff access is required to remove template uploads.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.storage.from("kalexi-vault").remove([data.path]);
+    if (error) {
+      console.error("[brand templates] Could not remove an unused upload.", error);
+      throw new Error("The unused template upload could not be removed.");
+    }
+  });
+
 export const getBrandSignature = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))

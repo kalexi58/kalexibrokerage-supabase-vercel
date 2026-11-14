@@ -77,7 +77,7 @@ function ReceiptDocument() {
           actions={
             <div className="flex gap-2">
               <Button variant="outline" asChild>
-                <Link to="/finance/receipts">Receipts</Link>
+                <Link to="/finance/receipts" search={{ transactionId: undefined }}>Receipts</Link>
               </Button>
               <Button onClick={() => window.print()}>Print / save PDF</Button>
             </div>

@@ -1,0 +1,760 @@
+﻿KALEXI BROKERAGE: BRANDING + REPORT INTEGRATION REVIEW
+Generated: 2026-10-29 20:09:16
+Project: C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)
+
+==========================================================================================
+FILE: src\routes\_authenticated\brand.tsx
+==========================================================================================
+Total lines: 97
+
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
+import { FilePlus2, Save, Printer, Copy, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { KalexiMark } from "@/components/KalexiMark";
+import { BrandAppearanceSettings } from "@/components/BrandAppearanceSettings";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession, logAudit } from "@/hooks/useSession";
+import { NoAccess } from "@/components/records";
+import { supabase } from "@/integrations/supabase/client";
+import { createBrandSignatureUpload, getBrandSignature } from "@/lib/brand.functions";
+import type { Database } from "@/integrations/supabase/types";
+
+type Template = Database["public"]["Tables"]["brand_templates"]["Row"];
+type Draft = Pick<Template, "name" | "kind" | "heading" | "body" | "doc_date" | "signatory_name" | "signatory_title" | "signature_path" | "accent">;
+const fresh = (): Draft => ({ name: "", kind: "letter", heading: "", body: "", doc_date: new Date().toISOString().slice(0, 10), signatory_name: "", signatory_title: "", signature_path: null, accent: "gold" });
+const KIND_LABEL: Record<string, string> = { letter: "Official correspondence", notice: "Company notice", certificate: "Official certificate", memo: "Internal memo", appointment: "Letter of appointment", authorization: "Agent authorisation", invoice: "Invoice letterhead" };
+const PRESETS: Partial<Draft>[] = [
+  { name: "Agent authorisation", kind: "authorization", heading: "Letter of Authorisation", body: "This is to confirm that [Agent name], Agent ID [KBL-AG-000000], is an authorised Digital Agent of Kalexi Brokerage Ltd.\n\nThe agent may refer clients and share the official referral link. The agent may not receive payments, sign contracts or make guarantees on behalf of the company." },
+  { name: "Appointment letter", kind: "appointment", heading: "Letter of Appointment", body: "Dear [Name],\n\nWe are pleased to appoint you as [Position] with Kalexi Brokerage Ltd, effective [date].\n\nYours faithfully," },
+  { name: "Company notice", kind: "notice", heading: "Notice", body: "All staff and agents are hereby notified thatâ€¦" },
+  { name: "Certificate", kind: "certificate", heading: "Certificate of Recognition", body: "Awarded to\n\n[Name]\n\nin recognition of outstanding performance." },
+  { name: "Internal memo", kind: "memo", heading: "Memo: [Subject]", body: "To: \nFrom: \nSubject: \n\n" },
+];
+export const Route = createFileRoute("/_authenticated/brand")({
+  head: () => ({ meta: [{ title: "Brand Centre â€” Kalexi Brokerage" }, { name: "description", content: "Design and save branded Kalexi letters, notices and certificates." }, { property: "og:title", content: "Brand Centre â€” Kalexi Brokerage" }, { property: "og:description", content: "Company templates with dates, signatures and printable letterheads." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
+  component: BrandCentre,
+});
+function BrandCentre() {
+  const { data: session } = useSession(); const qc = useQueryClient();
+  const [id, setId] = useState<string | null>(null); const [draft, setDraft] = useState<Draft>(fresh);
+  const [signature, setSignature] = useState<File | null>(null); const [preview, setPreview] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false); const [dirty, setDirty] = useState(false);
+  const upload = useServerFn(createBrandSignatureUpload); const sign = useServerFn(getBrandSignature);
+  const staff = !!session?.profile && session.profile.status === "active" && session.roles.length > 0;
+  const q = useQuery({ queryKey: ["brand-templates"], enabled: staff, queryFn: async () => { const { data, error } = await supabase.from("brand_templates").select("*").order("updated_at", { ascending: false }); if (error) throw error; return data; } });
+  const signed = useQuery({ queryKey: ["brand-signature", id, draft.signature_path], enabled: !!id && !!draft.signature_path, queryFn: () => id ? sign({ data: { id } }) : null });
+  useEffect(() => { if (!signature) { setPreview(null); return; } const url = URL.createObjectURL(signature); setPreview(url); return () => URL.revokeObjectURL(url); }, [signature]);
+  function update<K extends keyof Draft>(key: K, value: Draft[K]) { setDraft(p => ({ ...p, [key]: value })); setDirty(true); }
+  function choose(row?: Template) { if (dirty && !window.confirm("Discard unsaved changes?")) return; setId(row?.id ?? null); setDraft(row ?? fresh()); setSignature(null); setDirty(false); }
+  async function save() {
+    if (!session || !draft.name.trim()) { toast.error("Enter a template name."); return; }
+    setBusy(true);
+    try {
+      let signaturePath = draft.signature_path;
+      if (signature) {
+        if (!signature.type.startsWith("image/") || signature.size > 5 * 1024 * 1024) throw new Error("Choose a signature image under 5 MB.");
+        const slot = await upload({ data: { fileName: signature.name } });
+        const { error } = await supabase.storage.from("kalexi-vault").uploadToSignedUrl(slot.path, slot.token, signature); if (error) throw error;
+        signaturePath = slot.path;
+      }
+      const payload = { ...draft, name: draft.name.trim(), doc_date: draft.doc_date || null, signature_path: signaturePath };
+      const result = id ? await supabase.from("brand_templates").update(payload).eq("id", id).select().single() : await supabase.from("brand_templates").insert({ ...payload, created_by: session.userId }).select().single();
+      if (result.error) throw result.error;
+      setId(result.data.id); setDraft(result.data); setSignature(null); setDirty(false);
+      await logAudit({ actorId: session.userId, actorEmail: session.email, action: "brand.template_saved", entityType: "brand_template", entityId: result.data.id });
+      await qc.invalidateQueries({ queryKey: ["brand-templates"] }); toast.success("Template saved");
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Could not save template"); } finally { setBusy(false); }
+  }
+  async function remove() { if (!id || !window.confirm("Delete this saved template?")) return; setBusy(true); const { error } = await supabase.from("brand_templates").delete().eq("id", id); setBusy(false); if (error) { toast.error(error.message); return; } setDirty(false); setId(null); setDraft(fresh()); setSignature(null); qc.invalidateQueries({ queryKey: ["brand-templates"] }); toast.success("Template deleted"); }
+  const field = (key: "name" | "heading" | "doc_date" | "signatory_name" | "signatory_title", label: string, type = "text") => <div className="space-y-1"><Label htmlFor={`brand-${key}`}>{label}</Label><Input id={`brand-${key}`} type={type} value={draft[key] ?? ""} onChange={e => update(key, e.target.value)} /></div>;
+  const accent = draft.accent === "navy" ? "border-navy" : draft.accent === "green" ? "border-success" : "border-gold";
+  return <AppShell><div className="no-print"><PageHeader title="Brand Centre" actions={<Button variant="outline" onClick={() => choose()}><FilePlus2 />New template</Button>} /></div>
+    {!staff ? <NoAccess module="Brand Centre" /> : <>
+      {session?.access.isSuperAdmin ? <BrandAppearanceSettings /> : null}
+      <div className="grid gap-6 xl:grid-cols-[350px_minmax(0,1fr)]">
+      <section className="brand-editor space-y-5">
+        <div><Label htmlFor="template-select">Saved templates</Label><select id="template-select" value={id ?? ""} disabled={busy} className="mt-1 h-10 w-full rounded-md border bg-card px-3 text-sm" onChange={e => choose(q.data?.find(t => t.id === e.target.value))}><option value="">New template</option>{q.data?.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select>{q.isError ? <p role="alert" className="text-sm text-destructive">Could not load templates.</p> : null}</div>
+        <div className="space-y-4">{field("name", "Template name")}
+          <div><p className="mb-2 text-sm font-medium">Quick start</p><div className="flex flex-wrap gap-2">{PRESETS.map(p => <Button key={p.name} type="button" size="sm" variant="secondary" onClick={() => { setDraft(d => ({ ...d, ...p })); setDirty(true); }}>{p.name}</Button>)}</div></div>
+          <div className="grid grid-cols-2 gap-3"><div><Label htmlFor="brand-kind">Format</Label><select id="brand-kind" className="mt-1 h-9 w-full rounded-md border bg-card px-2 text-sm" value={draft.kind} onChange={e => update("kind", e.target.value)}>{Object.entries(KIND_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>{field("doc_date", "Document date", "date")}</div>
+          {field("heading", "Heading")}<div><Label htmlFor="brand-body">Document text</Label><Textarea id="brand-body" rows={7} value={draft.body ?? ""} onChange={e => update("body", e.target.value)} /></div>
+          {field("signatory_name", "Signatory name")}{field("signatory_title", "Signatory title")}
+          <div><Label htmlFor="brand-signature">Signature image</Label><Input id="brand-signature" type="file" accept="image/*" onChange={e => { setSignature(e.target.files?.[0] ?? null); setDirty(true); }} />{draft.signature_path || signature ? <Button size="sm" variant="ghost" onClick={() => { update("signature_path", null); setSignature(null); }}>Remove signature</Button> : null}</div>
+          <fieldset><legend className="mb-2 text-sm font-medium">Accent</legend><div className="flex gap-2">{(["gold", "navy", "green"] as const).map(c => <Button key={c} variant="outline" size="icon" title={c} aria-label={`${c} accent`} aria-pressed={draft.accent === c} className={draft.accent === c ? "ring-2 ring-ring" : ""} onClick={() => update("accent", c)}><span className={`h-4 w-4 rounded-full ${c === "gold" ? "bg-gold" : c === "navy" ? "bg-navy" : "bg-success"}`} /></Button>)}</div></fieldset>
+          <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={save}><Save />{busy ? "Savingâ€¦" : "Save template"}</Button><Button variant="outline" onClick={() => window.print()}><Printer />Print / PDF</Button>{id ? <><Button variant="outline" size="icon" title="Duplicate template" aria-label="Duplicate template" onClick={() => { setId(null); update("name", `${draft.name} copy`); }}><Copy /></Button><Button variant="outline" size="icon" disabled={busy} title="Delete template" aria-label="Delete template" onClick={remove}><Trash2 /></Button></> : null}</div>
+        </div>
+      </section>
+      <section className={`brand-preview relative min-h-[700px] overflow-hidden rounded-sm border border-t-4 bg-card p-6 shadow-[var(--shadow-panel)] sm:p-12 ${accent} ${draft.kind === "certificate" ? "border-x-4 border-b-4" : ""}`} aria-label="Document preview">
+        <KalexiMark className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 opacity-[0.05]" />
+        <header className="relative flex flex-wrap items-center justify-between gap-4 border-b pb-6"><div className="flex items-center gap-4"><KalexiMark className="h-16 w-16" /><div><h2 className="font-display text-lg font-semibold sm:text-xl">KALEXI BROKERAGE LTD</h2><p className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">{KIND_LABEL[draft.kind] ?? "Official correspondence"}</p></div></div><div className="text-right text-xs leading-5 text-muted-foreground"><p>info@kalexibrokerage.com</p><p>www.kalexibrokerage.com</p></div></header>
+        <p className="relative mt-6 text-right text-sm text-muted-foreground">{draft.doc_date ? new Date(`${draft.doc_date}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}</p>
+        <h3 className={`relative mt-10 break-words font-display text-2xl font-semibold ${draft.kind === "certificate" ? "text-center text-3xl" : ""}`}>{draft.heading || ""}</h3>
+        <div className={`relative mt-6 min-h-64 whitespace-pre-wrap break-words text-sm leading-7 ${draft.kind === "certificate" ? "text-center" : ""}`}>{draft.body}</div>
+        <div className={`relative mt-12 ${draft.kind === "certificate" ? "flex flex-col items-center text-center" : ""}`}>{preview || signed.data ? <img src={preview ?? signed.data ?? ""} alt="Authorised signature" className="mb-3 h-16 max-w-48 object-contain object-left" /> : <div className="mb-3 h-12 w-48 border-b border-dashed" />}<p className="font-semibold">{draft.signatory_name}</p><p className="text-sm text-muted-foreground">{draft.signatory_title}</p></div>
+        <footer className="relative mt-10 flex flex-wrap justify-between gap-2 border-t pt-4 text-xs text-muted-foreground"><span>KALEXI BROKERAGE LTD Â· Brokerage Â· Facilitation Â· Advisory</span><span>Ref: KBL-{(id ?? "draft").slice(0, 8).toUpperCase()}</span></footer>
+      </section>
+      </div>
+    </>}
+  </AppShell>;
+}
+
+==========================================================================================
+FILE: src\components\CompanyBrand.tsx
+==========================================================================================
+Total lines: 24
+
+import { KalexiMark } from "@/components/KalexiMark";
+
+export function CompanyBrand({
+  markClassName = "h-11 w-11",
+  className = "",
+}: {
+  markClassName?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`inline-flex items-center gap-3 text-left ${className}`}
+      aria-label="Kalexi Brokerage Ltd"
+    >
+      <KalexiMark className={markClassName} />
+      <span>
+        <span className="block text-sm font-bold tracking-wide">KALEXI</span>
+        <span className="mt-0.5 block text-[10px] uppercase tracking-[0.16em] text-[#71807c]">
+          Brokerage Ltd
+        </span>
+      </span>
+    </div>
+  );
+}
+
+
+==========================================================================================
+FILE: src\components\BrandAppearanceSettings.tsx
+==========================================================================================
+Total lines: 201
+
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { ImageUp, Save } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  createBrandLogoUpload,
+  getCompanyBranding,
+  saveBrandAppearance,
+} from "@/lib/brand.functions";
+
+const MAX_LOGO_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_LOGO_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+export function BrandAppearanceSettings() {
+  const queryClient = useQueryClient();
+  const getBranding = useServerFn(getCompanyBranding);
+  const createUpload = useServerFn(createBrandLogoUpload);
+  const saveAppearance = useServerFn(saveBrandAppearance);
+  const query = useQuery({
+    queryKey: ["company-branding"],
+    queryFn: () => getBranding({ data: undefined }),
+    staleTime: 5 * 60_000,
+  });
+  const [primaryColor, setPrimaryColor] = useState("#145453");
+  const [accentColor, setAccentColor] = useState("#d3ad52");
+  const [logo, setLogo] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!query.data) return;
+    setPrimaryColor(query.data.primaryColor);
+    setAccentColor(query.data.accentColor);
+  }, [query.data]);
+
+  useEffect(() => {
+    if (!logo) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(logo);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [logo]);
+
+  async function save() {
+    setSaving(true);
+    try {
+      let logoPath = query.data?.logoPath ?? null;
+
+      if (logo) {
+        if (!ACCEPTED_LOGO_TYPES.includes(logo.type) || logo.size > MAX_LOGO_SIZE) {
+          throw new Error("Choose a PNG, JPEG, or WebP logo under 5 MB.");
+        }
+        const extension = logo.name.split(".").pop()?.toLowerCase();
+        if (extension !== "png" && extension !== "jpg" && extension !== "jpeg" && extension !== "webp") {
+          throw new Error("The logo file extension is not supported.");
+        }
+        const slot = await createUpload({ data: { extension } });
+        const { error } = await supabase.storage
+          .from("company-branding")
+          .uploadToSignedUrl(slot.path, slot.token, logo, { contentType: logo.type });
+        if (error) throw new Error("The company logo could not be uploaded.");
+        logoPath = slot.path;
+      }
+
+      const saved = await saveAppearance({
+        data: { logoPath, primaryColor, accentColor },
+      });
+      queryClient.setQueryData(["company-branding"], saved);
+      setLogo(null);
+      await queryClient.invalidateQueries({ queryKey: ["company-branding"] });
+      toast.success("Company logo and theme saved.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save the company theme.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="mb-6 rounded-xl border bg-card p-5 shadow-[var(--shadow-panel)]">
+      <div>
+        <h2 className="font-display text-lg font-semibold">Company logo and theme</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Update the shared application mark and brand colors. Only Super Admins can save changes.
+        </p>
+      </div>
+
+      {query.isError ? (
+        <div className="mt-4">
+          <p className="text-sm text-destructive" role="alert">
+            Company appearance settings could not be loaded.
+          </p>
+          <Button className="mt-2" variant="outline" onClick={() => void query.refetch()}>
+            Retry
+          </Button>
+        </div>
+      ) : query.isLoading ? (
+        <p className="mt-4 text-sm text-muted-foreground" role="status">
+          Loading company appearanceâ€¦
+        </p>
+      ) : (
+        <>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="company-logo">Company logo</Label>
+              <Input
+                id="company-logo"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                disabled={saving}
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0] ?? null;
+                  if (file && (file.size > MAX_LOGO_SIZE || !ACCEPTED_LOGO_TYPES.includes(file.type))) {
+                    toast.error("Choose a PNG, JPEG, or WebP logo under 5 MB.");
+                    event.currentTarget.value = "";
+                    setLogo(null);
+                    return;
+                  }
+                  setLogo(file);
+                }}
+              />
+              <p className="text-xs text-muted-foreground">PNG, JPEG, or WebP; maximum 5 MB.</p>
+            </div>
+            <div className="flex items-center gap-4 rounded-lg border p-4">
+              <img
+                src={previewUrl ?? query.data?.logoUrl ?? "/favicon.png"}
+                alt="Company logo preview"
+                className="h-14 w-14 rounded-md object-contain"
+              />
+              <div>
+                <p className="text-sm font-medium">Shared application logo</p>
+                <p className="text-xs text-muted-foreground">Preview of the logo used in navigation.</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="brand-primary">Primary theme color</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="brand-primary"
+                  type="color"
+                  className="h-10 w-16 p-1"
+                  value={primaryColor}
+                  disabled={saving}
+                  onChange={(event) => {
+                    if (/^#[0-9a-fA-F]{6}$/.test(event.target.value)) {
+                      setPrimaryColor(event.target.value);
+                    }
+                  }}
+                />
+                <Input
+                  aria-label="Primary color hex value"
+                  value={primaryColor}
+                  maxLength={7}
+                  disabled={saving}
+                  onChange={(event) => setPrimaryColor(event.target.value)}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="brand-accent">Accent theme color</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="brand-accent"
+                  type="color"
+                  className="h-10 w-16 p-1"
+                  value={accentColor}
+                  disabled={saving}
+                  onChange={(event) => {
+                    if (/^#[0-9a-fA-F]{6}$/.test(event.target.value)) {
+                      setAccentColor(event.target.value);
+                    }
+                  }}
+                />
+                <Input
+                  aria-label="Accent color hex value"
+                  value={accentColor}
+                  maxLength={7}
+                  disabled={saving}
+                  onChange={(event) => setAccentColor(event.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="mt-5 flex justify-end">
+            <Button disabled={saving || query.isLoading} onClick={() => void save()}>
+              {saving ? <ImageUp aria-hidden="true" className="mr-2 h-4 w-4 animate-pulse" /> : <Save aria-hidden="true" className="mr-2 h-4 w-4" />}
+              {saving ? "Saving appearanceâ€¦" : "Save appearance"}
+            </Button>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+
+==========================================================================================
+FILE: src\lib\brand.functions.ts
+==========================================================================================
+Total lines: 146
+
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+const brandAppearanceInput = z.object({
+  logoPath: z.string().max(300).nullable(),
+  primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  accentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+});
+
+async function assertSuperAdmin(supabase: SupabaseClient<Database>, userId: string) {
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("user_id")
+    .eq("user_id", userId)
+    .eq("role", "super_admin")
+    .maybeSingle();
+  if (error || !data) throw new Error("Super Admin authority is required.");
+}
+
+export const getCompanyBranding = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("company_branding")
+    .select("logo_path, primary_color, accent_color")
+    .eq("id", "default")
+    .single();
+  if (error) {
+    console.error("[branding] Could not load public company branding.", error);
+    throw new Error("Company branding could not be loaded.");
+  }
+  const logoUrl = data.logo_path
+    ? supabaseAdmin.storage.from("company-branding").getPublicUrl(data.logo_path).data.publicUrl
+    : null;
+  return {
+    logoPath: data.logo_path,
+    logoUrl,
+    primaryColor: data.primary_color,
+    accentColor: data.accent_color,
+  };
+});
+
+export const createBrandLogoUpload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ extension: z.enum(["png", "jpg", "jpeg", "webp"]) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const path = `${context.userId}/${crypto.randomUUID()}.${data.extension}`;
+    const { data: upload, error } = await supabaseAdmin.storage
+      .from("company-branding")
+      .createSignedUploadUrl(path);
+    if (error || !upload) {
+      console.error("[branding] Could not prepare company logo upload.", error);
+      throw new Error("Could not prepare the company logo upload.");
+    }
+    return { path, token: upload.token };
+  });
+
+export const saveBrandAppearance = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => brandAppearanceInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    if (data.logoPath && !data.logoPath.startsWith(`${context.userId}/`)) {
+      throw new Error("The selected company logo is invalid.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: previous, error: readError } = await supabaseAdmin
+      .from("company_branding")
+      .select("*")
+      .eq("id", "default")
+      .single();
+    if (readError) {
+      console.error("[branding] Could not read current company branding.", readError);
+      throw new Error("Company branding could not be saved.");
+    }
+    const { data: updated, error } = await supabaseAdmin
+      .from("company_branding")
+      .update({
+        logo_path: data.logoPath,
+        primary_color: data.primaryColor,
+        accent_color: data.accentColor,
+        updated_at: new Date().toISOString(),
+        updated_by: context.userId,
+      })
+      .eq("id", "default")
+      .select("logo_path, primary_color, accent_color")
+      .single();
+    if (error) {
+      console.error("[branding] Could not save company branding.", error);
+      throw new Error("Company branding could not be saved.");
+    }
+    const { error: auditError } = await supabaseAdmin.from("audit_logs").insert({
+      actor_id: context.userId,
+      actor_email: (context.claims?.email as string | undefined) ?? null,
+      action: "brand.appearance_updated",
+      entity_type: "company_branding",
+      entity_id: "default",
+      previous_value: previous,
+      new_value: updated,
+    });
+    if (auditError) {
+      console.error("[branding] Appearance was saved, but the audit entry failed.", auditError);
+      throw new Error("Appearance was saved, but its audit record could not be written.");
+    }
+    return {
+      logoPath: updated.logo_path,
+      logoUrl: updated.logo_path
+        ? supabaseAdmin.storage.from("company-branding").getPublicUrl(updated.logo_path).data
+            .publicUrl
+        : null,
+      primaryColor: updated.primary_color,
+      accentColor: updated.accent_color,
+    };
+  });
+
+export const createBrandSignatureUpload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ fileName: z.string().min(1).max(150) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: staff } = await context.supabase.rpc("is_active_staff", { _user_id: context.userId });
+    if (!staff) throw new Error("Staff access required.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const path = `brand-signatures/${context.userId}/${crypto.randomUUID()}-${data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+    const { data: upload, error } = await supabaseAdmin.storage.from("kalexi-vault").createSignedUploadUrl(path);
+    if (error || !upload) throw new Error("Could not prepare signature upload.");
+    return { path, token: upload.token };
+  });
+
+export const getBrandSignature = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.from("brand_templates").select("signature_path").eq("id", data.id).single();
+    if (error) throw new Error("Template not accessible.");
+    if (!row.signature_path) return null;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed, error: signingError } = await supabaseAdmin.storage.from("kalexi-vault").createSignedUrl(row.signature_path, 900);
+    if (signingError) throw new Error("Could not load signature.");
+    return signed?.signedUrl ?? null;
+  });
+
+==========================================================================================
+FILE: src\routes\_authenticated\risk.search.tsx
+==========================================================================================
+Total lines: 748
+
+--- Match: 'function generatePdf' at line 421 ---
+  418:     }
+  419:   }
+  420: 
+  421:   function generatePdf() {
+  422:     setReportTitle(prev => prev || "Kalexi Due Diligence Report: " + query);
+  423:     setTimeout(() => window.print(), 100);
+  424:   }
+  425: 
+  426:   useEffect(() => {
+  427:     void loadActivities();
+  428:     const channel = db.channel("kalexi-intelligence-activity")
+  429:       .on("postgres_changes", {
+  430:         event: "*", schema: "public", table: "intelligence_activity"
+  431:       }, (payload: any) => {
+  432:         const row = payload.new as Activity;
+
+--- Match: 'function openItem' at line 363 ---
+  360:     });
+  361:   }
+  362: 
+  363:   async function openItem(item: Item, kind: string) {
+  364:     addToReport(item, kind);
+  365:     setReadingItem(item);
+  366:     setReadingKind(kind);
+  367:     setReadingContent(null);
+  368:     setReadingError("");
+  369:     setReadingBusy(false);
+  370: 
+  371:     setReportSummary(prev => prev || "This report summarizes the evidence located during the investigation. Findings remain subject to independent verification.");
+  372: 
+  373:     const urlValue = item.source_url || item.url || item.link;
+  374:     const url = typeof urlValue === "string" ? urlValue.trim() : "";
+
+--- Match: 'reportSummary' at line 136 ---
+  133:   const [errors, setErrors] = useState<string[]>([]);
+  134:   const [searchTime, setSearchTime] = useState("");
+  135:   const [reportTitle, setReportTitle] = useState("");
+  136:   const [reportSummary, setReportSummary] = useState("");
+  137:   const [reportAssessment, setReportAssessment] = useState("");
+  138:   const [reportStatus, setReportStatus] = useState("Preliminary assessment");
+  139:   const [historyQuery, setHistoryQuery] = useState("");
+  140:   const [learningLoading, setLearningLoading] = useState(false);
+  141:   const [readingItem, setReadingItem] = useState<Item | null>(null);
+  142:   const [readingKind, setReadingKind] = useState("");
+  143:   const [readingContent, setReadingContent] = useState<any>(null);
+  144:   const [readingBusy, setReadingBusy] = useState(false);
+  145:   const [readingError, setReadingError] = useState("");
+  146: 
+  147:   const completedCount = internalResults.length + externalResults.length;
+
+--- Match: 'reportSummary' at line 371 ---
+  368:     setReadingError("");
+  369:     setReadingBusy(false);
+  370: 
+  371:     setReportSummary(prev => prev || "This report summarizes the evidence located during the investigation. Findings remain subject to independent verification.");
+  372: 
+  373:     const urlValue = item.source_url || item.url || item.link;
+  374:     const url = typeof urlValue === "string" ? urlValue.trim() : "";
+  375: 
+  376:     if (!url || !/^https?:\/\//i.test(url) || kind.toLowerCase().includes("internal") ||
+  377:         ["risk cases", "clients", "companies", "contacts", "opportunities", "documents", "historical record"].some(x => kind.toLowerCase().includes(x))) {
+  378:       setReadingContent({
+  379:         title: item.title || item.subject_name || item.name || item.company_name || item.case_ref || "Internal finding",
+  380:         source_url: url,
+  381:         content: [
+  382:           item.description && `Description:\n${item.description}`,
+
+--- Match: 'reportSummary' at line 518 ---
+  515:           <button className={"ri-button " + (activeTab === "results" ? "ri-tab-active" : "")} onClick={() => setActiveTab("results")}>Search results</button>
+  516:           <button className={"ri-button " + (activeTab === "reports" ? "ri-tab-active" : "")} onClick={() => setActiveTab("reports")}>Old reports & memory</button>
+  517:           <button className={"ri-button " + (activeTab === "learning" ? "ri-tab-active" : "")} onClick={() => { setActiveTab("learning"); void loadActivities(); }}>Learning history</button>
+  518:           <button className="ri-button" onClick={() => { setSelected([]); setReportSummary(""); setReportAssessment(""); }}>Clear report selection</button>
+  519:         </nav>
+  520:       </header>
+  521: 
+  522:       {errors.length > 0 && (
+  523:         <div className="shrink-0 mb-2 rounded-lg border border-amber-500/50 p-2 text-xs no-print">
+  524:           <div className="font-semibold mb-1">Some sources did not return results</div>
+  525:           <div className="max-h-16 overflow-y-auto space-y-1">
+  526:             {errors.slice(-8).map((error, index) => <div key={index} className="break-words">{error}</div>)}
+  527:           </div>
+  528:           <button className="underline mt-1" onClick={() => setErrors([])}>Dismiss errors</button>
+  529:         </div>
+
+--- Match: 'reportSummary' at line 717 ---
+  714:           <p>Assessment status: {reportStatus}</p>
+  715:           <hr className="my-4" />
+  716:           <h2 className="text-lg font-bold">Executive summary</h2>
+  717:           <textarea className="ri-field my-2 no-print" value={reportSummary} onChange={e => setReportSummary(e.target.value)} placeholder="Write the executive summary before generating the PDFâ€¦" />
+  718:           <p className="whitespace-pre-wrap">{reportSummary || "No executive summary supplied. Review the evidence below before relying on this report."}</p>
+  719:           <h2 className="text-lg font-bold mt-4">Risk assessment</h2>
+  720:           <p className="whitespace-pre-wrap">{reportAssessment || "No final risk conclusion entered. Do not infer that absence of findings means low risk."}</p>
+  721:           <h2 className="text-lg font-bold mt-4">Evidence and source records</h2>
+  722:           <p>Internal results: {internalCount} Â· External results: {externalCount} Â· Historical reports/memory: {reportCount}</p>
+  723:           {reportItems.map((item, index) => (
+  724:             <div key={String(item.id || item.source_url || index)} className="border-b py-3">
+  725:               <b>{index + 1}. {item.title || item.subject || item.subject_name || item.name || item.company_name || item.case_ref || "Evidence item"}</b>
+  726:               <p>Record type: {item._kind || "Finding"} Â· Status: {item.verification_status || item.status || "Not verified"}</p>
+  727:               {item.description && <p>{item.description}</p>}
+  728:               {item.content && <p>{item.content}</p>}
+
+--- Match: 'reportSummary' at line 718 ---
+  715:           <hr className="my-4" />
+  716:           <h2 className="text-lg font-bold">Executive summary</h2>
+  717:           <textarea className="ri-field my-2 no-print" value={reportSummary} onChange={e => setReportSummary(e.target.value)} placeholder="Write the executive summary before generating the PDFâ€¦" />
+  718:           <p className="whitespace-pre-wrap">{reportSummary || "No executive summary supplied. Review the evidence below before relying on this report."}</p>
+  719:           <h2 className="text-lg font-bold mt-4">Risk assessment</h2>
+  720:           <p className="whitespace-pre-wrap">{reportAssessment || "No final risk conclusion entered. Do not infer that absence of findings means low risk."}</p>
+  721:           <h2 className="text-lg font-bold mt-4">Evidence and source records</h2>
+  722:           <p>Internal results: {internalCount} Â· External results: {externalCount} Â· Historical reports/memory: {reportCount}</p>
+  723:           {reportItems.map((item, index) => (
+  724:             <div key={String(item.id || item.source_url || index)} className="border-b py-3">
+  725:               <b>{index + 1}. {item.title || item.subject || item.subject_name || item.name || item.company_name || item.case_ref || "Evidence item"}</b>
+  726:               <p>Record type: {item._kind || "Finding"} Â· Status: {item.verification_status || item.status || "Not verified"}</p>
+  727:               {item.description && <p>{item.description}</p>}
+  728:               {item.content && <p>{item.content}</p>}
+  729:               {item.findings && <p>{item.findings}</p>}
+
+--- Match: 'reportAssessment' at line 137 ---
+  134:   const [searchTime, setSearchTime] = useState("");
+  135:   const [reportTitle, setReportTitle] = useState("");
+  136:   const [reportSummary, setReportSummary] = useState("");
+  137:   const [reportAssessment, setReportAssessment] = useState("");
+  138:   const [reportStatus, setReportStatus] = useState("Preliminary assessment");
+  139:   const [historyQuery, setHistoryQuery] = useState("");
+  140:   const [learningLoading, setLearningLoading] = useState(false);
+  141:   const [readingItem, setReadingItem] = useState<Item | null>(null);
+  142:   const [readingKind, setReadingKind] = useState("");
+  143:   const [readingContent, setReadingContent] = useState<any>(null);
+  144:   const [readingBusy, setReadingBusy] = useState(false);
+  145:   const [readingError, setReadingError] = useState("");
+  146: 
+  147:   const completedCount = internalResults.length + externalResults.length;
+  148:   const reviewedCount = selected.filter(x =>
+
+--- Match: 'reportAssessment' at line 518 ---
+  515:           <button className={"ri-button " + (activeTab === "results" ? "ri-tab-active" : "")} onClick={() => setActiveTab("results")}>Search results</button>
+  516:           <button className={"ri-button " + (activeTab === "reports" ? "ri-tab-active" : "")} onClick={() => setActiveTab("reports")}>Old reports & memory</button>
+  517:           <button className={"ri-button " + (activeTab === "learning" ? "ri-tab-active" : "")} onClick={() => { setActiveTab("learning"); void loadActivities(); }}>Learning history</button>
+  518:           <button className="ri-button" onClick={() => { setSelected([]); setReportSummary(""); setReportAssessment(""); }}>Clear report selection</button>
+  519:         </nav>
+  520:       </header>
+  521: 
+  522:       {errors.length > 0 && (
+  523:         <div className="shrink-0 mb-2 rounded-lg border border-amber-500/50 p-2 text-xs no-print">
+  524:           <div className="font-semibold mb-1">Some sources did not return results</div>
+  525:           <div className="max-h-16 overflow-y-auto space-y-1">
+  526:             {errors.slice(-8).map((error, index) => <div key={index} className="break-words">{error}</div>)}
+  527:           </div>
+  528:           <button className="underline mt-1" onClick={() => setErrors([])}>Dismiss errors</button>
+  529:         </div>
+
+--- Match: 'reportAssessment' at line 720 ---
+  717:           <textarea className="ri-field my-2 no-print" value={reportSummary} onChange={e => setReportSummary(e.target.value)} placeholder="Write the executive summary before generating the PDFâ€¦" />
+  718:           <p className="whitespace-pre-wrap">{reportSummary || "No executive summary supplied. Review the evidence below before relying on this report."}</p>
+  719:           <h2 className="text-lg font-bold mt-4">Risk assessment</h2>
+  720:           <p className="whitespace-pre-wrap">{reportAssessment || "No final risk conclusion entered. Do not infer that absence of findings means low risk."}</p>
+  721:           <h2 className="text-lg font-bold mt-4">Evidence and source records</h2>
+  722:           <p>Internal results: {internalCount} Â· External results: {externalCount} Â· Historical reports/memory: {reportCount}</p>
+  723:           {reportItems.map((item, index) => (
+  724:             <div key={String(item.id || item.source_url || index)} className="border-b py-3">
+  725:               <b>{index + 1}. {item.title || item.subject || item.subject_name || item.name || item.company_name || item.case_ref || "Evidence item"}</b>
+  726:               <p>Record type: {item._kind || "Finding"} Â· Status: {item.verification_status || item.status || "Not verified"}</p>
+  727:               {item.description && <p>{item.description}</p>}
+  728:               {item.content && <p>{item.content}</p>}
+  729:               {item.findings && <p>{item.findings}</p>}
+  730:               {item.verified_finding && <p>Verified finding field: {item.verified_finding}</p>}
+  731:               {item.allegation && <p>Allegation field: {item.allegation}</p>}
+
+--- Match: 'Confidential due-diligence' at line 711 ---
+  708:       <div id="kalexi-print-report" className="hidden print:!block">
+  709:         <div className="hidden print:!block">
+  710:           <h1 className="text-2xl font-bold">{reportTitle || "Kalexi Due Diligence Report"}</h1>
+  711:           <p>Kalexi Brokerage | Confidential due-diligence working document</p>
+  712:           <p>Subject searched: {query || "Not specified"}</p>
+  713:           <p>Generated: {new Date().toLocaleString()}</p>
+  714:           <p>Assessment status: {reportStatus}</p>
+  715:           <hr className="my-4" />
+  716:           <h2 className="text-lg font-bold">Executive summary</h2>
+  717:           <textarea className="ri-field my-2 no-print" value={reportSummary} onChange={e => setReportSummary(e.target.value)} placeholder="Write the executive summary before generating the PDFâ€¦" />
+  718:           <p className="whitespace-pre-wrap">{reportSummary || "No executive summary supplied. Review the evidence below before relying on this report."}</p>
+  719:           <h2 className="text-lg font-bold mt-4">Risk assessment</h2>
+  720:           <p className="whitespace-pre-wrap">{reportAssessment || "No final risk conclusion entered. Do not infer that absence of findings means low risk."}</p>
+  721:           <h2 className="text-lg font-bold mt-4">Evidence and source records</h2>
+  722:           <p>Internal results: {internalCount} Â· External results: {externalCount} Â· Historical reports/memory: {reportCount}</p>
+
+--- Match: 'window.print' at line 423 ---
+  420: 
+  421:   function generatePdf() {
+  422:     setReportTitle(prev => prev || "Kalexi Due Diligence Report: " + query);
+  423:     setTimeout(() => window.print(), 100);
+  424:   }
+  425: 
+  426:   useEffect(() => {
+  427:     void loadActivities();
+  428:     const channel = db.channel("kalexi-intelligence-activity")
+  429:       .on("postgres_changes", {
+  430:         event: "*", schema: "public", table: "intelligence_activity"
+  431:       }, (payload: any) => {
+  432:         const row = payload.new as Activity;
+  433:         if (row?.id) setActivities(prev => [row, ...prev.filter(x => x.id !== row.id)].slice(0, 100));
+  434:       }).subscribe();
+
+--- Match: 'reportItems' at line 152 ---
+  149:     ["verified", "corroborated"].includes(String(x.verification_status || "").toLowerCase())
+  150:   ).length;
+  151: 
+  152:   const reportItems = useMemo(() => {
+  153:     const all = [...internalResults, ...externalResults, ...selected];
+  154:     const seen = new Set<string>();
+  155:     return all.filter((item, index) => {
+  156:       const key = String(item.id || item.source_url || item.url || item.case_ref || textOf(item) || index);
+  157:       if (seen.has(key)) return false;
+  158:       seen.add(key);
+  159:       return true;
+  160:     });
+  161:   }, [internalResults, externalResults, selected]);
+  162: 
+  163:   async function loadActivities() {
+
+--- Match: 'reportItems' at line 723 ---
+  720:           <p className="whitespace-pre-wrap">{reportAssessment || "No final risk conclusion entered. Do not infer that absence of findings means low risk."}</p>
+  721:           <h2 className="text-lg font-bold mt-4">Evidence and source records</h2>
+  722:           <p>Internal results: {internalCount} Â· External results: {externalCount} Â· Historical reports/memory: {reportCount}</p>
+  723:           {reportItems.map((item, index) => (
+  724:             <div key={String(item.id || item.source_url || index)} className="border-b py-3">
+  725:               <b>{index + 1}. {item.title || item.subject || item.subject_name || item.name || item.company_name || item.case_ref || "Evidence item"}</b>
+  726:               <p>Record type: {item._kind || "Finding"} Â· Status: {item.verification_status || item.status || "Not verified"}</p>
+  727:               {item.description && <p>{item.description}</p>}
+  728:               {item.content && <p>{item.content}</p>}
+  729:               {item.findings && <p>{item.findings}</p>}
+  730:               {item.verified_finding && <p>Verified finding field: {item.verified_finding}</p>}
+  731:               {item.allegation && <p>Allegation field: {item.allegation}</p>}
+  732:               {(item.source_url || item.url || item.link) && <p>Source: {item.source_url || item.url || item.link}</p>}
+  733:               <p>Record date: {safeDate(item.created_at || item.updated_at)}</p>
+  734:             </div>
+
+==========================================================================================
+FILE: supabase\config.toml
+==========================================================================================
+Total lines: 1
+
+project_id = "alxpwbqthlrexrbycqjp"
+
+
+==========================================================================================
+ENVIRONMENT VARIABLE NAMES ONLY (VALUES ARE NOT EXPORTED)
+==========================================================================================
+Found .env
+  SUPABASE_PROJECT_ID=<value hidden>
+  SUPABASE_URL=<value hidden>
+  SUPABASE_PUBLISHABLE_KEY=<value hidden>
+  SUPABASE_SECRET_KEY=<value hidden>
+  VITE_SUPABASE_PROJECT_ID=<value hidden>
+  VITE_SUPABASE_URL=<value hidden>
+  VITE_SUPABASE_PUBLISHABLE_KEY=<value hidden>

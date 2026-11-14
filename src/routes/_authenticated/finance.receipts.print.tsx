@@ -49,7 +49,7 @@ function PrintAll() {
   return (
     <AppShell>
       <div className="print:hidden">
-        <PageHeader title="Print all receipts" description={`${rows.length} receipt(s) ready to print, one per page.`} actions={<div className="flex gap-2"><Button variant="outline" asChild><Link to="/finance/receipts">Back</Link></Button><Button disabled={!rows.length} onClick={() => window.print()}>Print / save PDF</Button></div>} />
+        <PageHeader title="Print all receipts" description={`${rows.length} receipt(s) ready to print, one per page.`} actions={<div className="flex gap-2"><Button variant="outline" asChild><Link to="/finance/receipts" search={{ transactionId: undefined }}>Back</Link></Button><Button disabled={!rows.length} onClick={() => window.print()}>Print / save PDF</Button></div>} />
         <div className="mb-6 flex flex-wrap gap-3"><label className="text-sm">From<Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></label><label className="text-sm">To<Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label></div>
       </div>
       {q.isLoading ? <p className="text-sm text-muted-foreground">Loading receipts…</p> : null}

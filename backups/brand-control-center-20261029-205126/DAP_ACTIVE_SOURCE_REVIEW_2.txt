@@ -1,0 +1,3278 @@
+﻿KALEXI DAP ACTIVE SOURCE REVIEW
+Generated: 2026-10-28 14:49:29
+Project: C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)
+
+========== package.json ==========
+   1: {
+   2:   "name": "kalexi-brokerage",
+   3:   "version": "2.0.0",
+   4:   "private": true,
+   5:   "sideEffects": false,
+   6:   "type": "module",
+   7:   "scripts": {
+   8:     "dev": "vite dev",
+   9:     "build": "vite build",
+  10:     "build:dev": "vite build --mode development",
+  11:     "preview": "vite preview",
+  12:     "lint": "eslint .",
+  13:     "format": "prettier --write ."
+  14:   },
+  15:   "dependencies": {
+  16:     "@hookform/resolvers": "^5.2.2",
+  17:     "@radix-ui/react-accordion": "^1.2.12",
+  18:     "@radix-ui/react-alert-dialog": "^1.1.15",
+  19:     "@radix-ui/react-aspect-ratio": "^1.1.8",
+  20:     "@radix-ui/react-avatar": "^1.1.11",
+  21:     "@radix-ui/react-checkbox": "^1.3.3",
+  22:     "@radix-ui/react-collapsible": "^1.1.12",
+  23:     "@radix-ui/react-context-menu": "^2.2.16",
+  24:     "@radix-ui/react-dialog": "^1.1.15",
+  25:     "@radix-ui/react-dropdown-menu": "^2.1.16",
+  26:     "@radix-ui/react-hover-card": "^1.1.15",
+  27:     "@radix-ui/react-label": "^2.1.8",
+  28:     "@radix-ui/react-menubar": "^1.1.16",
+  29:     "@radix-ui/react-navigation-menu": "^1.2.14",
+  30:     "@radix-ui/react-popover": "^1.1.15",
+  31:     "@radix-ui/react-progress": "^1.1.8",
+  32:     "@radix-ui/react-radio-group": "^1.3.8",
+  33:     "@radix-ui/react-scroll-area": "^1.2.10",
+  34:     "@radix-ui/react-select": "^2.2.6",
+  35:     "@radix-ui/react-separator": "^1.1.8",
+  36:     "@radix-ui/react-slider": "^1.3.6",
+  37:     "@radix-ui/react-slot": "^1.2.4",
+  38:     "@radix-ui/react-switch": "^1.2.6",
+  39:     "@radix-ui/react-tabs": "^1.1.13",
+  40:     "@radix-ui/react-toggle": "^1.1.10",
+  41:     "@radix-ui/react-toggle-group": "^1.1.11",
+  42:     "@radix-ui/react-tooltip": "^1.2.8",
+  43:     "@supabase/supabase-js": "^2.112.2",
+  44:     "@tailwindcss/vite": "^4.2.1",
+  45:     "@tanstack/react-query": "^5.101.1",
+  46:     "@tanstack/react-router": "1.170.41",
+  47:     "@tanstack/react-start": "1.168.60",
+  48:     "@tanstack/router-plugin": "1.168.42",
+  49:     "@types/jsbarcode": "^3.11.4",
+  50:     "class-variance-authority": "^0.7.1",
+  51:     "clsx": "^2.1.1",
+  52:     "cmdk": "^1.1.1",
+  53:     "date-fns": "^4.1.0",
+  54:     "embla-carousel-react": "^8.6.0",
+  55:     "input-otp": "^1.4.2",
+  56:     "jsbarcode": "^3.12.3",
+  57:     "lucide-react": "^0.575.0",
+  58:     "qrcode": "^1.5.4",
+  59:     "react": "^19.2.0",
+  60:     "react-day-picker": "^9.14.0",
+  61:     "react-dom": "^19.2.0",
+  62:     "react-hook-form": "^7.71.2",
+  63:     "react-resizable-panels": "^4.6.5",
+  64:     "recharts": "^2.15.4",
+  65:     "sonner": "^2.0.7",
+  66:     "tailwind-merge": "^3.5.0",
+  67:     "tailwindcss": "^4.2.1",
+  68:     "tw-animate-css": "^1.3.4",
+  69:     "vaul": "^1.1.2",
+  70:     "vite-tsconfig-paths": "^6.0.2",
+  71:     "zod": "^3.24.2"
+  72:   },
+  73:   "devDependencies": {
+  74:     "@eslint/js": "^9.32.0",
+  75:     "@types/node": "^22.16.5",
+  76:     "@types/qrcode": "^1.5.6",
+  77:     "@types/react": "^19.2.0",
+  78:     "@types/react-dom": "^19.2.0",
+  79:     "@vitejs/plugin-react": "^5.2.0",
+  80:     "drizzle-kit": "0.x",
+  81:     "drizzle-orm": "0.x",
+  82:     "eslint": "^9.32.0",
+  83:     "eslint-config-prettier": "^10.1.1",
+  84:     "eslint-plugin-prettier": "^5.2.6",
+  85:     "eslint-plugin-react-hooks": "^5.2.0",
+  86:     "eslint-plugin-react-refresh": "^0.4.20",
+  87:     "globals": "^15.15.0",
+  88:     "nitro": "3.0.260603-beta",
+  89:     "postgres": "^3.4.9",
+  90:     "prettier": "^3.7.3",
+  91:     "typescript": "^5.8.3",
+  92:     "typescript-eslint": "^8.56.1",
+  93:     "vite": "^8.2.0",
+  94:     "vitest": "^5.0.4"
+  95:   }
+  96: }
+
+========== src/lib/agent-rules.ts ==========
+   1: export function approximateReward(tokens: number) { return Math.max(0, tokens) * 100000 / 100; }
+   2: export function validAgent(status: string, expiry: string, now = new Date()) { return status === "active" && new Date(expiry).getTime() > now.getTime(); }
+   3: export function agentPermissions(status: string, expiry: string) { return validAgent(status, expiry) ? ["Refer clients", "Share official referral link"] : []; }
+
+========== src/lib/redemption-rules.ts ==========
+   1: export type RedemptionStatus = "requested" | "approved" | "paid" | "rejected";
+   2: export function canProcessRedemption(current: string, next: Exclude<RedemptionStatus, "requested">) {
+   3:   return current === "requested" && (next === "approved" || next === "rejected")
+   4:     || current === "approved" && (next === "paid" || next === "rejected");
+   5: }
+
+========== src/lib/agents.functions.ts ==========
+   1: import { createServerFn } from "@tanstack/react-start";
+   2: import { z } from "zod";
+   3: import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+   4: import { canProcessRedemption } from "@/lib/redemption-rules";
+   5: import { approximateReward, agentPermissions, validAgent } from "@/lib/agent-rules";
+   6: import { AGENT_ID_THEME_ID } from "@/lib/agent-id-theme";
+   7: 
+   8: const BUCKET = "kalexi-vault";
+   9: const token = z.string().trim().min(10).max(200);
+  10: 
+  11: async function admin() {
+  12:   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
+  13: }
+  14: 
+  15: async function openCampaign(t: string) {
+  16:   const db = await admin();
+  17:   const { data } = await db
+  18:     .from("agent_campaigns")
+  19:     .select("id, title, active, expires_at")
+  20:     .eq("token", t)
+  21:     .maybeSingle();
+  22:   if (!data) return null;
+  23:   const expired = !!data.expires_at && new Date(data.expires_at) < new Date();
+  24:   return { ...data, open: data.active && !expired };
+  25: }
+  26: 
+  27: async function assertPerm(supabase: any, userId: string, perm: string) {
+  28:   const { data } = await supabase.rpc("has_permission", { _user_id: userId, _perm: perm });
+  29:   if (!data) throw new Error("Forbidden: you do not have Digital Agent Programme authority.");
+  30: }
+  31: 
+  32: async function audit(
+  33:   actorId: string | null,
+  34:   email: string | null,
+  35:   action: string,
+  36:   entityId: string,
+  37:   value?: unknown,
+  38: ) {
+  39:   const db = await admin();
+  40:   await db.from("audit_logs").insert({
+  41:     actor_id: actorId,
+  42:     actor_email: email,
+  43:     action,
+  44:     entity_type: "agent",
+  45:     entity_id: entityId,
+  46:     new_value: (value ?? null) as never,
+  47:   });
+  48: }
+  49: 
+  50: export const getAgentCampaign = createServerFn({ method: "POST" })
+  51:   .inputValidator((i: unknown) => z.object({ token }).parse(i))
+  52:   .handler(async ({ data }) => {
+  53:     const c = await openCampaign(data.token);
+  54:     return c ? { title: c.title, open: c.open } : null;
+  55:   });
+  56: 
+  57: export const createAgentUpload = createServerFn({ method: "POST" })
+  58:   .inputValidator((i: unknown) =>
+  59:     z.object({ token, fileName: z.string().trim().min(1).max(200) }).parse(i),
+  60:   )
+  61:   .handler(async ({ data }) => {
+  62:     const c = await openCampaign(data.token);
+  63:     if (!c?.open) throw new Error("This registration link is closed.");
+  64:     const safe = data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100);
+  65:     const path = `agent-applications/${c.id}/${crypto.randomUUID()}-${safe}`;
+  66:     const { data: s, error } = await (
+  67:       await admin()
+  68:     ).storage
+  69:       .from(BUCKET)
+  70:       .createSignedUploadUrl(path);
+  71:     if (error || !s) throw new Error("Could not prepare the upload.");
+  72:     return { path, uploadToken: s.token, bucket: BUCKET };
+  73:   });
+  74: 
+  75: const path = z.string().trim().min(3).max(400).startsWith("agent-applications/");
+  76: 
+  77: export const submitAgentApplication = createServerFn({ method: "POST" })
+  78:   .inputValidator((i: unknown) =>
+  79:     z
+  80:       .object({
+  81:         token,
+  82:         fullName: z.string().trim().min(2).max(140),
+  83:         phone: z.string().trim().min(7).max(40),
+  84:         email: z.string().trim().email().max(255),
+  85:         dateOfBirth: z.string().trim().max(20).nullish(),
+  86:         gender: z.string().trim().max(30).nullish(),
+  87:         nationality: z.string().trim().max(80).nullish(),
+  88:         address: z.string().trim().max(300).nullish(),
+  89:         district: z.string().trim().max(100).nullish(),
+  90:         occupation: z.string().trim().max(120).nullish(),
+  91:         idType: z.string().trim().min(2).max(60),
+  92:         idNumber: z.string().trim().min(3).max(60),
+  93:         photoPath: path,
+  94:         idFrontPath: path,
+  95:         idBackPath: path.nullish(),
+  96:         paymentMethod: z.enum(["mobile_money", "bank"]),
+  97:         paymentProvider: z.string().trim().max(100).nullish(),
+  98:         paymentAccountName: z.string().trim().min(2).max(140),
+  99:         paymentAccountNumber: z.string().trim().min(4).max(60),
+ 100:         password: z.string().min(8).max(72),
+ 101:         registryId: z.string().uuid().nullish(),
+ 102:         village: z.string().trim().max(100).nullish(),
+ 103:         declarations: z.object({
+ 104:           accurate: z.literal(true),
+ 105:           terms: z.literal(true),
+ 106:           conduct: z.literal(true),
+ 107:           consent: z.literal(true),
+ 108:         }),
+ 109:       })
+ 110:       .parse(i),
+ 111:   )
+ 112:   .handler(async ({ data }) => {
+ 113:     const c = await openCampaign(data.token);
+ 114:     if (!c?.open) throw new Error("This registration link is closed.");
+ 115:     const db = await admin();
+ 116:     const { data: dup } = await db
+ 117:       .from("agent_applications")
+ 118:       .select("id")
+ 119:       .eq("id_number", data.idNumber)
+ 120:       .in("status", ["pending", "approved"])
+ 121:       .maybeSingle();
+ 122:     if (dup) throw new Error("An application with this ID number is already on record.");
+ 123:     const { data: created, error: authErr } = await db.auth.admin.createUser({
+ 124:       email: data.email.toLowerCase(),
+ 125:       password: data.password,
+ 126:       email_confirm: true,
+ 127:       user_metadata: { full_name: data.fullName, job_title: "Digital Agent (pending)" },
+ 128:     });
+ 129:     if (authErr || !created.user)
+ 130:       throw new Error(
+ 131:         authErr?.message?.includes("already")
+ 132:           ? "This email already has an account. Sign in instead."
+ 133:           : "Could not create your sign-in.",
+ 134:       );
+ 135:     await db
+ 136:       .from("profiles")
+ 137:       .update({
+ 138:         job_title: "Digital Agent (pending)",
+ 139:         department: "Digital Agent Programme",
+ 140:         phone: data.phone,
+ 141:       })
+ 142:       .eq("id", created.user.id);
+ 143:     const { data: row, error } = await db
+ 144:       .from("agent_applications")
+ 145:       .insert({
+ 146:         campaign_id: c.id,
+ 147:         full_name: data.fullName,
+ 148:         phone: data.phone,
+ 149:         email: data.email.toLowerCase(),
+ 150:         date_of_birth: data.dateOfBirth || null,
+ 151:         gender: data.gender ?? null,
+ 152:         nationality: data.nationality ?? null,
+ 153:         address: data.address ?? null,
+ 154:         district: data.district ?? null,
+ 155:         occupation: data.occupation ?? null,
+ 156:         id_type: data.idType,
+ 157:         id_number: data.idNumber,
+ 158:         photo_path: data.photoPath,
+ 159:         id_front_path: data.idFrontPath,
+ 160:         id_back_path: data.idBackPath ?? null,
+ 161:         payment_method: data.paymentMethod,
+ 162:         payment_provider: data.paymentProvider ?? null,
+ 163:         payment_account_name: data.paymentAccountName,
+ 164:         payment_account_number: data.paymentAccountNumber,
+ 165:         user_id: created.user.id,
+ 166:         registry_id: data.registryId ?? null,
+ 167:         village: data.village ?? null,
+ 168:         declarations: { ...data.declarations, agreed_at: new Date().toISOString() } as never,
+ 169:       })
+ 170:       .select("id, application_ref")
+ 171:       .single();
+ 172:     if (error) {
+ 173:       await db.auth.admin.deleteUser(created.user.id);
+ 174:       throw new Error("Your application could not be recorded. Please try again.");
+ 175:     }
+ 176:     if (data.registryId)
+ 177:       await db
+ 178:         .from("agent_registry")
+ 179:         .update({ linked_application_id: row.id, status: "linked" })
+ 180:         .eq("id", data.registryId);
+ 181:     await audit(null, data.email, "agent.application_submitted", row.id);
+ 182:     return { reference: row.application_ref };
+ 183:   });
+ 184: 
+ 185: export const reviewAgentApplication = createServerFn({ method: "POST" })
+ 186:   .middleware([requireSupabaseAuth])
+ 187:   .inputValidator((i: unknown) =>
+ 188:     z
+ 189:       .object({
+ 190:         id: z.string().uuid(),
+ 191:         decision: z.enum(["approved", "rejected", "more_info"]),
+ 192:         note: z.string().trim().max(1000).nullish(),
+ 193:       })
+ 194:       .parse(i),
+ 195:   )
+ 196:   .handler(async ({ data, context }) => {
+ 197:     await assertPerm(context.supabase, context.userId, "agents.manage");
+ 198:     const db = await admin();
+ 199:     const { data: app } = await db
+ 200:       .from("agent_applications")
+ 201:       .select("*")
+ 202:       .eq("id", data.id)
+ 203:       .single();
+ 204:     if (!app) throw new Error("Application not found.");
+ 205:     if (app.status === "approved") throw new Error("This application is already approved.");
+ 206:     if (data.decision === "rejected" && !data.note)
+ 207:       throw new Error("A reason is required to reject.");
+ 208:     await db
+ 209:       .from("agent_applications")
+ 210:       .update({
+ 211:         status: data.decision,
+ 212:         review_note: data.note ?? null,
+ 213:         reviewed_by: context.userId,
+ 214:         reviewed_at: new Date().toISOString(),
+ 215:       })
+ 216:       .eq("id", data.id);
+ 217:     let agentId: string | null = null;
+ 218:     if (data.decision === "approved") {
+ 219:       const { data: ag, error } = await db
+ 220:         .from("agents")
+ 221:         .insert({
+ 222:           application_id: app.id,
+ 223:           full_name: app.full_name,
+ 224:           phone: app.phone,
+ 225:           email: app.email,
+ 226:           district: app.district,
+ 227:           village: app.village,
+ 228:           registry_id: app.registry_id,
+ 229:           user_id: app.user_id,
+ 230:           photo_path: app.photo_path,
+ 231:           created_by: context.userId,
+ 232:         })
+ 233:         .select("id, agent_code")
+ 234:         .single();
+ 235:       if (error) throw new Error(error.message);
+ 236:       agentId = ag.id;
+ 237:     }
+ 238:     await audit(
+ 239:       context.userId,
+ 240:       (context.claims?.email as string) ?? null,
+ 241:       `agent.application_${data.decision}`,
+ 242:       data.id,
+ 243:       { note: data.note },
+ 244:     );
+ 245:     return { agentId };
+ 246:   });
+ 247: 
+ 248: export const setAgentStatus = createServerFn({ method: "POST" })
+ 249:   .middleware([requireSupabaseAuth])
+ 250:   .inputValidator((i: unknown) =>
+ 251:     z
+ 252:       .object({ id: z.string().uuid(), status: z.enum(["active", "suspended", "revoked"]) })
+ 253:       .parse(i),
+ 254:   )
+ 255:   .handler(async ({ data, context }) => {
+ 256:     await assertPerm(context.supabase, context.userId, "agents.manage");
+ 257:     await (await admin()).from("agents").update({ status: data.status }).eq("id", data.id);
+ 258:     await audit(
+ 259:       context.userId,
+ 260:       (context.claims?.email as string) ?? null,
+ 261:       `agent.${data.status}`,
+ 262:       data.id,
+ 263:     );
+ 264:     return { ok: true };
+ 265:   });
+ 266: 
+ 267: export const signAgentFiles = createServerFn({ method: "POST" })
+ 268:   .middleware([requireSupabaseAuth])
+ 269:   .inputValidator((i: unknown) => z.object({ paths: z.array(path).max(10) }).parse(i))
+ 270:   .handler(async ({ data, context }) => {
+ 271:     await assertPerm(context.supabase, context.userId, "agents.view");
+ 272:     const db = await admin();
+ 273:     const out: Record<string, string> = {};
+ 274:     for (const p of data.paths) {
+ 275:       const { data: s } = await db.storage.from(BUCKET).createSignedUrl(p, 900);
+ 276:       if (s) out[p] = s.signedUrl;
+ 277:     }
+ 278:     return out;
+ 279:   });
+ 280: 
+ 281: /** Public QR verification â€” returns only safe card details. */
+ 282: export const verifyAgent = createServerFn({ method: "POST" })
+ 283:   .inputValidator((i: unknown) => z.object({ token: z.string().trim().min(10).max(80) }).parse(i))
+ 284:   .handler(async ({ data }) => {
+ 285:     const db = await admin();
+ 286:     const { data: a } = await db
+ 287:       .from("agents")
+ 288:       .select(
+ 289:         "full_name, agent_code, district, status, issued_at, expires_at, photo_path, referral_code, designation, application_id",
+ 290:       )
+ 291:       .eq("verification_token", data.token)
+ 292:       .maybeSingle();
+ 293:     if (!a) return null;
+ 294:     let photoUrl: string | null = null;
+ 295:     if (a.photo_path)
+ 296:       photoUrl =
+ 297:         (await db.storage.from(BUCKET).createSignedUrl(a.photo_path, 600)).data?.signedUrl ?? null;
+ 298:     const expired = new Date(a.expires_at) < new Date();
+ 299:     return {
+ 300:       fullName: a.full_name,
+ 301:       agentCode: a.agent_code,
+ 302:       district: a.district,
+ 303:       status: expired && a.status === "active" ? "expired" : a.status,
+ 304:       issuedAt: a.issued_at,
+ 305:       expiresAt: a.expires_at,
+ 306:       photoUrl,
+ 307:       referralCode: a.referral_code,
+ 308:       designation: a.designation,
+ 309:       registrationVerified: !!a.application_id,
+ 310:       valid: validAgent(a.status, a.expires_at),
+ 311:       permissions: agentPermissions(a.status, a.expires_at),
+ 312:     };
+ 313:   });
+ 314: 
+ 315: /** Public: look up a manually registered agent record while applying. */
+ 316: export const matchAgentRegistry = createServerFn({ method: "POST" })
+ 317:   .inputValidator((i: unknown) =>
+ 318:     z
+ 319:       .object({
+ 320:         token,
+ 321:         regId: z.string().trim().max(60).nullish(),
+ 322:         phone: z.string().trim().max(40).nullish(),
+ 323:       })
+ 324:       .parse(i),
+ 325:   )
+ 326:   .handler(async ({ data }) => {
+ 327:     const c = await openCampaign(data.token);
+ 328:     if (!c?.open) return null;
+ 329:     const db = await admin();
+ 330:     const phone = (data.phone ?? "").replace(/\D/g, "");
+ 331:     let q = db
+ 332:       .from("agent_registry")
+ 333:       .select("id, reg_id, full_name, phone, village, district")
+ 334:       .is("linked_application_id", null);
+ 335:     if (data.regId && data.regId.length >= 3) q = q.ilike("reg_id", data.regId);
+ 336:     else if (phone.length >= 9) q = q.ilike("phone", `%${phone.slice(-9)}`);
+ 337:     else return null;
+ 338:     const { data: r } = await q.limit(1).maybeSingle();
+ 339:     return r
+ 340:       ? {
+ 341:           id: r.id,
+ 342:           regId: r.reg_id,
+ 343:           fullName: r.full_name,
+ 344:           phone: r.phone,
+ 345:           village: r.village,
+ 346:           district: r.district,
+ 347:         }
+ 348:       : null;
+ 349:   });
+ 350: 
+ 351: /** Staff: issue sign-in details so an approved agent can reach their dashboard. */
+ 352: export const createAgentLogin = createServerFn({ method: "POST" })
+ 353:   .middleware([requireSupabaseAuth])
+ 354:   .inputValidator((i: unknown) =>
+ 355:     z
+ 356:       .object({
+ 357:         agentId: z.string().uuid(),
+ 358:         email: z.string().trim().email().max(255),
+ 359:         password: z.string().min(8).max(72),
+ 360:       })
+ 361:       .parse(i),
+ 362:   )
+ 363:   .handler(async ({ data, context }) => {
+ 364:     await assertPerm(context.supabase, context.userId, "agents.manage");
+ 365:     const db = await admin();
+ 366:     const { data: ag } = await db
+ 367:       .from("agents")
+ 368:       .select("id, full_name, user_id, phone")
+ 369:       .eq("id", data.agentId)
+ 370:       .single();
+ 371:     if (!ag) throw new Error("Agent not found.");
+ 372:     let uid = ag.user_id;
+ 373:     if (uid) {
+ 374:       const { error } = await db.auth.admin.updateUserById(uid, {
+ 375:         email: data.email,
+ 376:         password: data.password,
+ 377:         email_confirm: true,
+ 378:       });
+ 379:       if (error) throw new Error(error.message);
+ 380:     } else {
+ 381:       const { data: created, error } = await db.auth.admin.createUser({
+ 382:         email: data.email,
+ 383:         password: data.password,
+ 384:         email_confirm: true,
+ 385:         user_metadata: { full_name: ag.full_name, job_title: "Digital Agent" },
+ 386:       });
+ 387:       if (error || !created.user)
+ 388:         throw new Error(error?.message ?? "Could not create the sign-in.");
+ 389:       uid = created.user.id;
+ 390:       await db.from("agents").update({ user_id: uid, email: data.email }).eq("id", ag.id);
+ 391:     }
+ 392:     await db
+ 393:       .from("profiles")
+ 394:       .update({
+ 395:         full_name: ag.full_name,
+ 396:         email: data.email,
+ 397:         job_title: "Digital Agent",
+ 398:         department: "Digital Agent Programme",
+ 399:         phone: ag.phone,
+ 400:         status: "active",
+ 401:       })
+ 402:       .eq("id", uid);
+ 403:     await audit(
+ 404:       context.userId,
+ 405:       (context.claims?.email as string) ?? null,
+ 406:       "agent.login_issued",
+ 407:       ag.id,
+ 408:       { email: data.email },
+ 409:     );
+ 410:     return { ok: true };
+ 411:   });
+ 412: 
+ 413: const REDEEM_TOKENS = 100; // tokens needed for one reward â€” kept server-side only
+ 414: const REDEEM_AMOUNT = 100000;
+ 415: 
+ 416: async function tokenState(db: any, agentId: string) {
+ 417:   const [{ count }, { data: red }] = await Promise.all([
+ 418:     db.from("clients").select("id", { count: "exact", head: true }).eq("agent_id", agentId),
+ 419:     db.from("agent_redemptions").select("tokens_used, status").eq("agent_id", agentId),
+ 420:   ]);
+ 421:   const used = (red ?? [])
+ 422:     .filter((r: any) => r.status !== "rejected")
+ 423:     .reduce((n: number, r: any) => n + r.tokens_used, 0);
+ 424:   const earned = count ?? 0;
+ 425:   return {
+ 426:     earned,
+ 427:     available: Math.max(0, earned - used),
+ 428:     canRedeem: earned - used >= REDEEM_TOKENS,
+ 429:   };
+ 430: }
+ 431: 
+ 432: /** Agent: own dashboard â€” never exposes other agents' identities. */
+ 433: export const getAgentDashboard = createServerFn({ method: "POST" })
+ 434:   .middleware([requireSupabaseAuth])
+ 435:   .handler(async ({ context }) => {
+ 436:     const db = await admin();
+ 437:     const { data: me } = await db
+ 438:       .from("agents")
+ 439:       .select("*")
+ 440:       .eq("user_id", context.userId)
+ 441:       .maybeSingle();
+ 442:     if (!me) {
+ 443:       const { data: app } = await db
+ 444:         .from("agent_applications")
+ 445:         .select("application_ref, full_name, status, review_note, created_at, district")
+ 446:         .eq("user_id", context.userId)
+ 447:         .maybeSingle();
+ 448:       return app ? { kind: "pending" as const, application: app } : null;
+ 449:     }
+ 450:     const [{ data: all }, { data: clients }, { data: notices }, { data: redemptions }] =
+ 451:       await Promise.all([
+ 452:         db.from("agents").select("id").eq("status", "active"),
+ 453:         db
+ 454:           .from("clients")
+ 455:           .select("id, agent_id, client_ref, full_name, status, sector, created_at")
+ 456:           .not("agent_id", "is", null),
+ 457:         db
+ 458:           .from("agent_notices")
+ 459:           .select("id, title, body, created_at")
+ 460:           .order("created_at", { ascending: false })
+ 461:           .limit(20),
+ 462:         db
+ 463:           .from("agent_redemptions")
+ 464:           .select("id, amount, currency, status, created_at")
+ 465:           .eq("agent_id", me.id)
+ 466:           .order("created_at", { ascending: false }),
+ 467:       ]);
+ 468:     const counts = new Map<string, number>();
+ 469:     for (const c of clients ?? []) {
+ 470:       if (c.agent_id) counts.set(c.agent_id, (counts.get(c.agent_id) ?? 0) + 1);
+ 471:     }
+ 472:     const ids = (all ?? []).map((a) => a.id);
+ 473:     if (!ids.includes(me.id)) ids.push(me.id);
+ 474:     const sorted = ids.map((id) => counts.get(id) ?? 0).sort((a, b) => b - a);
+ 475:     const mine = counts.get(me.id) ?? 0;
+ 476:     const rank = sorted.indexOf(mine) + 1;
+ 477:     const average = sorted.length ? sorted.reduce((a, b) => a + b, 0) / sorted.length : 0;
+ 478:     const myClients = (clients ?? []).filter((c) => c.agent_id === me.id);
+ 479:     const months: { month: string; mine: number; average: number }[] = [];
+ 480:     for (let i = 5; i >= 0; i--) {
+ 481:       const d = new Date();
+ 482:       d.setDate(1);
+ 483:       d.setMonth(d.getMonth() - i);
+ 484:       const key = d.toISOString().slice(0, 7);
+ 485:       const inMonth = (clients ?? []).filter((c) => c.created_at.slice(0, 7) === key);
+ 486:       months.push({
+ 487:         month: d.toLocaleString("en", { month: "short" }),
+ 488:         mine: inMonth.filter((c) => c.agent_id === me.id).length,
+ 489:         average: Math.round((inMonth.length / Math.max(1, ids.length)) * 10) / 10,
+ 490:       });
+ 491:     }
+ 492:     let photoUrl: string | null = null;
+ 493:     if (me.photo_path)
+ 494:       photoUrl =
+ 495:         (await db.storage.from(BUCKET).createSignedUrl(me.photo_path, 900)).data?.signedUrl ?? null;
+ 496:     const tokens = await tokenState(db, me.id);
+ 497:     return {
+ 498:       kind: "agent" as const,
+ 499:       me: {
+ 500:         ...me,
+ 501:         photoUrl,
+ 502:         signatureUrl: me.signature_path
+ 503:           ? ((await db.storage.from(BUCKET).createSignedUrl(me.signature_path, 900)).data
+ 504:               ?.signedUrl ?? null)
+ 505:           : null,
+ 506:       },
+ 507:       clients: myClients,
+ 508:       performance: {
+ 509:         rank,
+ 510:         totalAgents: ids.length,
+ 511:         mine,
+ 512:         average: Math.round(average * 10) / 10,
+ 513:         topPercent: Math.max(1, Math.round((rank / ids.length) * 100)),
+ 514:         months,
+ 515:       },
+ 516:       tokens: {
+ 517:         available: tokens.available,
+ 518:         earned: tokens.earned,
+ 519:         canRedeem: tokens.canRedeem,
+ 520:         approximateValue: approximateReward(tokens.available),
+ 521:       },
+ 522:       redemptions: redemptions ?? [],
+ 523:       notices: notices ?? [],
+ 524:     };
+ 525:   });
+ 526: 
+ 527: export const redeemAgentTokens = createServerFn({ method: "POST" })
+ 528:   .middleware([requireSupabaseAuth])
+ 529:   .handler(async ({ context }) => {
+ 530:     const db = await admin();
+ 531:     const { data: me } = await db
+ 532:       .from("agents")
+ 533:       .select("id, status")
+ 534:       .eq("user_id", context.userId)
+ 535:       .maybeSingle();
+ 536:     if (!me || me.status !== "active")
+ 537:       throw new Error("Only active, verified agents can redeem tokens.");
+ 538:     const t = await tokenState(db, me.id);
+ 539:     if (!t.canRedeem)
+ 540:       throw new Error("You don't have enough tokens to redeem yet. Keep referring clients!");
+ 541:     await db
+ 542:       .from("agent_redemptions")
+ 543:       .insert({ agent_id: me.id, tokens_used: REDEEM_TOKENS, amount: REDEEM_AMOUNT });
+ 544:     await audit(
+ 545:       context.userId,
+ 546:       (context.claims?.email as string) ?? null,
+ 547:       "agent.tokens_redeemed",
+ 548:       me.id,
+ 549:       { amount: REDEEM_AMOUNT },
+ 550:     );
+ 551:     return { amount: REDEEM_AMOUNT };
+ 552:   });
+ 553: 
+ 554: export const getAgentImpact = createServerFn({ method: "POST" })
+ 555:   .middleware([requireSupabaseAuth])
+ 556:   .handler(async ({ context }) => {
+ 557:     await assertPerm(context.supabase, context.userId, "agents.view");
+ 558:     const db = context.supabase;
+ 559:     const [a, c, d, t, r, total] = await Promise.all([
+ 560:       db.from("agents").select("id, agent_code, full_name, status, user_id"),
+ 561:       db.from("clients").select("id, agent_id, created_at").not("agent_id", "is", null),
+ 562:       db.from("deals").select("id, client_id, status, stage, value, currency"),
+ 563:       db.from("transactions").select("client_id, amount, currency, status"),
+ 564:       db.from("agent_redemptions").select("amount, status, currency"),
+ 565:       db.from("clients").select("id", { count: "exact", head: true }),
+ 566:     ]);
+ 567:     for (const result of [a, c, d, t, r, total])
+ 568:       if (result.error) throw new Error(result.error.message);
+ 569:     const referred = c.data ?? [];
+ 570:     const ids = new Set(referred.map((x) => x.id));
+ 571:     const linkedDeals = (d.data ?? []).filter((x) => x.client_id && ids.has(x.client_id));
+ 572:     const amounts: Record<string, number> = {};
+ 573:     for (const x of t.data ?? [])
+ 574:       if (
+ 575:         x.client_id &&
+ 576:         ids.has(x.client_id) &&
+ 577:         !["archived", "cancelled", "void"].includes(x.status)
+ 578:       )
+ 579:         amounts[x.currency] = (amounts[x.currency] ?? 0) + Number(x.amount);
+ 580:     const months = Array.from({ length: 6 }, (_, i) => {
+ 581:       const date = new Date();
+ 582:       date.setDate(1);
+ 583:       date.setMonth(date.getMonth() - 5 + i);
+ 584:       return {
+ 585:         month: date.toLocaleString("en", { month: "short" }),
+ 586:         referrals: referred.filter(
+ 587:           (x) => x.created_at.slice(0, 7) === date.toISOString().slice(0, 7),
+ 588:         ).length,
+ 589:       };
+ 590:     });
+ 591:     return {
+ 592:       agents: (a.data ?? [])
+ 593:         .map((x) => ({
+ 594:           ...x,
+ 595:           referrals: referred.filter((y) => y.agent_id === x.id).length,
+ 596:           deals: linkedDeals.filter((y) =>
+ 597:             referred.some((z) => z.id === y.client_id && z.agent_id === x.id),
+ 598:           ).length,
+ 599:         }))
+ 600:         .sort((x, y) => y.referrals - x.referrals),
+ 601:       referrals: referred.length,
+ 602:       share: total.count ? Math.round((referred.length / total.count) * 100) : 0,
+ 603:       deals: linkedDeals.length,
+ 604:       amounts,
+ 605:       paidRewards: (r.data ?? [])
+ 606:         .filter((x) => x.status === "paid" && x.currency === "UGX")
+ 607:         .reduce((s, x) => s + Number(x.amount), 0),
+ 608:       months,
+ 609:     };
+ 610:   });
+ 611: 
+ 612: export const prepareAgentIdentityUpload = createServerFn({ method: "POST" })
+ 613:   .middleware([requireSupabaseAuth])
+ 614:   .inputValidator((i: unknown) =>
+ 615:     z
+ 616:       .object({
+ 617:         id: z.string().uuid(),
+ 618:         kind: z.enum(["photo", "signature"]),
+ 619:         name: z.string().min(1).max(150),
+ 620:       })
+ 621:       .parse(i),
+ 622:   )
+ 623:   .handler(async ({ data, context }) => {
+ 624:     await assertPerm(context.supabase, context.userId, "agents.manage");
+ 625:     const p = `agent-applications/identity/${data.id}/${data.kind}-${crypto.randomUUID()}-${data.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+ 626:     const { data: slot, error } = await (
+ 627:       await admin()
+ 628:     ).storage
+ 629:       .from(BUCKET)
+ 630:       .createSignedUploadUrl(p);
+ 631:     if (error || !slot) throw new Error("Could not prepare image upload.");
+ 632:     return { path: p, token: slot.token };
+ 633:   });
+ 634: 
+ 635: export const updateAgentIdentity = createServerFn({ method: "POST" })
+ 636:   .middleware([requireSupabaseAuth])
+ 637:   .inputValidator((i: unknown) =>
+ 638:     z
+ 639:       .object({
+ 640:         id: z.string().uuid(),
+ 641:         full_name: z.string().trim().min(2).max(140),
+ 642:         phone: z.string().trim().min(7).max(40),
+ 643:         district: z.string().max(100),
+ 644:         village: z.string().max(100),
+ 645:         designation: z.string().trim().min(2).max(80),
+ 646:         agent_code: z.string().trim().min(4).max(60),
+ 647:         referral_code: z.string().trim().min(4).max(20),
+ 648:         issued_at: z.string().datetime(),
+ 649:         expires_at: z.string().datetime(),
+ 650:         company_phone: z.string().max(40),
+ 651:         photo_path: path.nullish(),
+ 652:         signature_path: path.nullish(),
+ 653:       })
+ 654:       .refine(
+ 655:         (x) => new Date(x.expires_at) > new Date(x.issued_at),
+ 656:         "Expiry must be after issue date.",
+ 657:       )
+ 658:       .parse(i),
+ 659:   )
+ 660:   .handler(async ({ data, context }) => {
+ 661:     await assertPerm(context.supabase, context.userId, "agents.manage");
+ 662:     const { id, ...payload } = data;
+ 663:     for (const p of [payload.photo_path, payload.signature_path])
+ 664:       if (
+ 665:         p?.startsWith("agent-applications/identity/") &&
+ 666:         !p.startsWith(`agent-applications/identity/${id}/`)
+ 667:       )
+ 668:         throw new Error("Image belongs to another identity.");
+ 669:     const clean = Object.fromEntries(Object.entries(payload).filter(([, v]) => v !== undefined));
+ 670:     const { data: row, error } = await context.supabase
+ 671:       .from("agents")
+ 672:       .update({ ...clean, referral_code: payload.referral_code.toUpperCase() })
+ 673:       .eq("id", id)
+ 674:       .select("id, user_id")
+ 675:       .single();
+ 676:     if (error || !row) throw new Error(error?.message ?? "Agent not found.");
+ 677:     if (row.user_id)
+ 678:       await (
+ 679:         await admin()
+ 680:       )
+ 681:         .from("profiles")
+ 682:         .update({ full_name: payload.full_name, phone: payload.phone })
+ 683:         .eq("id", row.user_id);
+ 684:     await audit(
+ 685:       context.userId,
+ 686:       (context.claims?.email as string) ?? null,
+ 687:       "agent.identity_updated",
+ 688:       id,
+ 689:       payload,
+ 690:     );
+ 691:     return { ok: true };
+ 692:   });
+ 693: 
+ 694: export const saveAgentIdTheme = createServerFn({ method: "POST" })
+ 695:   .middleware([requireSupabaseAuth])
+ 696:   .inputValidator((input: unknown) =>
+ 697:     z
+ 698:       .object({
+ 699:         background: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+ 700:         accent: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+ 701:         text: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+ 702:         accentText: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+ 703:         widthMm: z.number().min(50).max(150).default(85.6),
+ 704:         heightMm: z.number().min(30).max(100).default(53.98),
+ 705:         radiusMm: z.number().min(0).max(10).default(2),
+ 706:         fontFamily: z.enum([
+ 707:           "Arial, sans-serif",
+ 708:           "Georgia, serif",
+ 709:           "'Trebuchet MS', sans-serif",
+ 710:           "'Times New Roman', serif",
+ 711:           "Verdana, sans-serif",
+ 712:         ]).default("Arial, sans-serif"),
+ 713:       })
+ 714:       .parse(input),
+ 715:   )
+ 716:   .handler(async ({ data, context }) => {
+ 717:     await assertPerm(context.supabase, context.userId, "agents.manage");
+ 718:     const { error } = await context.supabase.from("brand_templates").upsert(
+ 719:       {
+ 720:         id: AGENT_ID_THEME_ID,
+ 721:         name: "Shared Agent ID Theme",
+ 722:         kind: "agent_id_theme",
+ 723:         heading: "Shared agent identification card colors",
+ 724:         accent: data.accent,
+ 725:         body: JSON.stringify(data),
+ 726:       },
+ 727:       { onConflict: "id" },
+ 728:     );
+ 729:     if (error) throw new Error(`Could not save the shared ID theme: ${error.message}`);
+ 730:     await audit(
+ 731:       context.userId,
+ 732:       (context.claims?.email as string) ?? null,
+ 733:       "agent.id_theme_updated",
+ 734:       AGENT_ID_THEME_ID,
+ 735:       data,
+ 736:     );
+ 737:     return { ok: true };
+ 738:   });
+ 739: 
+ 740: export const setRedemptionStatus = createServerFn({ method: "POST" })
+ 741:   .middleware([requireSupabaseAuth])
+ 742:   .inputValidator((i: unknown) =>
+ 743:     z.object({ id: z.string().uuid(), status: z.enum(["approved", "paid", "rejected"]) }).parse(i),
+ 744:   )
+ 745:   .handler(async ({ data, context }) => {
+ 746:     await assertPerm(context.supabase, context.userId, "agents.manage");
+ 747:     const db = await admin();
+ 748:     const { data: row, error: readError } = await db
+ 749:       .from("agent_redemptions")
+ 750:       .select("status")
+ 751:       .eq("id", data.id)
+ 752:       .single();
+ 753:     if (readError || !row || !canProcessRedemption(row.status, data.status))
+ 754:       throw new Error("This request is no longer available for that action. Refresh the list.");
+ 755:     const { data: updated, error } = await db
+ 756:       .from("agent_redemptions")
+ 757:       .update({
+ 758:         status: data.status,
+ 759:         processed_by: context.userId,
+ 760:         processed_at: new Date().toISOString(),
+ 761:       })
+ 762:       .eq("id", data.id)
+ 763:       .eq("status", row.status)
+ 764:       .select("id")
+ 765:       .maybeSingle();
+ 766:     if (error || !updated) throw new Error("Request could not be updated. Refresh and try again.");
+ 767:     await audit(
+ 768:       context.userId,
+ 769:       (context.claims?.email as string) ?? null,
+ 770:       `agent.redemption_${data.status}`,
+ 771:       data.id,
+ 772:     );
+ 773:     return { ok: true };
+ 774:   });
+ 775: 
+ 776: const code = z.string().trim().min(4).max(20);
+ 777: 
+ 778: /** Public: confirm a referral code belongs to an active agent. */
+ 779: export const lookupReferral = createServerFn({ method: "POST" })
+ 780:   .inputValidator((i: unknown) => z.object({ code }).parse(i))
+ 781:   .handler(async ({ data }) => {
+ 782:     const { data: a } = await (
+ 783:       await admin()
+ 784:     )
+ 785:       .from("agents")
+ 786:       .select("id, full_name, status")
+ 787:       .eq("referral_code", data.code.toUpperCase())
+ 788:       .maybeSingle();
+ 789:     if (!a || a.status !== "active") return null;
+ 790:     return { agentId: a.id, agentName: a.full_name.split(" ")[0] };
+ 791:   });
+ 792: 
+ 793: /** Public: a client registers themselves through an agent's referral link. */
+ 794: export const registerReferredClient = createServerFn({ method: "POST" })
+ 795:   .inputValidator((i: unknown) =>
+ 796:     z
+ 797:       .object({
+ 798:         code: code.nullish(),
+ 799:         fullName: z.string().trim().min(2).max(120),
+ 800:         phone: z.string().trim().min(6).max(30),
+ 801:         email: z.string().trim().email().max(255).optional().or(z.literal("")),
+ 802:         clientType: z.string().trim().min(2).max(40),
+ 803:         sector: z.string().trim().min(2).max(60),
+ 804:         requirement: z.string().trim().min(5).max(2000),
+ 805:       })
+ 806:       .parse(i),
+ 807:   )
+ 808:   .handler(async ({ data }) => {
+ 809:     const db = await admin();
+ 810:     let agentId: string | null = null;
+ 811:     if (data.code) {
+ 812:       const { data: a } = await db
+ 813:         .from("agents")
+ 814:         .select("id, status")
+ 815:         .eq("referral_code", data.code.toUpperCase())
+ 816:         .maybeSingle();
+ 817:       if (a?.status === "active") agentId = a.id;
+ 818:     }
+ 819:     const { data: dup } = await db
+ 820:       .from("clients")
+ 821:       .select("id")
+ 822:       .eq("phone", data.phone)
+ 823:       .maybeSingle();
+ 824:     if (dup)
+ 825:       throw new Error("This phone number is already registered with Kalexi. We'll be in touch.");
+ 826:     const { data: row, error } = await db
+ 827:       .from("clients")
+ 828:       .insert({
+ 829:         full_name: data.fullName,
+ 830:         phone: data.phone,
+ 831:         email: data.email || null,
+ 832:         client_type: data.clientType,
+ 833:         sector: data.sector,
+ 834:         requirement: data.requirement,
+ 835:         agent_id: agentId,
+ 836:         referral_code: agentId ? (data.code?.toUpperCase() ?? null) : null,
+ 837:       })
+ 838:       .select("id, client_ref")
+ 839:       .single();
+ 840:     if (error) throw new Error("Registration could not be completed. Please try again.");
+ 841:     await audit(null, data.email || null, "client.self_registered", row.id, { agent_id: agentId });
+ 842:     return { reference: row.client_ref };
+ 843:   });
+ 844: 
+
+========== src/routes/join.$token.tsx ==========
+   1: import { createFileRoute, useParams } from "@tanstack/react-router";
+   2: import { useQuery } from "@tanstack/react-query";
+   3: import { useState } from "react";
+   4: import { toast } from "sonner";
+   5: import { supabase } from "@/integrations/supabase/client";
+   6: import { createAgentUpload, getAgentCampaign, matchAgentRegistry, submitAgentApplication } from "@/lib/agents.functions";
+   7: import { KalexiMark } from "@/components/KalexiMark";
+   8: import { Button } from "@/components/ui/button";
+   9: import { Input } from "@/components/ui/input";
+  10: import { Label } from "@/components/ui/label";
+  11: 
+  12: export const Route = createFileRoute("/join/$token")({
+  13:   head: () => ({
+  14:     meta: [
+  15:       { title: "Become a Kalexi Digital Agent" },
+  16:       { name: "description", content: "Apply to join the Kalexi Brokerage Digital Agent Programme." },
+  17:       { property: "og:title", content: "Become a Kalexi Digital Agent" },
+  18:       { property: "og:description", content: "Apply to join the Kalexi Brokerage Digital Agent Programme." },
+  19:       { property: "og:type", content: "website" },
+  20:       { name: "twitter:card", content: "summary" },
+  21:     ],
+  22:   }),
+  23:   component: JoinPage,
+  24: });
+  25: 
+  26: const STEPS = ["Personal", "Identity", "Payment", "Declarations", "Review"];
+  27: type K = "regId"|"village"|"fullName"|"phone"|"email"|"dateOfBirth"|"gender"|"nationality"|"address"|"district"|"occupation"|"idType"|"idNumber"|"paymentMethod"|"paymentProvider"|"paymentAccountName"|"paymentAccountNumber"|"password"|"password2";
+  28: type F = Partial<Record<K, string>>;
+  29: type FK = "photo"|"idFront"|"idBack";
+  30: 
+  31: function JoinPage() {
+  32:   const { token } = useParams({ from: "/join/$token" });
+  33:   const campaign = useQuery({ queryKey: ["agent-campaign", token], queryFn: () => getAgentCampaign({ data: { token } }) });
+  34:   const [step, setStep] = useState(0);
+  35:   const [f, setF] = useState<F>({ paymentMethod: "mobile_money", idType: "National ID" });
+  36:   const [files, setFiles] = useState<Partial<Record<FK, File | null>>>({});
+  37:   const [decl, setDecl] = useState({ accurate: false, terms: false, conduct: false, consent: false });
+  38:   const [busy, setBusy] = useState(false);
+  39:   const [match, setMatch] = useState<{ id: string; regId: string; fullName: string; village: string | null; district: string | null } | null>(null);
+  40:   async function lookup() {
+  41:     if (match) return;
+  42:     try {
+  43:       const r = await matchAgentRegistry({ data: { token, regId: f.regId || null, phone: f.phone || null } });
+  44:       if (r) {
+  45:         setMatch(r);
+  46:         setF((prev) => ({ ...prev, fullName: prev.fullName || r.fullName, phone: prev.phone || r.phone || "", village: prev.village || r.village || "", district: prev.district || r.district || "" }));
+  47:         toast.success("We found your field registration — your details are linked. Please complete the rest.");
+  48:       }
+  49:     } catch { /* ignore */ }
+  50:   }
+  51:   const [done, setDone] = useState<string | null>(null);
+  52:   const set = (k: K) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
+  53: 
+  54:   function validStep(): string | null {
+  55:     if (step === 0 && (!f.fullName || !f.phone || !f.email)) return "Full name, phone and email are required.";
+  56:     if (step === 0 && (!f.password || f.password.length < 8)) return "Create a password of at least 8 characters.";
+  57:     if (step === 0 && f.password !== f.password2) return "Passwords do not match.";
+  58:     if (step === 1 && (!f.idNumber || !files.photo || !files.idFront)) return "ID number, passport photo and ID front are required.";
+  59:     if (step === 2 && (!f.paymentAccountName || !f.paymentAccountNumber)) return "Payment account details are required.";
+  60:     if (step === 3 && !Object.values(decl).every(Boolean)) return "Please accept all declarations.";
+  61:     return null;
+  62:   }
+  63: 
+  64:   async function upload(file: File) {
+  65:     if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} is larger than 10MB.`);
+  66:     const slot = await createAgentUpload({ data: { token, fileName: file.name } });
+  67:     const { error } = await supabase.storage.from(slot.bucket).uploadToSignedUrl(slot.path, slot.uploadToken, file);
+  68:     if (error) throw new Error(`Upload failed for ${file.name}.`);
+  69:     return slot.path;
+  70:   }
+  71: 
+  72:   async function submit() {
+  73:     const { fullName, phone, email, password, idType, idNumber, paymentAccountName, paymentAccountNumber } = f;
+  74:     const photo = files.photo; const idFront = files.idFront;
+  75:     if (!fullName || !phone || !email || !password || !idType || !idNumber || !paymentAccountName || !paymentAccountNumber || !photo || !idFront) {
+  76:       toast.error("Please complete all required details."); return;
+  77:     }
+  78:     setBusy(true);
+  79:     try {
+  80:       const photoPath = await upload(photo);
+  81:       const idFrontPath = await upload(idFront);
+  82:       const idBackPath = files.idBack ? await upload(files.idBack) : null;
+  83:       const r = await submitAgentApplication({
+  84:         data: {
+  85:           token, fullName, phone, email, dateOfBirth: f.dateOfBirth, gender: f.gender,
+  86:           nationality: f.nationality, address: f.address, district: f.district, occupation: f.occupation,
+  87:           idType, idNumber, photoPath, idFrontPath, idBackPath,
+  88:           paymentMethod: f.paymentMethod as "mobile_money" | "bank", paymentProvider: f.paymentProvider,
+  89:           paymentAccountName, paymentAccountNumber,
+  90:           password, registryId: match?.id ?? null, village: f.village,
+  91:           declarations: decl as never,
+  92:         },
+  93:       });
+  94:       setDone(r.reference);
+  95:     } catch (e) {
+  96:       toast.error((e as Error).message);
+  97:     } finally {
+  98:       setBusy(false);
+  99:     }
+ 100:   }
+ 101: 
+ 102:   const shell = (body: React.ReactNode) => (
+ 103:     <main className="relative min-h-screen overflow-hidden bg-background px-4 py-10">
+ 104:       <span aria-hidden className="pointer-events-none absolute -left-20 top-0 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
+ 105:       <div className="relative mx-auto w-full max-w-2xl rounded-xl border bg-card/90 p-6 shadow-[var(--shadow-panel)] backdrop-blur md:p-8">
+ 106:         <div className="mb-6 flex items-center gap-3 border-b pb-5">
+ 107:           <KalexiMark className="h-10 w-10" />
+ 108:           <div>
+ 109:             <p className="font-display font-semibold">KALEXI BROKERAGE LTD</p>
+ 110:             <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Digital Agent Programme</p>
+ 111:           </div>
+ 112:         </div>
+ 113:         {body}
+ 114:       </div>
+ 115:     </main>
+ 116:   );
+ 117: 
+ 118:   if (campaign.isLoading) return shell(<p className="text-sm text-muted-foreground">Loading…</p>);
+ 119:   if (!campaign.data || !campaign.data.open)
+ 120:     return shell(<p className="text-sm">This registration link is not available or has closed. Please contact Kalexi Brokerage.</p>);
+ 121:   if (done)
+ 122:     return shell(
+ 123:       <div className="space-y-2">
+ 124:         <h1 className="font-display text-xl font-semibold">Application received</h1>
+ 125:         <p className="text-sm text-muted-foreground">Your reference is <b className="text-foreground">{done}</b>. Our team will review your details. You can already sign in with your email and password to see your dashboard.</p>
+ 126:         <a href="/" className="inline-block rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground">Sign in now</a>
+ 127:       </div>,
+ 128:     );
+ 129: 
+ 130:   const inp = (k: K, label: string, type = "text") => (
+ 131:     <div className="space-y-1.5"><Label>{label}</Label><Input type={type} value={f[k] ?? ""} onChange={set(k)} onBlur={k === "regId" || k === "phone" ? lookup : undefined} /></div>
+ 132:   );
+ 133:   const fileInp = (k: FK, label: string) => (
+ 134:     <div className="space-y-1.5"><Label>{label}</Label>
+ 135:       <Input type="file" accept="image/*,application/pdf" onChange={(e) => setFiles({ ...files, [k]: e.target.files?.[0] ?? null })} />
+ 136:       {files[k] ? <p className="text-xs text-muted-foreground">{files[k]?.name}</p> : null}
+ 137:     </div>
+ 138:   );
+ 139: 
+ 140:   return shell(
+ 141:     <div className="space-y-6">
+ 142:       <div>
+ 143:         <h1 className="font-display text-xl font-semibold">{campaign.data.title}</h1>
+ 144:         <div className="mt-3 flex gap-1">
+ 145:           {STEPS.map((s, i) => (
+ 146:             <div key={s} className="flex-1">
+ 147:               <div className={`h-1.5 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />
+ 148:               <p className="mt-1 text-[11px] text-muted-foreground">{s}</p>
+ 149:             </div>
+ 150:           ))}
+ 151:         </div>
+ 152:       </div>
+ 153: 
+ 154:       {step === 0 && (
+ 155:         <div className="grid gap-4 md:grid-cols-2">
+ 156:           {match ? (
+ 157:             <div className="rounded-lg border border-primary/40 bg-primary/10 p-3 text-sm md:col-span-2">
+ 158:               Linked to field registration <b>{match.regId}</b> — {match.fullName}{match.village ? `, ${match.village}` : ""}. Continue with the remaining details.
+ 159:             </div>
+ 160:           ) : null}
+ 161:           {inp("regId", "Field registration ID (if you have one)")}
+ 162:           {inp("fullName", "Full name *")}{inp("phone", "Phone *")}{inp("email", "Email *", "email")}
+ 163:           {inp("dateOfBirth", "Date of birth", "date")}{inp("gender", "Gender")}{inp("nationality", "Nationality")}
+ 164:           {inp("village", "Village")}{inp("district", "District / City")}{inp("occupation", "Occupation")}
+ 165:           <div className="md:col-span-2">{inp("address", "Physical address")}</div>
+ 166:           <div className="rounded-lg border bg-muted/40 p-3 md:col-span-2">
+ 167:             <p className="mb-2 text-sm font-medium">Create your agent sign-in</p>
+ 168:             <p className="mb-3 text-xs text-muted-foreground">You'll sign in with your email and this password. You can open your dashboard straight away; your ID card unlocks after verification.</p>
+ 169:             <div className="grid gap-3 md:grid-cols-2">{inp("password", "Password *", "password")}{inp("password2", "Confirm password *", "password")}</div>
+ 170:           </div>
+ 171:         </div>
+ 172:       )}
+ 173:       {step === 1 && (
+ 174:         <div className="grid gap-4 md:grid-cols-2">
+ 175:           <div className="space-y-1.5"><Label>ID type *</Label>
+ 176:             <select className="h-9 w-full rounded-md border bg-background px-3 text-sm" value={f.idType} onChange={set("idType")}>
+ 177:               <option>National ID</option><option>Passport</option><option>Driving Permit</option>
+ 178:             </select></div>
+ 179:           {inp("idNumber", "ID number *")}
+ 180:           {fileInp("photo", "Passport photo *")}{fileInp("idFront", "ID front *")}{fileInp("idBack", "ID back")}
+ 181:         </div>
+ 182:       )}
+ 183:       {step === 2 && (
+ 184:         <div className="grid gap-4 md:grid-cols-2">
+ 185:           <div className="space-y-1.5"><Label>Payment method *</Label>
+ 186:             <select className="h-9 w-full rounded-md border bg-background px-3 text-sm" value={f.paymentMethod} onChange={set("paymentMethod")}>
+ 187:               <option value="mobile_money">Mobile money</option><option value="bank">Bank account</option>
+ 188:             </select></div>
+ 189:           {inp("paymentProvider", f.paymentMethod === "bank" ? "Bank name" : "Network (e.g. MTN, Airtel)")}
+ 190:           {inp("paymentAccountName", "Account name *")}{inp("paymentAccountNumber", f.paymentMethod === "bank" ? "Account number *" : "Mobile number *")}
+ 191:         </div>
+ 192:       )}
+ 193:       {step === 3 && (
+ 194:         <div className="space-y-3 text-sm">
+ 195:           {([
+ 196:             ["accurate", "I confirm the information I have given is true and accurate."],
+ 197:             ["terms", "I accept the Kalexi Digital Agent Programme terms, including commission of 0.9% on eligible completed transactions."],
+ 198:             ["conduct", "I will act honestly and never misrepresent Kalexi Brokerage Ltd."],
+ 199:             ["consent", "I consent to Kalexi verifying my identity and processing my data."],
+ 200:           ] as const).map(([k, t]) => (
+ 201:             <label key={k} className="flex items-start gap-3">
+ 202:               <input type="checkbox" className="mt-1" checked={decl[k]} onChange={(e) => setDecl({ ...decl, [k]: e.target.checked })} />
+ 203:               <span>{t}</span>
+ 204:             </label>
+ 205:           ))}
+ 206:         </div>
+ 207:       )}
+ 208:       {step === 4 && (
+ 209:         <dl className="grid gap-2 text-sm md:grid-cols-2">
+ 210:           {[["Name", f.fullName], ["Phone", f.phone], ["Email", f.email], ["District", f.district], ["ID", `${f.idType} · ${f.idNumber}`],
+ 211:             ["Payment", `${f.paymentMethod === "bank" ? "Bank" : "Mobile money"} · ${f.paymentAccountNumber}`],
+ 212:             ["Files", [files.photo, files.idFront, files.idBack].filter(Boolean).length + " attached"]].map(([k, v]) => (
+ 213:             <div key={k}><dt className="text-xs text-muted-foreground">{k}</dt><dd>{v || "—"}</dd></div>
+ 214:           ))}
+ 215:         </dl>
+ 216:       )}
+ 217: 
+ 218:       <div className="flex justify-between border-t pt-4">
+ 219:         <Button variant="outline" disabled={step === 0 || busy} onClick={() => setStep(step - 1)}>Back</Button>
+ 220:         {step < 4 ? (
+ 221:           <Button onClick={() => { const e = validStep(); if (e) toast.error(e); else setStep(step + 1); }}>Continue</Button>
+ 222:         ) : (
+ 223:           <Button disabled={busy} onClick={submit}>{busy ? "Submitting…" : "Submit application"}</Button>
+ 224:         )}
+ 225:       </div>
+ 226:     </div>,
+ 227:   );
+ 228: }
+
+========== src/routes/_authenticated/agents.index.tsx ==========
+   1: import { createFileRoute, Link } from "@tanstack/react-router";
+   2: import { useQuery, useQueryClient } from "@tanstack/react-query";
+   3: import { useState } from "react";
+   4: import { toast } from "sonner";
+   5: import { supabase } from "@/integrations/supabase/client";
+   6: import { AppShell, PageHeader } from "@/components/AppShell";
+   7: import { NoAccess, Panel, StatusPill, EmptyState } from "@/components/records";
+   8: import { Button } from "@/components/ui/button";
+   9: import { Input } from "@/components/ui/input";
+  10: import { useAccess } from "@/hooks/useSession";
+  11: import { allows } from "@/lib/rbac";
+  12: import { reviewAgentApplication, signAgentFiles } from "@/lib/agents.functions";
+  13: import { AgentIdCardDesigner } from "@/components/AgentIdCardDesigner";
+  14: import {
+  15:   DataTableSkeleton,
+  16:   ErrorState,
+  17:   OperationProgress,
+  18:   PageLoadingState,
+  19: } from "@/components/LoadingStates";
+  20: 
+  21: export const Route = createFileRoute("/_authenticated/agents/")({
+  22:   head: () => ({
+  23:     meta: [
+  24:       { title: "Digital Agents Ã¢â‚¬â€ Kalexi" },
+  25:       { name: "description", content: "Digital Agent Programme administration." },
+  26:     ],
+  27:   }),
+  28:   component: AgentsPage,
+  29: });
+  30: 
+  31: function AgentsPage() {
+  32:   const access = useAccess();
+  33:   const [tab, setTab] = useState<"apps" | "agents" | "links" | "registry" | "notices" | "designer">("apps");
+  34:   if (access && !allows(access, "agents.view"))
+  35:     return (
+  36:       <AppShell>
+  37:         <NoAccess module="Digital Agents" />
+  38:       </AppShell>
+  39:     );
+  40:   return (
+  41:     <AppShell>
+  42:       <PageHeader
+  43:         title="Digital Agent Programme"
+  44:         description="Registration links, application review and official agent ID cards."
+  45:       />
+  46:       <div className="mb-4 flex flex-wrap gap-2">
+  47:         {(
+  48:           [
+  49:             ["apps", "Applications"],
+  50:             ["agents", "Agents"],
+  51:             ["registry", "Field register"],
+  52:             ["links", "Registration links"],
+  53:             ["notices", "Messages to agents"],
+  54:             ["designer", "ID Card Designer"],
+  55:           ] as const
+  56:         ).map(([k, l]) => (
+  57:           <Button
+  58:             key={k}
+  59:             variant={tab === k ? "default" : "outline"}
+  60:             size="sm"
+  61:             onClick={() => setTab(k)}
+  62:           >
+  63:             {l}
+  64:           </Button>
+  65:         ))}
+  66:       </div>
+  67:       {tab === "designer" ? (
+  68:         <AgentIdCardDesigner canManage={allows(access, "agents.manage")} />
+  69:       ) : tab === "apps" ? (
+  70:         <Applications canManage={allows(access, "agents.manage")} />
+  71:       ) : tab === "agents" ? (
+  72:         <AgentList />
+  73:       ) : tab === "registry" ? (
+  74:         <Registry />
+  75:       ) : tab === "notices" ? (
+  76:         <Notices />
+  77:       ) : (
+  78:         <Links />
+  79:       )}
+  80:     </AppShell>
+  81:   );
+  82: }
+  83: 
+  84: function Applications({ canManage }: { canManage: boolean }) {
+  85:   const qc = useQueryClient();
+  86:   const [open, setOpen] = useState<string | null>(null);
+  87:   const q = useQuery({
+  88:     queryKey: ["agent-apps"],
+  89:     queryFn: async () => {
+  90:       const { data, error } = await supabase
+  91:         .from("agent_applications")
+  92:         .select("*")
+  93:         .order("created_at", { ascending: false });
+  94:       if (error) throw error;
+  95:       return data ?? [];
+  96:     },
+  97:   });
+  98:   const current = q.data?.find((a) => a.id === open);
+  99:   const files = useQuery({
+ 100:     queryKey: ["agent-app-files", open],
+ 101:     enabled: !!current,
+ 102:     queryFn: () =>
+ 103:       signAgentFiles({
+ 104:         data: {
+ 105:           paths: [current!.photo_path, current!.id_front_path, current!.id_back_path].filter(
+ 106:             Boolean,
+ 107:           ) as string[],
+ 108:         },
+ 109:       }),
+ 110:   });
+ 111:   const [note, setNote] = useState("");
+ 112: 
+ 113:   async function decide(decision: "approved" | "rejected" | "more_info") {
+ 114:     try {
+ 115:       const result = await reviewAgentApplication({
+ 116:         data: { id: open!, decision, note: note || null },
+ 117:       });
+ 118:       toast.success(
+ 119:         decision === "approved" ? "Approved. Opening the agent ID card." : "Decision recorded.",
+ 120:       );
+ 121:       setNote("");
+ 122:       setOpen(null);
+ 123:       qc.invalidateQueries({ queryKey: ["agent-apps"] });
+ 124:       qc.invalidateQueries({ queryKey: ["agents"] });
+ 125: 
+ 126:       if (decision === "approved" && result.agentId) {
+ 127:         window.location.assign(`/agents/${encodeURIComponent(result.agentId)}`);
+ 128:       }
+ 129:     } catch (e) {
+ 130:       toast.error((e as Error).message);
+ 131:     }
+ 132:   }
+ 133: 
+ 134:   if (q.isLoading) return <PageLoadingState message="Loading agent applicationsÃ¢â‚¬Â¦" />;
+ 135:   if (q.isError)
+ 136:     return (
+ 137:       <ErrorState
+ 138:         title="Agent applications could not be retrieved"
+ 139:         onRetry={() => void q.refetch()}
+ 140:       />
+ 141:     );
+ 142:   if (!q.data?.length)
+ 143:     return (
+ 144:       <EmptyState
+ 145:         title="No applications yet"
+ 146:         hint="Share a registration link to start receiving applications."
+ 147:       />
+ 148:     );
+ 149:   return (
+ 150:     <div className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
+ 151:       <Panel title="Applications">
+ 152:         <ul className="divide-y">
+ 153:           {q.data.map((a) => (
+ 154:             <li key={a.id}>
+ 155:               <button
+ 156:                 onClick={() => setOpen(a.id)}
+ 157:                 className={`flex w-full items-center justify-between px-2 py-3 text-left text-sm hover:bg-muted ${open === a.id ? "bg-muted" : ""}`}
+ 158:               >
+ 159:                 <span>
+ 160:                   <b>{a.full_name}</b>
+ 161:                   <br />
+ 162:                   <span className="text-xs text-muted-foreground">
+ 163:                     {a.application_ref} Ã‚Â· {a.district ?? "Ã¢â‚¬â€"}
+ 164:                   </span>
+ 165:                 </span>
+ 166:                 <StatusPill value={a.status} />
+ 167:               </button>
+ 168:             </li>
+ 169:           ))}
+ 170:         </ul>
+ 171:       </Panel>
+ 172:       {current ? (
+ 173:         <Panel title={`${current.application_ref} Ã¢â‚¬â€ ${current.full_name}`}>
+ 174:           <div className="grid grid-cols-3 gap-2">
+ 175:             {[current.photo_path, current.id_front_path, current.id_back_path].map((p, i) =>
+ 176:               p && files.data?.[p] ? (
+ 177:                 <a key={p} href={files.data[p]} target="_blank" rel="noreferrer">
+ 178:                   <img
+ 179:                     src={files.data[p]}
+ 180:                     alt={["Photo", "ID front", "ID back"][i]}
+ 181:                     className="h-28 w-full rounded-md border object-cover"
+ 182:                   />
+ 183:                 </a>
+ 184:               ) : null,
+ 185:             )}
+ 186:           </div>
+ 187:           <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
+ 188:             {[
+ 189:               ["Phone", current.phone],
+ 190:               ["Email", current.email],
+ 191:               ["Date of birth", current.date_of_birth],
+ 192:               ["Gender", current.gender],
+ 193:               ["Nationality", current.nationality],
+ 194:               ["Occupation", current.occupation],
+ 195:               ["Address", current.address],
+ 196:               ["ID", `${current.id_type} Ã‚Â· ${current.id_number}`],
+ 197:               [
+ 198:                 "Payment",
+ 199:                 `${current.payment_method === "bank" ? "Bank" : "Mobile money"} ${current.payment_provider ?? ""}`,
+ 200:               ],
+ 201:               ["Account", `${current.payment_account_name} Ã‚Â· ${current.payment_account_number}`],
+ 202:             ].map(([k, v]) => (
+ 203:               <div key={k}>
+ 204:                 <dt className="text-xs text-muted-foreground">{k}</dt>
+ 205:                 <dd>{v || "Ã¢â‚¬â€"}</dd>
+ 206:               </div>
+ 207:             ))}
+ 208:           </dl>
+ 209:           {current.review_note ? (
+ 210:             <p className="mt-3 text-sm text-muted-foreground">Note: {current.review_note}</p>
+ 211:           ) : null}
+ 212:           {canManage && current.status !== "approved" ? (
+ 213:             <div className="mt-4 space-y-2 border-t pt-4">
+ 214:               <Input
+ 215:                 placeholder="Review note (required to reject)"
+ 216:                 value={note}
+ 217:                 onChange={(e) => setNote(e.target.value)}
+ 218:               />
+ 219:               <div className="flex flex-wrap gap-2">
+ 220:                 <Button onClick={() => decide("approved")}>Approve & issue card</Button>
+ 221:                 <Button variant="outline" onClick={() => decide("more_info")}>
+ 222:                   Request info
+ 223:                 </Button>
+ 224:                 <Button variant="destructive" onClick={() => decide("rejected")}>
+ 225:                   Reject
+ 226:                 </Button>
+ 227:               </div>
+ 228:             </div>
+ 229:           ) : null}
+ 230:         </Panel>
+ 231:       ) : (
+ 232:         <EmptyState
+ 233:           title="Select an application"
+ 234:           hint="Review identity photos and details before approving."
+ 235:         />
+ 236:       )}
+ 237:     </div>
+ 238:   );
+ 239: }
+ 240: 
+ 241: function AgentList() {
+ 242:   const qc = useQueryClient();
+ 243:   const access = useAccess();
+ 244:   const canManage = allows(access, "agents.manage");
+ 245:   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+ 246:   const [editing, setEditing] = useState(false);
+ 247:   const [saving, setSaving] = useState(false);
+ 248:   const [draft, setDraft] = useState({
+ 249:     full_name: "",
+ 250:     phone: "",
+ 251:     email: "",
+ 252:     company_phone: "",
+ 253:     district: "",
+ 254:     village: "",
+ 255:     designation: "",
+ 256:     commission_rate: "2",
+ 257:     referral_code: "",
+ 258:     registered_on: "",
+ 259:     received_by: "",
+ 260:     status: "registered",
+ 261:   });
+ 262: 
+ 263:   const q = useQuery({
+ 264:     queryKey: ["agents"],
+ 265:     queryFn: async () => {
+ 266:       const [agentsResult, registryResult] = await Promise.all([
+ 267:         supabase.from("agents").select("*").order("created_at", { ascending: false }),
+ 268:         supabase.from("agent_registry").select("*").order("created_at", { ascending: false }),
+ 269:       ]);
+ 270: 
+ 271:       if (agentsResult.error) throw agentsResult.error;
+ 272:       if (registryResult.error) throw registryResult.error;
+ 273: 
+ 274:       const officialRows = (agentsResult.data ?? []).map((a) => ({
+ 275:         id: a.id,
+ 276:         displayId: a.agent_code,
+ 277:         full_name: a.full_name,
+ 278:         phone: a.phone ?? "",
+ 279:         email: a.email ?? "",
+ 280:         company_phone: a.company_phone ?? "",
+ 281:         district: a.district ?? "",
+ 282:         village: a.village ?? "",
+ 283:         designation: a.designation ?? "",
+ 284:         commission_rate: String(a.commission_rate ?? 2),
+ 285:         referral_code: a.referral_code ?? "",
+ 286:         registered_on: "",
+ 287:         received_by: "",
+ 288:         status: a.status,
+ 289:         created_at: a.created_at,
+ 290:         recordType: "official" as const,
+ 291:       }));
+ 292: 
+ 293:       const registryRows = (registryResult.data ?? []).map((r) => ({
+ 294:         id: r.id,
+ 295:         displayId: r.reg_id,
+ 296:         full_name: r.full_name,
+ 297:         phone: r.phone ?? "",
+ 298:         email: "",
+ 299:         company_phone: "",
+ 300:         district: r.district ?? "",
+ 301:         village: r.village ?? "",
+ 302:         designation: "",
+ 303:         commission_rate: "2",
+ 304:         referral_code: "",
+ 305:         registered_on: r.registered_on ?? "",
+ 306:         received_by: r.received_by ?? "",
+ 307:         status: r.status,
+ 308:         created_at: r.created_at,
+ 309:         recordType: "field" as const,
+ 310:       }));
+ 311: 
+ 312:       return [...officialRows, ...registryRows].sort((a, b) =>
+ 313:         b.created_at.localeCompare(a.created_at),
+ 314:       );
+ 315:     },
+ 316:   });
+ 317: 
+ 318:   const records = q.data ?? [];
+ 319:   const selected = records.find(
+ 320:     (a) => `${a.recordType}-${a.id}` === selectedKey,
+ 321:   );
+ 322: 
+ 323:   function openRecord(a: (typeof records)[number]) {
+ 324:     setSelectedKey(`${a.recordType}-${a.id}`);
+ 325:     setEditing(false);
+ 326:     setDraft({
+ 327:       full_name: a.full_name,
+ 328:       phone: a.phone,
+ 329:       email: a.email,
+ 330:       company_phone: a.company_phone,
+ 331:       district: a.district,
+ 332:       village: a.village,
+ 333:       designation: a.designation,
+ 334:       commission_rate: a.commission_rate,
+ 335:       referral_code: a.referral_code,
+ 336:       registered_on: a.registered_on,
+ 337:       received_by: a.received_by,
+ 338:       status: a.status,
+ 339:     });
+ 340:   }
+ 341: 
+ 342:   async function saveRecord() {
+ 343:     if (!selected || !canManage) return;
+ 344: 
+ 345:     if (!draft.full_name.trim() || !draft.phone.trim()) {
+ 346:       toast.error("Full name and phone number are required.");
+ 347:       return;
+ 348:     }
+ 349: 
+ 350:     setSaving(true);
+ 351:     try {
+ 352:       if (selected.recordType === "official") {
+ 353:         const rate = Number(draft.commission_rate);
+ 354:         if (!Number.isFinite(rate) || rate < 0 || rate > 100) {
+ 355:           toast.error("Commission rate must be between 0 and 100.");
+ 356:           return;
+ 357:         }
+ 358: 
+ 359:         const { error } = await supabase
+ 360:           .from("agents")
+ 361:           .update({
+ 362:             full_name: draft.full_name.trim(),
+ 363:             phone: draft.phone.trim(),
+ 364:             email: draft.email.trim(),
+ 365:             company_phone: draft.company_phone.trim() || null,
+ 366:             district: draft.district.trim() || null,
+ 367:             village: draft.village.trim() || null,
+ 368:             designation: draft.designation.trim(),
+ 369:             commission_rate: rate,
+ 370:             referral_code: draft.referral_code.trim(),
+ 371:           })
+ 372:           .eq("id", selected.id);
+ 373: 
+ 374:         if (error) throw error;
+ 375:       } else {
+ 376:         const { error } = await supabase
+ 377:           .from("agent_registry")
+ 378:           .update({
+ 379:             full_name: draft.full_name.trim(),
+ 380:             phone: draft.phone.trim() || null,
+ 381:             district: draft.district.trim() || null,
+ 382:             village: draft.village.trim() || null,
+ 383:             registered_on: draft.registered_on || null,
+ 384:             received_by: draft.received_by.trim() || null,
+ 385:             status: draft.status,
+ 386:           })
+ 387:           .eq("id", selected.id);
+ 388: 
+ 389:         if (error) throw error;
+ 390:       }
+ 391: 
+ 392:       toast.success("Agent information updated.");
+ 393:       setEditing(false);
+ 394:       await Promise.all([
+ 395:         qc.invalidateQueries({ queryKey: ["agents"] }),
+ 396:         qc.invalidateQueries({ queryKey: ["agent-registry"] }),
+ 397:       ]);
+ 398:     } catch (error) {
+ 399:       toast.error(
+ 400:         error instanceof Error ? error.message : "Could not save agent information.",
+ 401:       );
+ 402:     } finally {
+ 403:       setSaving(false);
+ 404:     }
+ 405:   }
+ 406: 
+ 407:   const field = (
+ 408:     label: string,
+ 409:     key: keyof typeof draft,
+ 410:     type = "text",
+ 411:   ) => (
+ 412:     <label className="block space-y-1 text-sm">
+ 413:       <span className="text-xs text-muted-foreground">{label}</span>
+ 414:       <Input
+ 415:         type={type}
+ 416:         value={draft[key]}
+ 417:         disabled={!editing || saving}
+ 418:         onChange={(e) =>
+ 419:           setDraft((previous) => ({ ...previous, [key]: e.target.value }))
+ 420:         }
+ 421:       />
+ 422:     </label>
+ 423:   );
+ 424: 
+ 425:   if (q.isLoading) return <DataTableSkeleton rows={6} columns={6} />;
+ 426: 
+ 427:   if (q.isError) {
+ 428:     return (
+ 429:       <ErrorState
+ 430:         title="Agent records could not be retrieved"
+ 431:         onRetry={() => void q.refetch()}
+ 432:       />
+ 433:     );
+ 434:   }
+ 435: 
+ 436:   return (
+ 437:     <div className="grid gap-4 xl:grid-cols-[1fr_1.1fr]">
+ 438:       <Panel title={`Agent directory (${records.length})`}>
+ 439:         <p className="mb-3 text-sm text-muted-foreground">
+ 440:           Select a record to view its details, edit information or open an official ID card.
+ 441:         </p>
+ 442: 
+ 443:         {records.length ? (
+ 444:           <div className="max-h-[680px] overflow-auto">
+ 445:             <table className="w-full text-sm">
+ 446:               <thead className="sticky top-0 bg-background text-left text-xs text-muted-foreground">
+ 447:                 <tr>
+ 448:                   <th className="py-2">Name / ID</th>
+ 449:                   <th>Type</th>
+ 450:                   <th>Status</th>
+ 451:                 </tr>
+ 452:               </thead>
+ 453:               <tbody className="divide-y">
+ 454:                 {records.map((a) => {
+ 455:                   const key = `${a.recordType}-${a.id}`;
+ 456:                   return (
+ 457:                     <tr
+ 458:                       key={key}
+ 459:                       className={selectedKey === key ? "bg-muted" : ""}
+ 460:                     >
+ 461:                       <td className="py-3 pr-2">
+ 462:                         <button
+ 463:                           className="text-left hover:underline"
+ 464:                           onClick={() => openRecord(a)}
+ 465:                         >
+ 466:                           <span className="font-medium">{a.full_name}</span>
+ 467:                           <br />
+ 468:                           <span className="font-mono text-xs text-muted-foreground">
+ 469:                             {a.displayId}
+ 470:                           </span>
+ 471:                         </button>
+ 472:                       </td>
+ 473:                       <td className="pr-2 text-xs">
+ 474:                         {a.recordType === "official" ? "Official agent" : "Field register"}
+ 475:                       </td>
+ 476:                       <td><StatusPill value={a.status} /></td>
+ 477:                     </tr>
+ 478:                   );
+ 479:                 })}
+ 480:               </tbody>
+ 481:             </table>
+ 482:           </div>
+ 483:         ) : (
+ 484:           <EmptyState title="No agent records yet" />
+ 485:         )}
+ 486:       </Panel>
+ 487: 
+ 488:       {selected ? (
+ 489:         <Panel title={`${selected.full_name} Ã¢â‚¬â€ Profile`}>
+ 490:           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+ 491:             <div>
+ 492:               <p className="font-mono text-xs text-muted-foreground">{selected.displayId}</p>
+ 493:               <StatusPill value={selected.status} />
+ 494:               <p className="mt-1 text-xs text-muted-foreground">
+ 495:                 {selected.recordType === "official"
+ 496:                   ? "Official agent record"
+ 497:                   : "Field registration only; not an official agent ID"}
+ 498:               </p>
+ 499:             </div>
+ 500: 
+ 501:             <div className="flex flex-wrap gap-2">
+ 502:               {selected.recordType === "official" ? (
+ 503:                 <Button
+ 504:                   variant="outline"
+ 505:                   onClick={() =>
+ 506:                     window.open(
+ 507:                       `/agents/${encodeURIComponent(selected.id)}`,
+ 508:                       "_blank",
+ 509:                       "noopener,noreferrer",
+ 510:                     )
+ 511:                   }
+ 512:                 >
+ 513:                   View ID card
+ 514:                 </Button>
+ 515:               ) : null}
+ 516: 
+ 517:               {canManage && !editing ? (
+ 518:                 <Button onClick={() => setEditing(true)}>Edit details</Button>
+ 519:               ) : null}
+ 520:             </div>
+ 521:           </div>
+ 522: 
+ 523:           <div className="grid gap-3 sm:grid-cols-2">
+ 524:             {field("Full name *", "full_name")}
+ 525:             {field("Phone *", "phone")}
+ 526:             {selected.recordType === "official" ? field("Email", "email", "email") : null}
+ 527:             {selected.recordType === "official"
+ 528:               ? field("Company phone", "company_phone")
+ 529:               : null}
+ 530:             {field("District", "district")}
+ 531:             {field("Village", "village")}
+ 532: 
+ 533:             {selected.recordType === "official" ? (
+ 534:               <>
+ 535:                 {field("Designation", "designation")}
+ 536:                 {field("Commission rate (%)", "commission_rate", "number")}
+ 537:                 {field("Referral code", "referral_code")}
+ 538:               </>
+ 539:             ) : (
+ 540:               <>
+ 541:                 {field("Registration date", "registered_on", "date")}
+ 542:                 {field("Received by", "received_by")}
+ 543:                 {editing ? (
+ 544:                   <label className="block space-y-1 text-sm">
+ 545:                     <span className="text-xs text-muted-foreground">Registration status</span>
+ 546:                     <select
+ 547:                       className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+ 548:                       value={draft.status}
+ 549:                       onChange={(e) =>
+ 550:                         setDraft((previous) => ({ ...previous, status: e.target.value }))
+ 551:                       }
+ 552:                     >
+ 553:                       <option value="registered">Registered</option>
+ 554:                       <option value="verified">Verified</option>
+ 555:                       <option value="inactive">Inactive</option>
+ 556:                     </select>
+ 557:                   </label>
+ 558:                 ) : null}
+ 559:               </>
+ 560:             )}
+ 561:           </div>
+ 562: 
+ 563:           {editing && canManage ? (
+ 564:             <div className="mt-5 flex flex-wrap gap-2 border-t pt-4">
+ 565:               <Button disabled={saving} onClick={() => void saveRecord()}>
+ 566:                 {saving ? "SavingÃ¢â‚¬Â¦" : "Save changes"}
+ 567:               </Button>
+ 568:               <Button
+ 569:                 variant="outline"
+ 570:                 disabled={saving}
+ 571:                 onClick={() => {
+ 572:                   openRecord(selected);
+ 573:                   setEditing(false);
+ 574:                 }}
+ 575:               >
+ 576:                 Cancel
+ 577:               </Button>
+ 578:             </div>
+ 579:           ) : null}
+ 580: 
+ 581:           {!canManage ? (
+ 582:             <p className="mt-4 text-sm text-muted-foreground">
+ 583:               Your account has view-only access to agent information.
+ 584:             </p>
+ 585:           ) : null}
+ 586:         </Panel>
+ 587:       ) : (
+ 588:         <Panel title="Agent details">
+ 589:           <EmptyState
+ 590:             title="Select an agent"
+ 591:             hint="Choose a record from the directory to view its details and available actions."
+ 592:           />
+ 593:         </Panel>
+ 594:       )}
+ 595:     </div>
+ 596:   );
+ 597: }
+ 598: function Links() {
+ 599:   const qc = useQueryClient();
+ 600:   const [title, setTitle] = useState("Kalexi Digital Agent Registration");
+ 601:   const [newUrl, setNewUrl] = useState("");
+ 602:   const q = useQuery({
+ 603:     queryKey: ["agent-campaigns"],
+ 604:     queryFn: async () => {
+ 605:       const { data, error } = await supabase
+ 606:         .from("agent_campaigns")
+ 607:         .select("*")
+ 608:         .order("created_at", { ascending: false });
+ 609:       if (error) throw error;
+ 610:       return data ?? [];
+ 611:     },
+ 612:   });
+ 613: 
+ 614:   async function create() {
+ 615:     const campaignTitle = title.trim();
+ 616:     if (!campaignTitle) {
+ 617:       toast.error("Enter a registration campaign name.");
+ 618:       return;
+ 619:     }
+ 620:     const { data: u, error: authError } = await supabase.auth.getUser();
+ 621: 
+ 622:     console.log("[Agent campaign diagnostic]", {
+ 623:       authenticated: !!u.user,
+ 624:       userId: u.user?.id ?? null,
+ 625:       authError: authError?.message ?? null,
+ 626:     });
+ 627: 
+ 628:     if (authError) {
+ 629:       toast.error(`Authentication check failed: ${authError.message}`);
+ 630:       return;
+ 631:     }
+ 632:     if (!u.user) {
+ 633:       toast.error("Please sign in again.");
+ 634:       return;
+ 635:     }
+ 636:     const { data, error } = await supabase
+ 637:       .from("agent_campaigns")
+ 638:       .insert({ title: campaignTitle, created_by: u.user.id })
+ 639:       .select("id, title, active")
+ 640:       .single();
+ 641: 
+ 642:     if (error) {
+ 643:       toast.error(`Could not create link: ${error.message}`);
+ 644:       return;
+ 645:     }
+ 646: 
+ 647:     const registrationUrl = `${window.location.origin}/join/${data.id}`;
+ 648:     setNewUrl(registrationUrl);
+ 649:     await qc.invalidateQueries({ queryKey: ["agent-campaigns"] });
+ 650: 
+ 651:     try {
+ 652:       await navigator.clipboard.writeText(registrationUrl);
+ 653:       toast.success("Link created and copied. You can also copy it below.");
+ 654:     } catch {
+ 655:       toast.success("Link created. Copy it from the box below.");
+ 656:     }
+ 657:   }
+ 658: 
+ 659:   async function copyLink(link: string) {
+ 660:     try {
+ 661:       await navigator.clipboard.writeText(link);
+ 662:       toast.success("Registration link copied.");
+ 663:     } catch {
+ 664:       window.prompt("Copy your registration link:", link);
+ 665:     }
+ 666:   }
+ 667: 
+ 668:   async function toggle(id: string, active: boolean) {
+ 669:     const { error } = await supabase
+ 670:       .from("agent_campaigns")
+ 671:       .update({ active })
+ 672:       .eq("id", id);
+ 673:     if (error) {
+ 674:       toast.error(error.message);
+ 675:       return;
+ 676:     }
+ 677:     await qc.invalidateQueries({ queryKey: ["agent-campaigns"] });
+ 678:   }
+ 679: 
+ 680:   const url = (id: string) => `${window.location.origin}/join/${id}`;
+ 681: 
+ 682:   return (
+ 683:     <div className="space-y-4">
+ 684:       <Panel title="New registration link">
+ 685:         <div className="flex flex-wrap gap-2">
+ 686:           <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+ 687:           <Button onClick={() => void create()}>Generate link</Button>
+ 688:         </div>
+ 689:         {newUrl ? (
+ 690:           <div className="mt-4 space-y-2 rounded-md border p-3">
+ 691:             <p className="text-sm font-medium">Your registration link</p>
+ 692:             <input
+ 693:               aria-label="Generated registration link"
+ 694:               readOnly
+ 695:               value={newUrl}
+ 696:               onFocus={(e) => e.currentTarget.select()}
+ 697:               className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+ 698:             />
+ 699:             <Button onClick={() => void copyLink(newUrl)}>Copy link</Button>
+ 700:             <p className="text-xs text-muted-foreground">
+ 701:               Check that the public registration page is available before sharing.
+ 702:             </p>
+ 703:           </div>
+ 704:         ) : null}
+ 705:       </Panel>
+ 706: 
+ 707:       <Panel title="Links">
+ 708:         {q.isError ? (
+ 709:           <ErrorState title="Registration links could not be retrieved" onRetry={() => void q.refetch()} />
+ 710:         ) : (q.data ?? []).length === 0 ? (
+ 711:           <EmptyState title="No registration links yet" />
+ 712:         ) : (
+ 713:           <ul className="divide-y text-sm">
+ 714:             {(q.data ?? []).map((c) => {
+ 715:               const link = url(c.id);
+ 716:               return (
+ 717:                 <li key={c.id} className="space-y-2 py-3">
+ 718:                   <div className="flex flex-wrap items-center justify-between gap-2">
+ 719:                     <div>
+ 720:                       <b>{c.title}</b>
+ 721:                       <p className="text-xs text-muted-foreground">
+ 722:                         {c.active ? "Active" : "Disabled"}
+ 723:                       </p>
+ 724:                     </div>
+ 725:                     <div className="flex flex-wrap gap-2">
+ 726:                       <Button variant="outline" onClick={() => void copyLink(link)}>
+ 727:                         Copy link
+ 728:                       </Button>
+ 729:                       <Button
+ 730:                         variant="outline"
+ 731:                         onClick={() => void toggle(c.id, !c.active)}
+ 732:                       >
+ 733:                         {c.active ? "Disable" : "Enable"}
+ 734:                       </Button>
+ 735:                     </div>
+ 736:                   </div>
+ 737:                   <input
+ 738:                     aria-label={`Registration URL for ${c.title}`}
+ 739:                     readOnly
+ 740:                     value={link}
+ 741:                     onFocus={(e) => e.currentTarget.select()}
+ 742:                     className="h-9 w-full rounded-md border bg-background px-3 text-xs"
+ 743:                   />
+ 744:                 </li>
+ 745:               );
+ 746:             })}
+ 747:           </ul>
+ 748:         )}
+ 749:       </Panel>
+ 750:     </div>
+ 751:   );
+ 752: }
+ 753: function Registry() {
+ 754:   const qc = useQueryClient();
+ 755:   const blank = {
+ 756:     reg_id: "",
+ 757:     full_name: "",
+ 758:     phone: "",
+ 759:     village: "",
+ 760:     district: "",
+ 761:     registered_on: "",
+ 762:     received_by: "",
+ 763:     status: "registered",
+ 764:   };
+ 765:   const [f, setF] = useState(blank);
+ 766:   const [sig, setSig] = useState<File | null>(null);
+ 767:   const [saving, setSaving] = useState(false);
+ 768:   const q = useQuery({
+ 769:     queryKey: ["agent-registry"],
+ 770:     queryFn: async () => {
+ 771:       const { data, error } = await supabase
+ 772:         .from("agent_registry")
+ 773:         .select("*")
+ 774:         .order("created_at", { ascending: false });
+ 775:       if (error) throw error;
+ 776:       return data ?? [];
+ 777:     },
+ 778:   });
+ 779:   async function save() {
+ 780:     if (!f.reg_id || !f.full_name) {
+ 781:       toast.error("Registration ID and name are required.");
+ 782:       return;
+ 783:     }
+ 784:     setSaving(true);
+ 785:     try {
+ 786:       const { data: u } = await supabase.auth.getUser();
+ 787:       let signature_path: string | null = null;
+ 788:       if (sig) {
+ 789:         signature_path = `agent-registry/${crypto.randomUUID()}-${sig.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+ 790:         const { error } = await supabase.storage.from("kalexi-vault").upload(signature_path, sig);
+ 791:         if (error) throw error;
+ 792:       }
+ 793:       const { error } = await supabase.from("agent_registry").insert({
+ 794:         ...f,
+ 795:         phone: f.phone || null,
+ 796:         village: f.village || null,
+ 797:         district: f.district || null,
+ 798:         registered_on: f.registered_on || null,
+ 799:         received_by: f.received_by || null,
+ 800:         signature_path,
+ 801:         created_by: u.user?.id ?? null,
+ 802:       });
+ 803:       if (error) throw error;
+ 804:       toast.success("Agent recorded");
+ 805:       setF(blank);
+ 806:       setSig(null);
+ 807:       await qc.invalidateQueries({ queryKey: ["agent-registry"] });
+ 808:     } catch (error) {
+ 809:       console.error("[agents] Field registration could not be saved.", error);
+ 810:       toast.error(
+ 811:         error instanceof Error && error.message.toLowerCase().includes("duplicate")
+ 812:           ? "That registration ID already exists."
+ 813:           : error instanceof Error
+ 814:             ? `Agent registration could not be saved: ${error.message}`
+ 815:             : "Agent registration could not be saved. Check your connection and try again.",
+ 816:       );
+ 817:     } finally {
+ 818:       setSaving(false);
+ 819:     }
+ 820:   }
+ 821:   const field = (k: keyof typeof blank, label: string, type = "text") => (
+ 822:     <label className="space-y-1 text-sm">
+ 823:       <span className="text-xs text-muted-foreground">{label}</span>
+ 824:       <Input type={type} value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} />
+ 825:     </label>
+ 826:   );
+ 827:   return (
+ 828:     <div className="space-y-4">
+ 829:       <Panel title="Record an agent registered in the field">
+ 830:         {saving ? (
+ 831:           <OperationProgress
+ 832:             message={
+ 833:               sig
+ 834:                 ? "Uploading signature and saving agent informationÃ¢â‚¬Â¦"
+ 835:                 : "Saving agent informationÃ¢â‚¬Â¦"
+ 836:             }
+ 837:           />
+ 838:         ) : null}
+ 839:         <p className="mb-3 text-sm text-muted-foreground">
+ 840:           When this person later applies online with the same registration ID or phone number, the
+ 841:           system links them automatically.
+ 842:         </p>
+ 843:         <div className="grid gap-3 md:grid-cols-3">
+ 844:           {field("reg_id", "Registration ID *")}
+ 845:           {field("full_name", "Full name *")}
+ 846:           {field("phone", "Phone number")}
+ 847:           {field("village", "Village")}
+ 848:           {field("district", "District")}
+ 849:           {field("registered_on", "Date", "date")}
+ 850:           {field("received_by", "Received by")}
+ 851:           <label className="space-y-1 text-sm">
+ 852:             <span className="text-xs text-muted-foreground">Status</span>
+ 853:             <select
+ 854:               className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+ 855:               value={f.status}
+ 856:               onChange={(e) => setF({ ...f, status: e.target.value })}
+ 857:             >
+ 858:               <option value="registered">Registered</option>
+ 859:               <option value="verified">Verified</option>
+ 860:               <option value="inactive">Inactive</option>
+ 861:             </select>
+ 862:           </label>
+ 863:           <label className="space-y-1 text-sm">
+ 864:             <span className="text-xs text-muted-foreground">Signature (optional)</span>
+ 865:             <Input
+ 866:               type="file"
+ 867:               accept="image/*"
+ 868:               onChange={(e) => setSig(e.target.files?.[0] ?? null)}
+ 869:             />
+ 870:           </label>
+ 871:         </div>
+ 872:         <Button className="mt-4" disabled={saving} onClick={save}>
+ 873:           {saving ? "SavingÃ¢â‚¬Â¦" : "Save agent"}
+ 874:         </Button>
+ 875:       </Panel>
+ 876:       <Panel title="Field register">
+ 877:         {q.isLoading ? (
+ 878:           <DataTableSkeleton rows={5} columns={8} />
+ 879:         ) : q.isError ? (
+ 880:           <ErrorState
+ 881:             title="Field registrations could not be retrieved"
+ 882:             onRetry={() => void q.refetch()}
+ 883:           />
+ 884:         ) : q.data?.length ? (
+ 885:           <table className="w-full text-sm">
+ 886:             <thead className="text-left text-xs text-muted-foreground">
+ 887:               <tr>
+ 888:                 <th className="py-2">Reg ID</th>
+ 889:                 <th>Name</th>
+ 890:                 <th>Phone</th>
+ 891:                 <th>Village</th>
+ 892:                 <th>District</th>
+ 893:                 <th>Date</th>
+ 894:                 <th>Received by</th>
+ 895:                 <th>Status</th>
+ 896:               </tr>
+ 897:             </thead>
+ 898:             <tbody className="divide-y">
+ 899:               {q.data.map((r) => (
+ 900:                 <tr key={r.id}>
+ 901:                   <td className="py-2 font-mono text-xs">{r.reg_id}</td>
+ 902:                   <td>{r.full_name}</td>
+ 903:                   <td>{r.phone ?? "Ã¢â‚¬â€"}</td>
+ 904:                   <td>{r.village ?? "Ã¢â‚¬â€"}</td>
+ 905:                   <td>{r.district ?? "Ã¢â‚¬â€"}</td>
+ 906:                   <td>{r.registered_on ?? "Ã¢â‚¬â€"}</td>
+ 907:                   <td>{r.received_by ?? "Ã¢â‚¬â€"}</td>
+ 908:                   <td>
+ 909:                     <StatusPill value={r.status} />
+ 910:                   </td>
+ 911:                 </tr>
+ 912:               ))}
+ 913:             </tbody>
+ 914:           </table>
+ 915:         ) : (
+ 916:           <EmptyState title="No field registrations yet" />
+ 917:         )}
+ 918:       </Panel>
+ 919:     </div>
+ 920:   );
+ 921: }
+ 922: 
+ 923: function Notices() {
+ 924:   const qc = useQueryClient();
+ 925:   const [title, setTitle] = useState("");
+ 926:   const [body, setBody] = useState("");
+ 927:   const q = useQuery({
+ 928:     queryKey: ["agent-notices"],
+ 929:     queryFn: async () =>
+ 930:       (await supabase.from("agent_notices").select("*").order("created_at", { ascending: false }))
+ 931:         .data ?? [],
+ 932:   });
+ 933:   async function post() {
+ 934:     if (!title || !body) {
+ 935:       toast.error("Title and message are required.");
+ 936:       return;
+ 937:     }
+ 938:     const { data: u } = await supabase.auth.getUser();
+ 939:     const { error } = await supabase
+ 940:       .from("agent_notices")
+ 941:       .insert({ title, body, created_by: u.user?.id ?? null });
+ 942:     if (error) {
+ 943:       toast.error(error.message);
+ 944:       return;
+ 945:     }
+ 946:     setTitle("");
+ 947:     setBody("");
+ 948:     toast.success("Sent to all agents");
+ 949:     qc.invalidateQueries({ queryKey: ["agent-notices"] });
+ 950:   }
+ 951:   return (
+ 952:     <div className="space-y-4">
+ 953:       <Panel title="Send a message to all agents">
+ 954:         <Input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+ 955:         <textarea
+ 956:           className="mt-2 min-h-28 w-full rounded-md border bg-background p-3 text-sm"
+ 957:           placeholder="Message"
+ 958:           value={body}
+ 959:           onChange={(e) => setBody(e.target.value)}
+ 960:         />
+ 961:         <Button className="mt-2" onClick={post}>
+ 962:           Send
+ 963:         </Button>
+ 964:       </Panel>
+ 965:       <Panel title="Sent messages">
+ 966:         {(q.data ?? []).map((n) => (
+ 967:           <div key={n.id} className="border-b py-3 last:border-0">
+ 968:             <p className="font-medium">{n.title}</p>
+ 969:             <p className="whitespace-pre-wrap text-sm text-muted-foreground">{n.body}</p>
+ 970:           </div>
+ 971:         ))}
+ 972:       </Panel>
+ 973:     </div>
+ 974:   );
+ 975: }
+ 976: 
+ 977: 
+ 978: 
+
+========== src/routes/_authenticated/finance.index.tsx ==========
+   1: import { createFileRoute, Link } from "@tanstack/react-router";
+   2: import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+   3: import { useState } from "react";
+   4: import { toast } from "sonner";
+   5: import { supabase } from "@/integrations/supabase/client";
+   6: import { AppShell, PageHeader } from "@/components/AppShell";
+   7: import { useSession, logAudit } from "@/hooks/useSession";
+   8: import { allows } from "@/lib/rbac";
+   9: import { EmptyState, NoAccess, StatusPill } from "@/components/records";
+  10: import { archiveRecord, formatDate, formatMoney, titleCase, CURRENCIES } from "@/lib/records";
+  11: import { Button } from "@/components/ui/button";
+  12: import { Input } from "@/components/ui/input";
+  13: import { Label } from "@/components/ui/label";
+  14: import { Textarea } from "@/components/ui/textarea";
+  15: import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+  16: import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+  17: import { DataTableSkeleton, ErrorState } from "@/components/LoadingStates";
+  18: import {
+  19:   Select,
+  20:   SelectContent,
+  21:   SelectItem,
+  22:   SelectTrigger,
+  23:   SelectValue,
+  24: } from "@/components/ui/select";
+  25: 
+  26: export const Route = createFileRoute("/_authenticated/finance/")({
+  27:   head: () => ({
+  28:     meta: [
+  29:       { title: "Transactions — Kalexi Brokerage" },
+  30:       {
+  31:         name: "description",
+  32:         content: "Track transactions, invoices and commissions across every deal.",
+  33:       },
+  34:       { name: "robots", content: "noindex" },
+  35:     ],
+  36:   }),
+  37:   component: FinancePage,
+  38: });
+  39: 
+  40: const TX_STATUSES = ["pending", "cleared", "failed", "archived"];
+  41: const INVOICE_STATUSES = ["pending", "paid", "overdue", "cancelled", "archived"];
+  42: const COMMISSION_STATUSES = ["pending", "approved", "paid", "archived"];
+  43: 
+  44: interface TxRow {
+  45:   id: string;
+  46:   transaction_ref: string;
+  47:   client_id: string | null;
+  48:   deal_id: string | null;
+  49:   amount: number;
+  50:   currency: string;
+  51:   payment_method: string | null;
+  52:   payment_reference: string | null;
+  53:   purpose: string;
+  54:   commission_amount: number | null;
+  55:   occurred_on: string;
+  56:   status: string;
+  57:   clients: { full_name: string } | null;
+  58:   deals: { title: string } | null;
+  59: }
+  60: 
+  61: interface InvoiceRow {
+  62:   id: string;
+  63:   invoice_ref: string;
+  64:   client_id: string | null;
+  65:   deal_id: string | null;
+  66:   amount: number;
+  67:   currency: string;
+  68:   due_date: string | null;
+  69:   narrative: string | null;
+  70:   status: string;
+  71:   clients: { full_name: string } | null;
+  72:   deals: { title: string } | null;
+  73: }
+  74: 
+  75: interface CommissionRow {
+  76:   id: string;
+  77:   deal_id: string;
+  78:   transaction_id: string | null;
+  79:   rate: number | null;
+  80:   amount: number;
+  81:   currency: string;
+  82:   beneficiary: string | null;
+  83:   narrative: string | null;
+  84:   status: string;
+  85:   deals: { title: string } | null;
+  86: }
+  87: 
+  88: function useClientsAndDeals(enabled: boolean) {
+  89:   const clients = useQuery({
+  90:     queryKey: ["finance-clients"],
+  91:     enabled,
+  92:     queryFn: async () => {
+  93:       const { data } = await supabase
+  94:         .from("clients")
+  95:         .select("id, client_ref, full_name")
+  96:         .is("archived_at", null)
+  97:         .limit(500);
+  98:       return data ?? [];
+  99:     },
+ 100:   });
+ 101:   const deals = useQuery({
+ 102:     queryKey: ["finance-deals"],
+ 103:     enabled,
+ 104:     queryFn: async () => {
+ 105:       const { data } = await supabase
+ 106:         .from("deals")
+ 107:         .select("id, deal_ref, title")
+ 108:         .is("archived_at", null)
+ 109:         .limit(500);
+ 110:       return data ?? [];
+ 111:     },
+ 112:   });
+ 113:   return { clients: clients.data ?? [], deals: deals.data ?? [] };
+ 114: }
+ 115: 
+ 116: function FinancePage() {
+ 117:   const { data: session } = useSession();
+ 118:   const access = session?.access;
+ 119:   const qc = useQueryClient();
+ 120:   const [tab, setTab] = useState("transactions");
+ 121:   const [status, setStatus] = useState("all");
+ 122:   const [from, setFrom] = useState("");
+ 123:   const [to, setTo] = useState("");
+ 124:   const [txOpen, setTxOpen] = useState(false);
+ 125:   const [invOpen, setInvOpen] = useState(false);
+ 126:   const [comOpen, setComOpen] = useState(false);
+ 127: 
+ 128:   const canView = allows(access, "finance.view");
+ 129:   const canCreate = allows(access, "finance.create");
+ 130:   const canEdit = allows(access, "finance.edit");
+ 131: 
+ 132:   const transactions = useQuery({
+ 133:     queryKey: ["transactions", status, from, to],
+ 134:     enabled: canView,
+ 135:     queryFn: async () => {
+ 136:       let query = supabase
+ 137:         .from("transactions")
+ 138:         .select(
+ 139:           "id, transaction_ref, client_id, deal_id, amount, currency, payment_method, payment_reference, purpose, commission_amount, occurred_on, status, clients(full_name), deals(title)",
+ 140:         )
+ 141:         .is("archived_at", null)
+ 142:         .order("occurred_on", { ascending: false })
+ 143:         .limit(300);
+ 144:       if (status !== "all") query = query.eq("status", status);
+ 145:       if (from) query = query.gte("occurred_on", from);
+ 146:       if (to) query = query.lte("occurred_on", to);
+ 147:       const { data, error } = await query;
+ 148:       if (error) throw error;
+ 149:       return (data ?? []) as unknown as TxRow[];
+ 150:     },
+ 151:   });
+ 152: 
+ 153:   const invoices = useQuery({
+ 154:     queryKey: ["invoices", status, from, to],
+ 155:     enabled: canView,
+ 156:     queryFn: async () => {
+ 157:       let query = supabase
+ 158:         .from("invoices")
+ 159:         .select(
+ 160:           "id, invoice_ref, client_id, deal_id, amount, currency, due_date, narrative, status, clients(full_name), deals(title)",
+ 161:         )
+ 162:         .is("archived_at", null)
+ 163:         .order("created_at", { ascending: false })
+ 164:         .limit(300);
+ 165:       if (status !== "all") query = query.eq("status", status);
+ 166:       if (from) query = query.gte("due_date", from);
+ 167:       if (to) query = query.lte("due_date", to);
+ 168:       const { data, error } = await query;
+ 169:       if (error) throw error;
+ 170:       return (data ?? []) as unknown as InvoiceRow[];
+ 171:     },
+ 172:   });
+ 173: 
+ 174:   const commissions = useQuery({
+ 175:     queryKey: ["commissions", status],
+ 176:     enabled: canView,
+ 177:     queryFn: async () => {
+ 178:       let query = supabase
+ 179:         .from("commissions")
+ 180:         .select(
+ 181:           "id, deal_id, transaction_id, rate, amount, currency, beneficiary, narrative, status, deals(title)",
+ 182:         )
+ 183:         .is("archived_at", null)
+ 184:         .order("created_at", { ascending: false })
+ 185:         .limit(300);
+ 186:       if (status !== "all") query = query.eq("status", status);
+ 187:       const { data, error } = await query;
+ 188:       if (error) throw error;
+ 189:       return (data ?? []) as unknown as CommissionRow[];
+ 190:     },
+ 191:   });
+ 192: 
+ 193:   const setTxStatus = useMutation({
+ 194:     mutationFn: async ({ id, value }: { id: string; value: string }) => {
+ 195:       const { error } = await supabase.from("transactions").update({ status: value }).eq("id", id);
+ 196:       if (error) throw error;
+ 197:     },
+ 198:     onSuccess: () => {
+ 199:       toast.success("Transaction status updated.");
+ 200:       qc.invalidateQueries({ queryKey: ["transactions"] });
+ 201:     },
+ 202:     onError: (e: Error) => toast.error(e.message),
+ 203:   });
+ 204: 
+ 205:   const setInvoiceStatus = useMutation({
+ 206:     mutationFn: async ({ id, value }: { id: string; value: string }) => {
+ 207:       const { error } = await supabase.from("invoices").update({ status: value }).eq("id", id);
+ 208:       if (error) throw error;
+ 209:     },
+ 210:     onSuccess: () => {
+ 211:       toast.success("Invoice status updated.");
+ 212:       qc.invalidateQueries({ queryKey: ["invoices"] });
+ 213:     },
+ 214:     onError: (e: Error) => toast.error(e.message),
+ 215:   });
+ 216: 
+ 217:   const setCommissionStatus = useMutation({
+ 218:     mutationFn: async ({ id, value }: { id: string; value: string }) => {
+ 219:       const { error } = await supabase.from("commissions").update({ status: value }).eq("id", id);
+ 220:       if (error) throw error;
+ 221:     },
+ 222:     onSuccess: () => {
+ 223:       toast.success("Commission status updated.");
+ 224:       qc.invalidateQueries({ queryKey: ["commissions"] });
+ 225:     },
+ 226:     onError: (e: Error) => toast.error(e.message),
+ 227:   });
+ 228: 
+ 229:   async function archiveRow(
+ 230:     table: "transactions" | "invoices" | "commissions",
+ 231:     id: string,
+ 232:     ref: string,
+ 233:   ) {
+ 234:     const reason = window.prompt("Reason for archiving this record?");
+ 235:     if (!reason || !session) return;
+ 236:     try {
+ 237:       await archiveRecord({
+ 238:         table,
+ 239:         id,
+ 240:         entityRef: ref,
+ 241:         title: ref,
+ 242:         reason,
+ 243:         actorId: session.userId,
+ 244:         actorEmail: session.email,
+ 245:       });
+ 246:       toast.success("Record archived.");
+ 247:       qc.invalidateQueries({ queryKey: [table] });
+ 248:     } catch (e) {
+ 249:       toast.error((e as Error).message);
+ 250:     }
+ 251:   }
+ 252: 
+ 253:   if (!canView) {
+ 254:     return (
+ 255:       <AppShell>
+ 256:         <PageHeader title="Transactions" />
+ 257:         <NoAccess module="Finance" />
+ 258:       </AppShell>
+ 259:     );
+ 260:   }
+ 261: 
+ 262:   const txRows = transactions.data ?? [];
+ 263:   const invRows = invoices.data ?? [];
+ 264:   const comRows = commissions.data ?? [];
+ 265: 
+ 266:   const totalReceived = txRows
+ 267:     .filter((t) => t.status === "cleared")
+ 268:     .reduce((sum, t) => sum + Number(t.amount ?? 0), 0);
+ 269:   const commissionEarned = comRows
+ 270:     .filter((c) => c.status !== "archived")
+ 271:     .reduce((sum, c) => sum + Number(c.amount ?? 0), 0);
+ 272:   const outstandingInvoices = invRows
+ 273:     .filter((i) => i.status === "pending" || i.status === "overdue")
+ 274:     .reduce((sum, i) => sum + Number(i.amount ?? 0), 0);
+ 275: 
+ 276:   return (
+ 277:     <AppShell>
+ 278:       <PageHeader
+ 279:         title="Transactions"
+ 280:         description="Financial movements, invoices and commissions across every brokered deal."
+ 281:         actions={
+ 282:           <div className="flex flex-wrap gap-2">
+ 283:             <Button variant="outline" asChild>
+ 284:               <Link to="/finance/receipts">Receipts</Link>
+ 285:             </Button>
+ 286:           </div>
+ 287:         }
+ 288:       />
+ 289: 
+ 290:       <div className="mb-5 grid gap-3 sm:grid-cols-3">
+ 291:         <div className="rounded-lg border bg-card p-4">
+ 292:           <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+ 293:             Total received
+ 294:           </p>
+ 295:           <p className="mt-1 text-2xl font-semibold">{formatMoney(totalReceived, "UGX")}</p>
+ 296:         </div>
+ 297:         <div className="rounded-lg border bg-card p-4">
+ 298:           <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+ 299:             Commission earned
+ 300:           </p>
+ 301:           <p className="mt-1 text-2xl font-semibold">{formatMoney(commissionEarned, "UGX")}</p>
+ 302:         </div>
+ 303:         <div className="rounded-lg border bg-card p-4">
+ 304:           <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+ 305:             Outstanding invoices
+ 306:           </p>
+ 307:           <p className="mt-1 text-2xl font-semibold">{formatMoney(outstandingInvoices, "UGX")}</p>
+ 308:         </div>
+ 309:       </div>
+ 310: 
+ 311:       <Tabs value={tab} onValueChange={setTab}>
+ 312:         <div className="mb-4 flex flex-wrap items-center gap-2">
+ 313:           <TabsList>
+ 314:             <TabsTrigger value="transactions">Transactions</TabsTrigger>
+ 315:             <TabsTrigger value="invoices">Invoices</TabsTrigger>
+ 316:             <TabsTrigger value="commissions">Commissions</TabsTrigger>
+ 317:           </TabsList>
+ 318:           <Select value={status} onValueChange={setStatus}>
+ 319:             <SelectTrigger className="w-40">
+ 320:               <SelectValue placeholder="Status" />
+ 321:             </SelectTrigger>
+ 322:             <SelectContent>
+ 323:               <SelectItem value="all">All statuses</SelectItem>
+ 324:               {(tab === "transactions"
+ 325:                 ? TX_STATUSES
+ 326:                 : tab === "invoices"
+ 327:                   ? INVOICE_STATUSES
+ 328:                   : COMMISSION_STATUSES
+ 329:               ).map((s) => (
+ 330:                 <SelectItem key={s} value={s}>
+ 331:                   {titleCase(s)}
+ 332:                 </SelectItem>
+ 333:               ))}
+ 334:             </SelectContent>
+ 335:           </Select>
+ 336:           {tab !== "commissions" ? (
+ 337:             <>
+ 338:               <Input
+ 339:                 type="date"
+ 340:                 className="w-40"
+ 341:                 value={from}
+ 342:                 onChange={(e) => setFrom(e.target.value)}
+ 343:               />
+ 344:               <Input
+ 345:                 type="date"
+ 346:                 className="w-40"
+ 347:                 value={to}
+ 348:                 onChange={(e) => setTo(e.target.value)}
+ 349:               />
+ 350:             </>
+ 351:           ) : null}
+ 352:           <div className="ml-auto">
+ 353:             {canCreate && tab === "transactions" ? (
+ 354:               <Button onClick={() => setTxOpen(true)}>New transaction</Button>
+ 355:             ) : null}
+ 356:             {canCreate && tab === "invoices" ? (
+ 357:               <Button onClick={() => setInvOpen(true)}>New invoice</Button>
+ 358:             ) : null}
+ 359:             {canCreate && tab === "commissions" ? (
+ 360:               <Button onClick={() => setComOpen(true)}>New commission</Button>
+ 361:             ) : null}
+ 362:           </div>
+ 363:         </div>
+ 364: 
+ 365:         <TabsContent value="transactions">
+ 366:           {transactions.isLoading ? (
+ 367:             <DataTableSkeleton rows={5} columns={8} />
+ 368:           ) : transactions.isError ? (
+ 369:             <ErrorState
+ 370:               title="Transactions could not be retrieved"
+ 371:               onRetry={() => void transactions.refetch()}
+ 372:             />
+ 373:           ) : txRows.length === 0 ? (
+ 374:             <EmptyState title="No transactions recorded" hint="Create the first transaction." />
+ 375:           ) : (
+ 376:             <div className="overflow-x-auto rounded-lg border bg-card">
+ 377:               <table className="w-full text-sm">
+ 378:                 <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+ 379:                   <tr>
+ 380:                     <th className="px-4 py-2">Reference</th>
+ 381:                     <th className="px-4 py-2">Client / Deal</th>
+ 382:                     <th className="px-4 py-2">Purpose</th>
+ 383:                     <th className="px-4 py-2">Amount</th>
+ 384:                     <th className="px-4 py-2">Commission</th>
+ 385:                     <th className="px-4 py-2">Date</th>
+ 386:                     <th className="px-4 py-2">Status</th>
+ 387:                     <th className="px-4 py-2" />
+ 388:                   </tr>
+ 389:                 </thead>
+ 390:                 <tbody>
+ 391:                   {txRows.map((t) => (
+ 392:                     <tr key={t.id} className="border-t">
+ 393:                       <td className="px-4 py-2 ref-mono text-xs">{t.transaction_ref}</td>
+ 394:                       <td className="px-4 py-2">
+ 395:                         {t.clients?.full_name ?? "—"}
+ 396:                         <p className="text-xs text-muted-foreground">{t.deals?.title ?? ""}</p>
+ 397:                       </td>
+ 398:                       <td className="px-4 py-2">{t.purpose}</td>
+ 399:                       <td className="px-4 py-2">{formatMoney(t.amount, t.currency)}</td>
+ 400:                       <td className="px-4 py-2">{formatMoney(t.commission_amount, t.currency)}</td>
+ 401:                       <td className="px-4 py-2">{formatDate(t.occurred_on)}</td>
+ 402:                       <td className="px-4 py-2">
+ 403:                         {canEdit ? (
+ 404:                           <Select
+ 405:                             value={t.status}
+ 406:                             onValueChange={(v) => setTxStatus.mutate({ id: t.id, value: v })}
+ 407:                           >
+ 408:                             <SelectTrigger className="h-8 w-32 text-xs">
+ 409:                               <SelectValue />
+ 410:                             </SelectTrigger>
+ 411:                             <SelectContent>
+ 412:                               {TX_STATUSES.map((s) => (
+ 413:                                 <SelectItem key={s} value={s}>
+ 414:                                   {titleCase(s)}
+ 415:                                 </SelectItem>
+ 416:                               ))}
+ 417:                             </SelectContent>
+ 418:                           </Select>
+ 419:                         ) : (
+ 420:                           <StatusPill value={t.status} />
+ 421:                         )}
+ 422:                       </td>
+ 423:                       <td className="px-4 py-2">
+ 424:                         {allows(access, "finance.edit") ? (
+ 425:                           <Button
+ 426:                             size="sm"
+ 427:                             variant="outline"
+ 428:                             onClick={() => archiveRow("transactions", t.id, t.transaction_ref)}
+ 429:                           >
+ 430:                             Archive
+ 431:                           </Button>
+ 432:                         ) : null}
+ 433:                       </td>
+ 434:                     </tr>
+ 435:                   ))}
+ 436:                 </tbody>
+ 437:               </table>
+ 438:             </div>
+ 439:           )}
+ 440:         </TabsContent>
+ 441: 
+ 442:         <TabsContent value="invoices">
+ 443:           {invoices.isLoading ? (
+ 444:             <DataTableSkeleton rows={5} columns={6} />
+ 445:           ) : invoices.isError ? (
+ 446:             <ErrorState
+ 447:               title="Invoices could not be retrieved"
+ 448:               onRetry={() => void invoices.refetch()}
+ 449:             />
+ 450:           ) : invRows.length === 0 ? (
+ 451:             <EmptyState title="No invoices recorded" hint="Create the first invoice." />
+ 452:           ) : (
+ 453:             <div className="overflow-x-auto rounded-lg border bg-card">
+ 454:               <table className="w-full text-sm">
+ 455:                 <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+ 456:                   <tr>
+ 457:                     <th className="px-4 py-2">Reference</th>
+ 458:                     <th className="px-4 py-2">Client / Deal</th>
+ 459:                     <th className="px-4 py-2">Amount</th>
+ 460:                     <th className="px-4 py-2">Due date</th>
+ 461:                     <th className="px-4 py-2">Status</th>
+ 462:                     <th className="px-4 py-2" />
+ 463:                   </tr>
+ 464:                 </thead>
+ 465:                 <tbody>
+ 466:                   {invRows.map((i) => (
+ 467:                     <tr key={i.id} className="border-t">
+ 468:                       <td className="px-4 py-2 ref-mono text-xs">{i.invoice_ref}</td>
+ 469:                       <td className="px-4 py-2">
+ 470:                         {i.clients?.full_name ?? "—"}
+ 471:                         <p className="text-xs text-muted-foreground">{i.deals?.title ?? ""}</p>
+ 472:                       </td>
+ 473:                       <td className="px-4 py-2">{formatMoney(i.amount, i.currency)}</td>
+ 474:                       <td className="px-4 py-2">{formatDate(i.due_date)}</td>
+ 475:                       <td className="px-4 py-2">
+ 476:                         {canEdit ? (
+ 477:                           <Select
+ 478:                             value={i.status}
+ 479:                             onValueChange={(v) => setInvoiceStatus.mutate({ id: i.id, value: v })}
+ 480:                           >
+ 481:                             <SelectTrigger className="h-8 w-32 text-xs">
+ 482:                               <SelectValue />
+ 483:                             </SelectTrigger>
+ 484:                             <SelectContent>
+ 485:                               {INVOICE_STATUSES.map((s) => (
+ 486:                                 <SelectItem key={s} value={s}>
+ 487:                                   {titleCase(s)}
+ 488:                                 </SelectItem>
+ 489:                               ))}
+ 490:                             </SelectContent>
+ 491:                           </Select>
+ 492:                         ) : (
+ 493:                           <StatusPill value={i.status} />
+ 494:                         )}
+ 495:                       </td>
+ 496:                       <td className="px-4 py-2">
+ 497:                         {allows(access, "finance.edit") ? (
+ 498:                           <Button
+ 499:                             size="sm"
+ 500:                             variant="outline"
+ 501:                             onClick={() => archiveRow("invoices", i.id, i.invoice_ref)}
+ 502:                           >
+ 503:                             Archive
+ 504:                           </Button>
+ 505:                         ) : null}
+ 506:                       </td>
+ 507:                     </tr>
+ 508:                   ))}
+ 509:                 </tbody>
+ 510:               </table>
+ 511:             </div>
+ 512:           )}
+ 513:         </TabsContent>
+ 514: 
+ 515:         <TabsContent value="commissions">
+ 516:           {commissions.isLoading ? (
+ 517:             <DataTableSkeleton rows={5} columns={6} />
+ 518:           ) : commissions.isError ? (
+ 519:             <ErrorState
+ 520:               title="Commissions could not be retrieved"
+ 521:               onRetry={() => void commissions.refetch()}
+ 522:             />
+ 523:           ) : comRows.length === 0 ? (
+ 524:             <EmptyState title="No commissions recorded" hint="Create the first commission entry." />
+ 525:           ) : (
+ 526:             <div className="overflow-x-auto rounded-lg border bg-card">
+ 527:               <table className="w-full text-sm">
+ 528:                 <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+ 529:                   <tr>
+ 530:                     <th className="px-4 py-2">Deal</th>
+ 531:                     <th className="px-4 py-2">Beneficiary</th>
+ 532:                     <th className="px-4 py-2">Rate</th>
+ 533:                     <th className="px-4 py-2">Amount</th>
+ 534:                     <th className="px-4 py-2">Status</th>
+ 535:                     <th className="px-4 py-2" />
+ 536:                   </tr>
+ 537:                 </thead>
+ 538:                 <tbody>
+ 539:                   {comRows.map((c) => (
+ 540:                     <tr key={c.id} className="border-t">
+ 541:                       <td className="px-4 py-2">{c.deals?.title ?? "—"}</td>
+ 542:                       <td className="px-4 py-2">{c.beneficiary ?? "—"}</td>
+ 543:                       <td className="px-4 py-2">{c.rate ? `${c.rate}%` : "—"}</td>
+ 544:                       <td className="px-4 py-2">{formatMoney(c.amount, c.currency)}</td>
+ 545:                       <td className="px-4 py-2">
+ 546:                         {canEdit ? (
+ 547:                           <Select
+ 548:                             value={c.status}
+ 549:                             onValueChange={(v) =>
+ 550:                               setCommissionStatus.mutate({ id: c.id, value: v })
+ 551:                             }
+ 552:                           >
+ 553:                             <SelectTrigger className="h-8 w-32 text-xs">
+ 554:                               <SelectValue />
+ 555:                             </SelectTrigger>
+ 556:                             <SelectContent>
+ 557:                               {COMMISSION_STATUSES.map((s) => (
+ 558:                                 <SelectItem key={s} value={s}>
+ 559:                                   {titleCase(s)}
+ 560:                                 </SelectItem>
+ 561:                               ))}
+ 562:                             </SelectContent>
+ 563:                           </Select>
+ 564:                         ) : (
+ 565:                           <StatusPill value={c.status} />
+ 566:                         )}
+ 567:                       </td>
+ 568:                       <td className="px-4 py-2">
+ 569:                         {allows(access, "finance.edit") ? (
+ 570:                           <Button
+ 571:                             size="sm"
+ 572:                             variant="outline"
+ 573:                             onClick={() =>
+ 574:                               archiveRow("commissions", c.id, c.deals?.title ?? "commission")
+ 575:                             }
+ 576:                           >
+ 577:                             Archive
+ 578:                           </Button>
+ 579:                         ) : null}
+ 580:                       </td>
+ 581:                     </tr>
+ 582:                   ))}
+ 583:                 </tbody>
+ 584:               </table>
+ 585:             </div>
+ 586:           )}
+ 587:         </TabsContent>
+ 588:       </Tabs>
+ 589: 
+ 590:       <NewTransactionDialog
+ 591:         open={txOpen}
+ 592:         onOpenChange={setTxOpen}
+ 593:         onDone={() => {
+ 594:           setTxOpen(false);
+ 595:           qc.invalidateQueries({ queryKey: ["transactions"] });
+ 596:         }}
+ 597:       />
+ 598:       <NewInvoiceDialog
+ 599:         open={invOpen}
+ 600:         onOpenChange={setInvOpen}
+ 601:         onDone={() => {
+ 602:           setInvOpen(false);
+ 603:           qc.invalidateQueries({ queryKey: ["invoices"] });
+ 604:         }}
+ 605:       />
+ 606:       <NewCommissionDialog
+ 607:         open={comOpen}
+ 608:         onOpenChange={setComOpen}
+ 609:         onDone={() => {
+ 610:           setComOpen(false);
+ 611:           qc.invalidateQueries({ queryKey: ["commissions"] });
+ 612:         }}
+ 613:       />
+ 614:     </AppShell>
+ 615:   );
+ 616: }
+ 617: 
+ 618: function NewTransactionDialog({
+ 619:   open,
+ 620:   onOpenChange,
+ 621:   onDone,
+ 622: }: {
+ 623:   open: boolean;
+ 624:   onOpenChange: (v: boolean) => void;
+ 625:   onDone: () => void;
+ 626: }) {
+ 627:   const { data: session } = useSession();
+ 628:   const { clients, deals } = useClientsAndDeals(open);
+ 629:   const [clientId, setClientId] = useState("");
+ 630:   const [dealId, setDealId] = useState("");
+ 631:   const [amount, setAmount] = useState("");
+ 632:   const [currency, setCurrency] = useState("UGX");
+ 633:   const [paymentMethod, setPaymentMethod] = useState("");
+ 634:   const [paymentReference, setPaymentReference] = useState("");
+ 635:   const [purpose, setPurpose] = useState("");
+ 636:   const [commissionAmount, setCommissionAmount] = useState("");
+ 637:   const [occurredOn, setOccurredOn] = useState(() => new Date().toISOString().slice(0, 10));
+ 638: 
+ 639:   const create = useMutation({
+ 640:     mutationFn: async () => {
+ 641:       if (!purpose.trim()) throw new Error("Purpose is required.");
+ 642:       if (!amount) throw new Error("Amount is required.");
+ 643:       const { data, error } = await supabase
+ 644:         .from("transactions")
+ 645:         .insert({
+ 646:           client_id: clientId || null,
+ 647:           deal_id: dealId || null,
+ 648:           amount: Number(amount),
+ 649:           currency,
+ 650:           payment_method: paymentMethod || null,
+ 651:           payment_reference: paymentReference || null,
+ 652:           purpose: purpose.trim(),
+ 653:           commission_amount: commissionAmount ? Number(commissionAmount) : null,
+ 654:           occurred_on: occurredOn,
+ 655:           status: "pending",
+ 656:           created_by: session?.userId ?? null,
+ 657:         })
+ 658:         .select("id, transaction_ref")
+ 659:         .single();
+ 660:       if (error) throw error;
+ 661:       if (session) {
+ 662:         await logAudit({
+ 663:           actorId: session.userId,
+ 664:           actorEmail: session.email,
+ 665:           action: "transaction.created",
+ 666:           entityType: "transactions",
+ 667:           entityId: data.id,
+ 668:           newValue: { transaction_ref: data.transaction_ref },
+ 669:         });
+ 670:       }
+ 671:       return data;
+ 672:     },
+ 673:     onSuccess: () => {
+ 674:       toast.success("Transaction recorded.");
+ 675:       setClientId("");
+ 676:       setDealId("");
+ 677:       setAmount("");
+ 678:       setPaymentMethod("");
+ 679:       setPaymentReference("");
+ 680:       setPurpose("");
+ 681:       setCommissionAmount("");
+ 682:       onDone();
+ 683:     },
+ 684:     onError: (e: Error) => toast.error(e.message),
+ 685:   });
+ 686: 
+ 687:   return (
+ 688:     <Dialog open={open} onOpenChange={onOpenChange}>
+ 689:       <DialogContent className="max-h-[85vh] overflow-y-auto">
+ 690:         <DialogHeader>
+ 691:           <DialogTitle>New transaction</DialogTitle>
+ 692:         </DialogHeader>
+ 693:         <div className="space-y-4">
+ 694:           <div className="space-y-2">
+ 695:             <Label>Client</Label>
+ 696:             <Select value={clientId} onValueChange={setClientId}>
+ 697:               <SelectTrigger>
+ 698:                 <SelectValue placeholder="Select client (optional)" />
+ 699:               </SelectTrigger>
+ 700:               <SelectContent>
+ 701:                 {clients.map((c) => (
+ 702:                   <SelectItem key={c.id} value={c.id}>
+ 703:                     {c.full_name} · {c.client_ref}
+ 704:                   </SelectItem>
+ 705:                 ))}
+ 706:               </SelectContent>
+ 707:             </Select>
+ 708:           </div>
+ 709:           <div className="space-y-2">
+ 710:             <Label>Deal</Label>
+ 711:             <Select value={dealId} onValueChange={setDealId}>
+ 712:               <SelectTrigger>
+ 713:                 <SelectValue placeholder="Select deal (optional)" />
+ 714:               </SelectTrigger>
+ 715:               <SelectContent>
+ 716:                 {deals.map((d) => (
+ 717:                   <SelectItem key={d.id} value={d.id}>
+ 718:                     {d.title} · {d.deal_ref}
+ 719:                   </SelectItem>
+ 720:                 ))}
+ 721:               </SelectContent>
+ 722:             </Select>
+ 723:           </div>
+ 724:           <div className="space-y-2">
+ 725:             <Label>Purpose</Label>
+ 726:             <Input value={purpose} onChange={(e) => setPurpose(e.target.value)} />
+ 727:           </div>
+ 728:           <div className="grid grid-cols-2 gap-3">
+ 729:             <div className="space-y-2">
+ 730:               <Label>Amount</Label>
+ 731:               <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+ 732:             </div>
+ 733:             <div className="space-y-2">
+ 734:               <Label>Currency</Label>
+ 735:               <Select value={currency} onValueChange={setCurrency}>
+ 736:                 <SelectTrigger>
+ 737:                   <SelectValue />
+ 738:                 </SelectTrigger>
+ 739:                 <SelectContent>
+ 740:                   {CURRENCIES.map((c) => (
+ 741:                     <SelectItem key={c} value={c}>
+ 742:                       {c}
+ 743:                     </SelectItem>
+ 744:                   ))}
+ 745:                 </SelectContent>
+ 746:               </Select>
+ 747:             </div>
+ 748:           </div>
+ 749:           <div className="grid grid-cols-2 gap-3">
+ 750:             <div className="space-y-2">
+ 751:               <Label>Payment method</Label>
+ 752:               <Input value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} />
+ 753:             </div>
+ 754:             <div className="space-y-2">
+ 755:               <Label>Payment reference</Label>
+ 756:               <Input
+ 757:                 value={paymentReference}
+ 758:                 onChange={(e) => setPaymentReference(e.target.value)}
+ 759:               />
+ 760:             </div>
+ 761:           </div>
+ 762:           <div className="grid grid-cols-2 gap-3">
+ 763:             <div className="space-y-2">
+ 764:               <Label>Commission amount</Label>
+ 765:               <Input
+ 766:                 type="number"
+ 767:                 value={commissionAmount}
+ 768:                 onChange={(e) => setCommissionAmount(e.target.value)}
+ 769:               />
+ 770:             </div>
+ 771:             <div className="space-y-2">
+ 772:               <Label>Date occurred</Label>
+ 773:               <Input
+ 774:                 type="date"
+ 775:                 value={occurredOn}
+ 776:                 onChange={(e) => setOccurredOn(e.target.value)}
+ 777:               />
+ 778:             </div>
+ 779:           </div>
+ 780:           <Button className="w-full" disabled={create.isPending} onClick={() => create.mutate()}>
+ 781:             {create.isPending ? "Saving…" : "Record transaction"}
+ 782:           </Button>
+ 783:         </div>
+ 784:       </DialogContent>
+ 785:     </Dialog>
+ 786:   );
+ 787: }
+ 788: 
+ 789: function NewInvoiceDialog({
+ 790:   open,
+ 791:   onOpenChange,
+ 792:   onDone,
+ 793: }: {
+ 794:   open: boolean;
+ 795:   onOpenChange: (v: boolean) => void;
+ 796:   onDone: () => void;
+ 797: }) {
+ 798:   const { data: session } = useSession();
+ 799:   const { clients, deals } = useClientsAndDeals(open);
+ 800:   const [clientId, setClientId] = useState("");
+ 801:   const [dealId, setDealId] = useState("");
+ 802:   const [amount, setAmount] = useState("");
+ 803:   const [currency, setCurrency] = useState("UGX");
+ 804:   const [dueDate, setDueDate] = useState("");
+ 805:   const [narrative, setNarrative] = useState("");
+ 806: 
+ 807:   const create = useMutation({
+ 808:     mutationFn: async () => {
+ 809:       if (!amount) throw new Error("Amount is required.");
+ 810:       const { data, error } = await supabase
+ 811:         .from("invoices")
+ 812:         .insert({
+ 813:           client_id: clientId || null,
+ 814:           deal_id: dealId || null,
+ 815:           amount: Number(amount),
+ 816:           currency,
+ 817:           due_date: dueDate || null,
+ 818:           narrative: narrative || null,
+ 819:           status: "pending",
+ 820:           created_by: session?.userId ?? null,
+ 821:         })
+ 822:         .select("id, invoice_ref")
+ 823:         .single();
+ 824:       if (error) throw error;
+ 825:       if (session) {
+ 826:         await logAudit({
+ 827:           actorId: session.userId,
+ 828:           actorEmail: session.email,
+ 829:           action: "invoice.created",
+ 830:           entityType: "invoices",
+ 831:           entityId: data.id,
+ 832:           newValue: { invoice_ref: data.invoice_ref },
+ 833:         });
+ 834:       }
+ 835:       return data;
+ 836:     },
+ 837:     onSuccess: () => {
+ 838:       toast.success("Invoice created.");
+ 839:       setClientId("");
+ 840:       setDealId("");
+ 841:       setAmount("");
+ 842:       setDueDate("");
+ 843:       setNarrative("");
+ 844:       onDone();
+ 845:     },
+ 846:     onError: (e: Error) => toast.error(e.message),
+ 847:   });
+ 848: 
+ 849:   return (
+ 850:     <Dialog open={open} onOpenChange={onOpenChange}>
+ 851:       <DialogContent className="max-h-[85vh] overflow-y-auto">
+ 852:         <DialogHeader>
+ 853:           <DialogTitle>New invoice</DialogTitle>
+ 854:         </DialogHeader>
+ 855:         <div className="space-y-4">
+ 856:           <div className="space-y-2">
+ 857:             <Label>Client</Label>
+ 858:             <Select value={clientId} onValueChange={setClientId}>
+ 859:               <SelectTrigger>
+ 860:                 <SelectValue placeholder="Select client (optional)" />
+ 861:               </SelectTrigger>
+ 862:               <SelectContent>
+ 863:                 {clients.map((c) => (
+ 864:                   <SelectItem key={c.id} value={c.id}>
+ 865:                     {c.full_name} · {c.client_ref}
+ 866:                   </SelectItem>
+ 867:                 ))}
+ 868:               </SelectContent>
+ 869:             </Select>
+ 870:           </div>
+ 871:           <div className="space-y-2">
+ 872:             <Label>Deal</Label>
+ 873:             <Select value={dealId} onValueChange={setDealId}>
+ 874:               <SelectTrigger>
+ 875:                 <SelectValue placeholder="Select deal (optional)" />
+ 876:               </SelectTrigger>
+ 877:               <SelectContent>
+ 878:                 {deals.map((d) => (
+ 879:                   <SelectItem key={d.id} value={d.id}>
+ 880:                     {d.title} · {d.deal_ref}
+ 881:                   </SelectItem>
+ 882:                 ))}
+ 883:               </SelectContent>
+ 884:             </Select>
+ 885:           </div>
+ 886:           <div className="grid grid-cols-2 gap-3">
+ 887:             <div className="space-y-2">
+ 888:               <Label>Amount</Label>
+ 889:               <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+ 890:             </div>
+ 891:             <div className="space-y-2">
+ 892:               <Label>Currency</Label>
+ 893:               <Select value={currency} onValueChange={setCurrency}>
+ 894:                 <SelectTrigger>
+ 895:                   <SelectValue />
+ 896:                 </SelectTrigger>
+ 897:                 <SelectContent>
+ 898:                   {CURRENCIES.map((c) => (
+ 899:                     <SelectItem key={c} value={c}>
+ 900:                       {c}
+ 901:                     </SelectItem>
+ 902:                   ))}
+ 903:                 </SelectContent>
+ 904:               </Select>
+ 905:             </div>
+ 906:           </div>
+ 907:           <div className="space-y-2">
+ 908:             <Label>Due date</Label>
+ 909:             <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+ 910:           </div>
+ 911:           <div className="space-y-2">
+ 912:             <Label>Narrative</Label>
+ 913:             <Textarea value={narrative} onChange={(e) => setNarrative(e.target.value)} />
+ 914:           </div>
+ 915:           <Button className="w-full" disabled={create.isPending} onClick={() => create.mutate()}>
+ 916:             {create.isPending ? "Saving…" : "Create invoice"}
+ 917:           </Button>
+ 918:         </div>
+ 919:       </DialogContent>
+ 920:     </Dialog>
+ 921:   );
+ 922: }
+ 923: 
+ 924: function NewCommissionDialog({
+ 925:   open,
+ 926:   onOpenChange,
+ 927:   onDone,
+ 928: }: {
+ 929:   open: boolean;
+ 930:   onOpenChange: (v: boolean) => void;
+ 931:   onDone: () => void;
+ 932: }) {
+ 933:   const { data: session } = useSession();
+ 934:   const { deals } = useClientsAndDeals(open);
+ 935:   const [dealId, setDealId] = useState("");
+ 936:   const [transactionId, setTransactionId] = useState("");
+ 937:   const [rate, setRate] = useState("");
+ 938:   const [amount, setAmount] = useState("");
+ 939:   const [currency, setCurrency] = useState("UGX");
+ 940:   const [beneficiary, setBeneficiary] = useState("");
+ 941:   const [narrative, setNarrative] = useState("");
+ 942: 
+ 943:   const transactions = useQuery({
+ 944:     queryKey: ["commission-transactions", dealId],
+ 945:     enabled: open && !!dealId,
+ 946:     queryFn: async () => {
+ 947:       const { data } = await supabase
+ 948:         .from("transactions")
+ 949:         .select("id, transaction_ref")
+ 950:         .eq("deal_id", dealId)
+ 951:         .is("archived_at", null)
+ 952:         .limit(200);
+ 953:       return data ?? [];
+ 954:     },
+ 955:   });
+ 956: 
+ 957:   const create = useMutation({
+ 958:     mutationFn: async () => {
+ 959:       if (!dealId) throw new Error("Select a deal.");
+ 960:       if (!amount) throw new Error("Amount is required.");
+ 961:       const { data, error } = await supabase
+ 962:         .from("commissions")
+ 963:         .insert({
+ 964:           deal_id: dealId,
+ 965:           transaction_id: transactionId || null,
+ 966:           rate: rate ? Number(rate) : null,
+ 967:           amount: Number(amount),
+ 968:           currency,
+ 969:           beneficiary: beneficiary || null,
+ 970:           narrative: narrative || null,
+ 971:           status: "pending",
+ 972:           created_by: session?.userId ?? null,
+ 973:         })
+ 974:         .select("id")
+ 975:         .single();
+ 976:       if (error) throw error;
+ 977:       if (session) {
+ 978:         await logAudit({
+ 979:           actorId: session.userId,
+ 980:           actorEmail: session.email,
+ 981:           action: "commission.created",
+ 982:           entityType: "commissions",
+ 983:           entityId: data.id,
+ 984:         });
+ 985:       }
+ 986:       return data;
+ 987:     },
+ 988:     onSuccess: () => {
+ 989:       toast.success("Commission recorded.");
+ 990:       setDealId("");
+ 991:       setTransactionId("");
+ 992:       setRate("");
+ 993:       setAmount("");
+ 994:       setBeneficiary("");
+ 995:       setNarrative("");
+ 996:       onDone();
+ 997:     },
+ 998:     onError: (e: Error) => toast.error(e.message),
+ 999:   });
+1000: 
+1001:   return (
+1002:     <Dialog open={open} onOpenChange={onOpenChange}>
+1003:       <DialogContent className="max-h-[85vh] overflow-y-auto">
+1004:         <DialogHeader>
+1005:           <DialogTitle>New commission</DialogTitle>
+1006:         </DialogHeader>
+1007:         <div className="space-y-4">
+1008:           <div className="space-y-2">
+1009:             <Label>Deal</Label>
+1010:             <Select value={dealId} onValueChange={setDealId}>
+1011:               <SelectTrigger>
+1012:                 <SelectValue placeholder="Select deal" />
+1013:               </SelectTrigger>
+1014:               <SelectContent>
+1015:                 {deals.map((d) => (
+1016:                   <SelectItem key={d.id} value={d.id}>
+1017:                     {d.title} · {d.deal_ref}
+1018:                   </SelectItem>
+1019:                 ))}
+1020:               </SelectContent>
+1021:             </Select>
+1022:           </div>
+1023:           <div className="space-y-2">
+1024:             <Label>Transaction</Label>
+1025:             <Select value={transactionId} onValueChange={setTransactionId}>
+1026:               <SelectTrigger>
+1027:                 <SelectValue placeholder="Select transaction (optional)" />
+1028:               </SelectTrigger>
+1029:               <SelectContent>
+1030:                 {(transactions.data ?? []).map((t) => (
+1031:                   <SelectItem key={t.id} value={t.id}>
+1032:                     {t.transaction_ref}
+1033:                   </SelectItem>
+1034:                 ))}
+1035:               </SelectContent>
+1036:             </Select>
+1037:           </div>
+1038:           <div className="grid grid-cols-2 gap-3">
+1039:             <div className="space-y-2">
+1040:               <Label>Rate (%)</Label>
+1041:               <Input type="number" value={rate} onChange={(e) => setRate(e.target.value)} />
+1042:             </div>
+1043:             <div className="space-y-2">
+1044:               <Label>Amount</Label>
+1045:               <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+1046:             </div>
+1047:           </div>
+1048:           <div className="grid grid-cols-2 gap-3">
+1049:             <div className="space-y-2">
+1050:               <Label>Currency</Label>
+1051:               <Select value={currency} onValueChange={setCurrency}>
+1052:                 <SelectTrigger>
+1053:                   <SelectValue />
+1054:                 </SelectTrigger>
+1055:                 <SelectContent>
+1056:                   {CURRENCIES.map((c) => (
+1057:                     <SelectItem key={c} value={c}>
+1058:                       {c}
+1059:                     </SelectItem>
+1060:                   ))}
+1061:                 </SelectContent>
+1062:               </Select>
+1063:             </div>
+1064:             <div className="space-y-2">
+1065:               <Label>Beneficiary</Label>
+1066:               <Input value={beneficiary} onChange={(e) => setBeneficiary(e.target.value)} />
+1067:             </div>
+1068:           </div>
+1069:           <div className="space-y-2">
+1070:             <Label>Narrative</Label>
+1071:             <Textarea value={narrative} onChange={(e) => setNarrative(e.target.value)} />
+1072:           </div>
+1073:           <Button className="w-full" disabled={create.isPending} onClick={() => create.mutate()}>
+1074:             {create.isPending ? "Saving…" : "Record commission"}
+1075:           </Button>
+1076:         </div>
+1077:       </DialogContent>
+1078:     </Dialog>
+1079:   );
+1080: }
+
+========== drizzle/schema.ts ==========
+   1: // auto-generated and intentionally left blank, do not edit
+
+========== SUPABASE MIGRATION FILENAMES ==========
+-- supabase/migrations
+20260810000000_create_storage_buckets.sql
+20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql
+20260810183607_27fb022b-9190-4fef-95ab-401dd97e086e.sql
+20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql
+20260811070025_56fabcfd-1eff-46ec-9183-fbbf25285203.sql
+20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql
+20260814162920_0cb94f30-e546-4b87-b52a-0da3fc1f43e3.sql
+20260816035733_d4bba811-549a-4efa-a1fb-e69056e0792b.sql
+20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql
+20261022190000_agent_phone_signin.sql
+20261022203000_system_maintenance.sql
+20261024000000_agent_registration_schema.sql
+20261025000000_company_branding.sql
+-- drizzle/migrations
+0000_digital_agent_programme.sql
+0001_agent_seq_grants.sql
+0002_agent_accounts_registry_brand.sql
+0003_exclude_agents_from_staff.sql
+0004_agent_self_signup_tokens.sql
+0005_applicant_reads_own.sql
+0006_agent_identity_and_private_messages.sql

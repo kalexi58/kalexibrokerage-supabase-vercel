@@ -8,6 +8,7 @@ import { useSession } from "@/hooks/useSession";
 import { ALL_ROLES, ROLE_LABEL, allows, type AppRole } from "@/lib/rbac";
 import {
   adminCreateUser,
+  adminDeleteUser,
   adminResetPassword,
   adminSetRoles,
   adminSetStatus,
@@ -58,6 +59,8 @@ function UsersPage() {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<(StaffRow & { roles: AppRole[] }) | null>(null);
   const [tempPassword, setTempPassword] = useState<{ email: string; password: string } | null>(null);
+  const [deleting, setDeleting] = useState<StaffRow | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   const staff = useQuery({
     queryKey: ["staff"],
@@ -115,6 +118,18 @@ function UsersPage() {
   const terminate = useMutation({
     mutationFn: (v: { userId: string }) => adminTerminateSessions({ data: v }),
     onSuccess: () => toast.success("All sessions terminated"),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteUser = useMutation({
+    mutationFn: (userId: string) =>
+      adminDeleteUser({ data: { userId, confirmation: "DELETE" } }),
+    onSuccess: () => {
+      toast.success("User sign-in was removed and the profile was anonymized.");
+      setDeleting(null);
+      setDeleteConfirmation("");
+      refresh();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -209,6 +224,16 @@ function UsersPage() {
                       >
                         Terminate sessions
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          setDeleting(u);
+                          setDeleteConfirmation("");
+                        }}
+                      >
+                        Delete user
+                      </Button>
                     </>
                   ) : (
                     <span className="text-xs text-muted-foreground">Your account</span>
@@ -268,6 +293,51 @@ function UsersPage() {
           <p className="ref-mono rounded-md border bg-muted px-4 py-3 text-center text-base">
             {tempPassword?.password}
           </p>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!deleting}
+        onOpenChange={(open) => {
+          if (!open && !deleteUser.isPending) {
+            setDeleting(null);
+            setDeleteConfirmation("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete user access and profile</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm">
+              This permanently revokes sign-in, replaces the account credentials, anonymizes its
+              staff profile, removes its roles and private profile photo, and terminates active
+              sessions.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Shared business records and append-only audit history are retained. The account ID
+              remains as a disabled tombstone so historical records remain linked. This cannot
+              delete your own account or the last Super Admin.
+            </p>
+            <Label htmlFor="delete-user-confirmation">Type DELETE to confirm</Label>
+            <Input
+              id="delete-user-confirmation"
+              autoComplete="off"
+              value={deleteConfirmation}
+              onChange={(event) => setDeleteConfirmation(event.target.value)}
+            />
+            <Button
+              className="w-full"
+              variant="destructive"
+              disabled={deleteConfirmation !== "DELETE" || deleteUser.isPending}
+              onClick={() => {
+                if (deleting) deleteUser.mutate(deleting.id);
+              }}
+            >
+              {deleteUser.isPending ? "Removing access…" : "Permanently remove user access"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 

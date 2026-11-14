@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/useSession";
 import {
-  AGENT_ID_THEME_ID,
   DEFAULT_AGENT_ID_THEME,
-  parseAgentIdTheme,
   type AgentIdTheme,
 } from "@/lib/agent-id-theme";
 import {
+  getAgentIdTheme,
   prepareAgentIdentityUpload,
   saveAgentIdTheme,
   updateAgentIdentity,
@@ -20,7 +20,10 @@ import type { Database } from "@/integrations/supabase/types";
 
 type Agent = Database["public"]["Tables"]["agents"]["Row"];
 
-const THEME_FIELDS: { key: keyof AgentIdTheme; label: string }[] = [
+const THEME_FIELDS: {
+  key: "background" | "accent" | "text" | "accentText";
+  label: string;
+}[] = [
   { key: "background", label: "Card background" },
   { key: "accent", label: "Brand accent" },
   { key: "text", label: "Card text" },
@@ -46,21 +49,15 @@ export function AgentIdentityEditor({ agent }: { agent: Agent }) {
   const [busy, setBusy] = useState(false);
   const [savingTheme, setSavingTheme] = useState(false);
   const qc = useQueryClient();
+  const session = useSession();
   const themeQuery = useQuery({
-    queryKey: ["agent-id-theme"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("brand_templates")
-        .select("accent, body")
-        .eq("id", AGENT_ID_THEME_ID)
-        .maybeSingle();
-      if (error) throw error;
-      return parseAgentIdTheme(data?.body, data?.accent);
-    },
+    queryKey: ["agent-id-theme", session.data?.userId],
+    enabled: !!session.data?.userId,
+    queryFn: () => getAgentIdTheme(),
   });
 
   useEffect(() => {
-    if (themeQuery.data) setTheme(themeQuery.data);
+    if (themeQuery.data) setTheme(themeQuery.data.theme);
   }, [themeQuery.data]);
 
   async function save() {
@@ -199,7 +196,11 @@ export function AgentIdentityEditor({ agent }: { agent: Agent }) {
             </div>
           ))}
         </div>
-        <Button className="mt-4" disabled={savingTheme} onClick={saveTheme}>
+        <Button
+          className="mt-4"
+          disabled={savingTheme || themeQuery.isLoading || themeQuery.isError}
+          onClick={saveTheme}
+        >
           {savingTheme ? "Saving…" : "Save shared ID theme"}
         </Button>
       </div>

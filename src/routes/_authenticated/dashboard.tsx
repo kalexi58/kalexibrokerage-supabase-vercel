@@ -1,15 +1,18 @@
+import { DashboardCalendarSummary } from "@/components/DashboardCalendarSummary";
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
   ArrowUpRight,
   Briefcase,
+  Building2,
   CalendarDays,
   Download,
   RefreshCw,
   Users,
   Wallet,
+  ShieldCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -38,11 +41,15 @@ import type { Database } from "@/integrations/supabase/types";
 import { useSession } from "@/hooks/useSession";
 import { formatMoney, titleCase } from "@/lib/records";
 import { allows, greeting, primaryRole, ROLE_LABEL, WORKSPACE_LABEL } from "@/lib/rbac";
+import { isDigitalAgentAccount } from "@/lib/agents.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  beforeLoad: async () => {
+    if (await isDigitalAgentAccount()) throw redirect({ to: "/agent-portal" });
+  },
   head: () => ({
     meta: [
-      { title: "Company Performance — Kalexi Brokerage" },
+      { title: "Company Performance - Kalexi Brokerage" },
       {
         name: "description",
         content: "Financial and operational performance from Kalexi Brokerage records.",
@@ -64,15 +71,21 @@ type DashboardDeal = Pick<
 >;
 type DashboardTransaction = Pick<
   Database["public"]["Tables"]["transactions"]["Row"],
-  "amount" | "currency" | "status" | "occurred_on"
+  "amount" | "commission_amount" | "currency" | "status" | "occurred_on"
 >;
 type DashboardAuditEntry = Pick<Database["public"]["Tables"]["audit_logs"]["Row"], "actor_email">;
 type DashboardAgent = Pick<
   Database["public"]["Tables"]["agents"]["Row"],
   "id" | "full_name" | "status"
 >;
-type DashboardReferral = Pick<Database["public"]["Tables"]["clients"]["Row"], "id" | "agent_id">;
-type DashboardLinkedDeal = Pick<Database["public"]["Tables"]["deals"]["Row"], "client_id">;
+type DashboardReferral = Pick<
+  Database["public"]["Tables"]["clients"]["Row"],
+  "id" | "agent_id"
+>;
+type DashboardLinkedDeal = Pick<
+  Database["public"]["Tables"]["deals"]["Row"],
+  "client_id" | "stage"
+>;
 
 interface DashboardMonth {
   key: string;
@@ -80,10 +93,13 @@ interface DashboardMonth {
   newClients: number;
   closedDeals: number;
   clearedVolume: { currency: string; amount: number }[];
+  clearedCommission: { currency: string; amount: number }[];
 }
 
 interface DashboardSummary {
   activeClients: number;
+  propertyCount: number | null;
+  propertiesPendingVerification: number | null;
   openDeals: number | null;
   closedThisMonth: number | null;
   months: DashboardMonth[];
@@ -95,7 +111,17 @@ interface DashboardSummary {
 }
 
 interface AgentPerformance {
-  agents: (DashboardAgent & { referrals: number; deals: number | null })[];
+  agents: (DashboardAgent & {
+    referrals: number;
+    deals: number | null;
+    closedClients: number | null;
+    closeRate: number | null;
+  })[];
+  company: {
+    activeClients: number;
+    clientsWithClosedDeals: number;
+    closeRate: number;
+  };
 }
 
 async function collectPages<T>(
@@ -124,10 +150,12 @@ async function fetchDashboardSummary({
   canViewDeals,
   canViewFinance,
   canViewAudit,
+  canViewProperties,
 }: {
   canViewDeals: boolean;
   canViewFinance: boolean;
   canViewAudit: boolean;
+  canViewProperties: boolean;
 }): Promise<DashboardSummary> {
   const now = new Date();
   const currentMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
@@ -137,7 +165,8 @@ async function fetchDashboardSummary({
   const firstMonthIso = firstMonth.toISOString();
   const currentMonthKey = currentMonth.toISOString().slice(0, 7);
 
-  const [clientCount, clients, deals, transactions, auditEntries] = await Promise.all([
+  const [clientCount, clients, deals, transactions, auditEntries, propertyCount, pendingProperties] =
+    await Promise.all([
     supabase.from("clients").select("id", { count: "exact", head: true }).is("archived_at", null),
     collectPages<DashboardClient>((from, to) =>
       supabase
@@ -161,7 +190,7 @@ async function fetchDashboardSummary({
       ? collectPages<DashboardTransaction>((from, to) =>
           supabase
             .from("transactions")
-            .select("amount, currency, status, occurred_on")
+            .select("amount, commission_amount, currency, status, occurred_on")
             .is("archived_at", null)
             .gte("occurred_on", firstMonthIso.slice(0, 10))
             .order("occurred_on", { ascending: true })
@@ -178,9 +207,24 @@ async function fetchDashboardSummary({
             .range(from, to),
         )
       : Promise.resolve([] as DashboardAuditEntry[]),
-  ]);
+    canViewProperties
+      ? supabase
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .is("archived_at", null)
+      : Promise.resolve({ count: null, error: null }),
+    canViewProperties
+      ? supabase
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .is("archived_at", null)
+          .eq("status", "pending_verification")
+      : Promise.resolve({ count: null, error: null }),
+    ]);
 
   if (clientCount.error) throw clientCount.error;
+  if (propertyCount.error) throw propertyCount.error;
+  if (pendingProperties.error) throw pendingProperties.error;
 
   const months: DashboardMonth[] = Array.from({ length: MONTH_COUNT }, (_, index) => {
     const date = new Date(
@@ -197,6 +241,7 @@ async function fetchDashboardSummary({
       newClients: 0,
       closedDeals: 0,
       clearedVolume: [],
+      clearedCommission: [],
     };
   });
   const monthByKey = new Map(months.map((month) => [month.key, month]));
@@ -232,6 +277,7 @@ async function fetchDashboardSummary({
   }
 
   const monthlyCurrencyTotals = new Map<string, Map<string, number>>();
+  const monthlyCommissionTotals = new Map<string, Map<string, number>>();
   for (const transaction of transactions) {
     if (transaction.status !== "cleared") continue;
     const key = monthKey(transaction.occurred_on);
@@ -244,6 +290,14 @@ async function fetchDashboardSummary({
       (totals.get(transaction.currency) ?? 0) + Number(transaction.amount),
     );
     monthlyCurrencyTotals.set(key, totals);
+    if (transaction.commission_amount !== null) {
+      const commissionTotals = monthlyCommissionTotals.get(key) ?? new Map<string, number>();
+      commissionTotals.set(
+        transaction.currency,
+        (commissionTotals.get(transaction.currency) ?? 0) + Number(transaction.commission_amount),
+      );
+      monthlyCommissionTotals.set(key, commissionTotals);
+    }
   }
   for (const month of months) {
     month.clearedVolume = Array.from(
@@ -252,6 +306,10 @@ async function fetchDashboardSummary({
         currency,
         amount,
       }),
+    );
+    month.clearedCommission = Array.from(
+      monthlyCommissionTotals.get(month.key) ?? [],
+      ([currency, amount]) => ({ currency, amount }),
     );
   }
 
@@ -283,6 +341,8 @@ async function fetchDashboardSummary({
 
   return {
     activeClients: clientCount.count ?? 0,
+    propertyCount: canViewProperties ? propertyCount.count ?? 0 : null,
+    propertiesPendingVerification: canViewProperties ? pendingProperties.count ?? 0 : null,
     openDeals: canViewDeals ? currentOpenDeals.length : null,
     closedThisMonth: canViewDeals ? closedThisMonth : null,
     months,
@@ -302,7 +362,7 @@ async function fetchDashboardSummary({
 }
 
 async function fetchAgentPerformance(canViewDeals: boolean): Promise<AgentPerformance> {
-  const [agents, referrals, linkedDeals] = await Promise.all([
+  const [agents, companyClients, linkedDeals] = await Promise.all([
     collectPages<DashboardAgent>((from, to) =>
       supabase
         .from("agents")
@@ -315,14 +375,13 @@ async function fetchAgentPerformance(canViewDeals: boolean): Promise<AgentPerfor
         .from("clients")
         .select("id, agent_id")
         .is("archived_at", null)
-        .not("agent_id", "is", null)
         .range(from, to),
     ),
     canViewDeals
       ? collectPages<DashboardLinkedDeal>((from, to) =>
           supabase
             .from("deals")
-            .select("client_id")
+            .select("client_id, stage")
             .is("archived_at", null)
             .not("client_id", "is", null)
             .range(from, to),
@@ -330,29 +389,61 @@ async function fetchAgentPerformance(canViewDeals: boolean): Promise<AgentPerfor
       : Promise.resolve([] as DashboardLinkedDeal[]),
   ]);
 
+  const referredClients = companyClients.filter((client) => client.agent_id !== null);
   const agentByClient = new Map(
-    referrals.flatMap((client) => (client.agent_id ? [[client.id, client.agent_id] as const] : [])),
+    referredClients.flatMap((client) =>
+      client.agent_id ? [[client.id, client.agent_id] as const] : [],
+    ),
   );
   const referralCounts = new Map<string, number>();
   for (const agentId of agentByClient.values()) {
     referralCounts.set(agentId, (referralCounts.get(agentId) ?? 0) + 1);
   }
   const dealCounts = new Map<string, number>();
+  const closedClientIdsByAgent = new Map<string, Set<string>>();
+  const companyClosedClientIds = new Set<string>();
+  const activeCompanyClientIds = new Set(companyClients.map((client) => client.id));
   if (canViewDeals) {
     for (const deal of linkedDeals) {
       const agentId = deal.client_id ? agentByClient.get(deal.client_id) : undefined;
       if (agentId) dealCounts.set(agentId, (dealCounts.get(agentId) ?? 0) + 1);
+      if (deal.stage === "closed" && deal.client_id && activeCompanyClientIds.has(deal.client_id)) {
+        companyClosedClientIds.add(deal.client_id);
+        if (agentId) {
+          const closedClients = closedClientIdsByAgent.get(agentId) ?? new Set<string>();
+          closedClients.add(deal.client_id);
+          closedClientIdsByAgent.set(agentId, closedClients);
+        }
+      }
     }
   }
 
+  const companyRate = companyClients.length
+    ? Math.round((companyClosedClientIds.size / companyClients.length) * 100)
+    : 0;
   return {
     agents: agents
-      .map((agent) => ({
-        ...agent,
-        referrals: referralCounts.get(agent.id) ?? 0,
-        deals: canViewDeals ? (dealCounts.get(agent.id) ?? 0) : null,
-      }))
+      .map((agent) => {
+        const referrals = referralCounts.get(agent.id) ?? 0;
+        const closedClients = closedClientIdsByAgent.get(agent.id)?.size ?? 0;
+        return {
+          ...agent,
+          referrals,
+          deals: canViewDeals ? (dealCounts.get(agent.id) ?? 0) : null,
+          closedClients: canViewDeals ? closedClients : null,
+          closeRate: canViewDeals
+            ? referrals
+              ? Math.round((closedClients / referrals) * 100)
+              : 0
+            : null,
+        };
+      })
       .sort((left, right) => right.referrals - left.referrals),
+    company: {
+      activeClients: companyClients.length,
+      clientsWithClosedDeals: companyClosedClientIds.size,
+      closeRate: companyRate,
+    },
   };
 }
 
@@ -426,6 +517,7 @@ function Dashboard() {
   const [currency, setCurrency] = useState("");
 
   const canViewClients = allows(access, "clients.view");
+  const canViewProperties = allows(access, "properties.view");
   const canViewDeals = allows(access, "deals.view");
   const canViewFinance = allows(access, "finance.view");
   const canViewAgents = allows(access, "agents.view");
@@ -439,13 +531,15 @@ function Dashboard() {
       canViewDeals,
       canViewFinance,
       canViewAudit,
+      canViewProperties,
     ],
     enabled: canViewClients,
-    queryFn: () => fetchDashboardSummary({ canViewDeals, canViewFinance, canViewAudit }),
+    queryFn: () =>
+      fetchDashboardSummary({ canViewDeals, canViewFinance, canViewAudit, canViewProperties }),
     refetchInterval: REFRESH_INTERVAL,
   });
   const agents = useQuery({
-    queryKey: ["agent-impact"],
+    queryKey: ["dashboard-agent-impact"],
     enabled: canViewAgents,
     queryFn: () => fetchAgentPerformance(canViewDeals),
     refetchInterval: REFRESH_INTERVAL,
@@ -456,7 +550,7 @@ function Dashboard() {
 
     const refreshDashboard = () => {
       void queryClient.invalidateQueries({ queryKey: ["dashboard-performance"] });
-      if (canViewAgents) void queryClient.invalidateQueries({ queryKey: ["agent-impact"] });
+      if (canViewAgents) void queryClient.invalidateQueries({ queryKey: ["dashboard-agent-impact"] });
     };
 
     let channel = supabase
@@ -475,6 +569,13 @@ function Dashboard() {
       channel = channel.on(
         "postgres_changes",
         { event: "*", schema: "public", table: "transactions" },
+        refreshDashboard,
+      );
+    }
+    if (canViewProperties) {
+      channel = channel.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "properties" },
         refreshDashboard,
       );
     }
@@ -503,12 +604,13 @@ function Dashboard() {
     canViewClients,
     canViewDeals,
     canViewFinance,
+    canViewProperties,
     queryClient,
     session?.userId,
   ]);
 
   if (sessionQuery.isPending) {
-    return <BrandedLoadingScreen message="Verifying your session and permissions…" />;
+    return <BrandedLoadingScreen message="Verifying your session and permissions..." />;
   }
 
   if (sessionQuery.isError) {
@@ -530,6 +632,8 @@ function Dashboard() {
   const previousMonth = data?.months.at(-2);
   const currentVolume =
     currentMonth?.clearedVolume.find((item) => item.currency === selectedCurrency)?.amount ?? 0;
+  const currentCommission =
+    currentMonth?.clearedCommission.find((item) => item.currency === selectedCurrency)?.amount ?? 0;
   const previousVolume =
     previousMonth?.clearedVolume.find((item) => item.currency === selectedCurrency)?.amount ?? 0;
   const reportRows =
@@ -547,8 +651,10 @@ function Dashboard() {
           title="Company performance"
           description="Your current role does not include dashboard access."
         />
+      <DashboardCalendarSummary />
+
         <p className="rounded-xl border bg-card p-5 text-sm text-muted-foreground">
-          Ask an administrator to grant the Clients — View permission to access the company
+          Ask an administrator to grant the Clients - View permission to access the company
           dashboard.
         </p>
       </AppShell>
@@ -561,7 +667,7 @@ function Dashboard() {
         title="Company performance"
         description={`${greeting()}, ${session?.profile?.full_name?.split(" ")[0] ?? "there"}. ${
           role ? WORKSPACE_LABEL[role] : "Company overview"
-        } · ${session?.roles.map((item) => ROLE_LABEL[item]).join(", ") || "No role assigned"}`}
+        } | ${session?.roles.map((item) => ROLE_LABEL[item]).join(", ") || "No role assigned"}`}
         actions={
           <div className="flex items-center gap-2">
             {allows(access, "admin.users") || allows(access, "admin.roles") ? (
@@ -587,7 +693,7 @@ function Dashboard() {
                 aria-hidden="true"
                 className={`mr-2 h-4 w-4 ${summary.isFetching ? "animate-spin" : ""}`}
               />
-              {summary.isFetching ? "Updating…" : "Refresh"}
+              {summary.isFetching ? "Updating..." : "Refresh"}
             </Button>
           </div>
         }
@@ -595,7 +701,7 @@ function Dashboard() {
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 text-sm">
         <div className="flex items-center gap-2 text-muted-foreground">
-          <Activity aria-hidden="true" className="h-4 w-4 text-primary" />
+          <Activity color="#0891B2" strokeWidth={2.2} aria-hidden="true" className="h-4 w-4 text-primary shrink-0" />
           <span>Live record updates with a one-minute refresh fallback</span>
         </div>
         <span className="text-xs text-muted-foreground" aria-live="polite">
@@ -622,7 +728,11 @@ function Dashboard() {
           <section
             aria-label="Company performance indicators"
             className={`grid gap-4 sm:grid-cols-2 ${
-              canViewFinance ? "xl:grid-cols-4" : canViewDeals ? "xl:grid-cols-3" : "xl:grid-cols-2"
+              canViewFinance || canViewProperties
+                ? "xl:grid-cols-4"
+                : canViewDeals
+                  ? "xl:grid-cols-3"
+                  : "xl:grid-cols-2"
             }`}
           >
             <MetricCard
@@ -647,13 +757,37 @@ function Dashboard() {
                 />
               </>
             ) : null}
+            {canViewProperties ? (
+              <>
+                <MetricCard
+                  label="Property records"
+                  value={(data.propertyCount ?? 0).toLocaleString()}
+                  detail="Current, non-archived properties"
+                  icon={Building2}
+                />
+                <MetricCard
+                  label="Awaiting verification"
+                  value={(data.propertiesPendingVerification ?? 0).toLocaleString()}
+                  detail="Pending property approval"
+                  icon={ShieldCheck}
+                />
+              </>
+            ) : null}
             {canViewFinance ? (
-              <MetricCard
-                label={`Cleared volume · ${selectedCurrency}`}
-                value={formatMoney(currentVolume, selectedCurrency)}
-                detail="This month; not converted across currencies"
-                icon={Wallet}
-              />
+              <>
+                <MetricCard
+                  label={`Cleared revenue | ${selectedCurrency}`}
+                  value={formatMoney(currentVolume, selectedCurrency)}
+                  detail="This month; not converted across currencies"
+                  icon={Wallet}
+                />
+                <MetricCard
+                  label={`Recorded commission | ${selectedCurrency}`}
+                  value={formatMoney(currentCommission, selectedCurrency)}
+                  detail="Cleared transactions with commission recorded"
+                  icon={Wallet}
+                />
+              </>
             ) : null}
           </section>
 
@@ -747,7 +881,7 @@ function Dashboard() {
                     </div>
                     <Button asChild variant="ghost" size="sm">
                       <Link to="/deals">
-                        View deals <ArrowUpRight aria-hidden="true" className="ml-1 h-4 w-4" />
+                        View deals <ArrowUpRight color="#DC2626" strokeWidth={2.2} aria-hidden="true" className="ml-1 h-4 w-4 shrink-0" />
                       </Link>
                     </Button>
                   </div>
@@ -804,7 +938,7 @@ function Dashboard() {
                   )}
                   {data.pipelineByCurrency.length ? (
                     <div className="mt-4 border-t pt-4">
-                      <p className="label-caps">Open pipeline value · by currency</p>
+                      <p className="label-caps">Open pipeline value | by currency</p>
                       <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
                         {data.pipelineByCurrency.map((item) => (
                           <p key={item.currency} className="text-sm font-semibold">
@@ -850,7 +984,7 @@ function Dashboard() {
                       ) : null}
                       <Button asChild variant="outline" size="sm">
                         <Link to="/finance">
-                          Transactions <ArrowUpRight aria-hidden="true" className="ml-1 h-4 w-4" />
+                          Transactions <ArrowUpRight color="#DC2626" strokeWidth={2.2} aria-hidden="true" className="ml-1 h-4 w-4 shrink-0" />
                         </Link>
                       </Button>
                     </div>
@@ -935,13 +1069,13 @@ function Dashboard() {
                       <h2 className="font-display text-lg font-semibold">Agent performance</h2>
                       <p className="mt-1 text-sm text-muted-foreground">
                         {canViewDeals
-                          ? "Client referrals and deals linked to those clients"
-                          : "Client referrals linked to each agent"}
+                          ? "Top five agents compared with the company-wide client close rate"
+                          : "Top five agents ranked by client referrals"}
                       </p>
                     </div>
                     <Button asChild variant="ghost" size="sm">
                       <Link to="/agents">
-                        Agent programme <ArrowUpRight aria-hidden="true" className="ml-1 h-4 w-4" />
+                        Agent programme <ArrowUpRight color="#DC2626" strokeWidth={2.2} aria-hidden="true" className="ml-1 h-4 w-4 shrink-0" />
                       </Link>
                     </Button>
                   </div>
@@ -953,20 +1087,45 @@ function Dashboard() {
                     />
                   ) : agents.isLoading ? (
                     <SectionSkeleton lines={4} />
-                  ) : agents.data?.agents.length ? (
+                  ) : agents.data ? (
+                    <>
+                    {canViewDeals ? (
+                      <div className="mb-4 grid gap-3 rounded-lg bg-muted/50 p-3 text-sm sm:grid-cols-3">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Company clients</p>
+                          <p className="font-semibold tabular-nums">
+                            {agents.data.company.activeClients.toLocaleString()}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Company clients with closed deals</p>
+                          <p className="font-semibold tabular-nums">
+                            {agents.data.company.clientsWithClosedDeals.toLocaleString()}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Company close rate</p>
+                          <p className="font-semibold tabular-nums">{agents.data.company.closeRate}%</p>
+                        </div>
+                      </div>
+                    ) : null}
+                    {agents.data.agents.length ? (
                     <div className="overflow-x-auto">
-                      <table className="w-full min-w-[360px] text-sm">
+                      <table className="w-full min-w-[440px] text-sm">
                         <thead className="text-left text-muted-foreground">
                           <tr>
                             <th className="pb-2 font-medium">Agent</th>
                             <th className="pb-2 text-right font-medium">Referrals</th>
                             {canViewDeals ? (
-                              <th className="pb-2 text-right font-medium">Linked deals</th>
+                              <>
+                                <th className="pb-2 text-right font-medium">Linked deals</th>
+                                <th className="pb-2 text-right font-medium">Close rate</th>
+                              </>
                             ) : null}
                           </tr>
                         </thead>
                         <tbody>
-                          {agents.data.agents.slice(0, 6).map((agent) => (
+                          {agents.data.agents.slice(0, 5).map((agent) => (
                             <tr key={agent.id} className="border-t">
                               <td className="py-3 pr-3">
                                 <Link
@@ -982,14 +1141,22 @@ function Dashboard() {
                               </td>
                               <td className="py-3 text-right tabular-nums">{agent.referrals}</td>
                               {canViewDeals ? (
-                                <td className="py-3 text-right tabular-nums">{agent.deals}</td>
+                                <>
+                                  <td className="py-3 text-right tabular-nums">{agent.deals}</td>
+                                  <td className="py-3 text-right tabular-nums">
+                                    {agent.closeRate}%{" "}
+                                    <span className="block text-xs text-muted-foreground">
+                                      vs {agents.data.company.closeRate}% company-wide
+                                    </span>
+                                  </td>
+                                </>
                               ) : null}
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
-                  ) : (
+                    ) : (
                     <DataEmptyState
                       title="No agent activity recorded"
                       description={
@@ -998,6 +1165,10 @@ function Dashboard() {
                           : "Referral activity will appear here."
                       }
                     />
+                    )}
+                    </>
+                  ) : (
+                    <DataEmptyState title="Agent statistics are unavailable" />
                   )}
                 </CardContent>
               </Card>
@@ -1008,14 +1179,14 @@ function Dashboard() {
                 <CardContent className="p-5 sm:p-6">
                   <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h2 className="font-display text-lg font-semibold">Staff activity</h2>
+                      <h2 className="font-display text-lg font-semibold">Top 5 staff activity</h2>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Actions recorded in the audit trail · last 30 days
+                        Most active staff and referring agents by audit actions | last 30 days
                       </p>
                     </div>
                     <Button asChild variant="ghost" size="sm">
                       <Link to="/admin/audit">
-                        Audit trail <ArrowUpRight aria-hidden="true" className="ml-1 h-4 w-4" />
+                        Audit trail <ArrowUpRight color="#DC2626" strokeWidth={2.2} aria-hidden="true" className="ml-1 h-4 w-4 shrink-0" />
                       </Link>
                     </Button>
                   </div>

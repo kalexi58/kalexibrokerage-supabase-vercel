@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791744433786,
+      "tag": "0000_digital_agent_programme",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791744448769,
+      "tag": "0001_agent_seq_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791819523293,
+      "tag": "0002_agent_accounts_registry_brand",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791819536496,
+      "tag": "0003_exclude_agents_from_staff",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791849662259,
+      "tag": "0004_agent_self_signup_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791849726877,
+      "tag": "0005_applicant_reads_own",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792043871023,
+      "tag": "0006_agent_identity_and_private_messages",
+      "breakpoints": true
+    }
+  ]
+}

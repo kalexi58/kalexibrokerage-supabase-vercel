@@ -1,0 +1,409 @@
+
+========== FILE: src/routes/_authenticated/agents.index.tsx ==========
+
+========== IMPORTS ==========
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { NoAccess, Panel, StatusPill, EmptyState } from "@/components/records";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import type { Database } from "@/integrations/supabase/types";
+import {
+  expectedApplicationUpdatedAtSchema,
+  type UpdateAgentApplicationFields,
+} from "@/lib/agent-application-validation";
+import { useAccess } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import {
+  createAgentCampaign,
+  listAgentApplications,
+  listAgentCampaigns,
+  reviewAgentApplication,
+  setAgentCampaignStatus,
+  signAgentFiles,
+  updateAgentApplication,
+} from "@/lib/agents.functions";
+import { AgentIdCardDesigner } from "@/components/AgentIdCardDesigner";
+import {
+  DataTableSkeleton,
+  ErrorState,
+  OperationProgress,
+  PageLoadingState,
+} from "@/components/LoadingStates";
+
+export const Route = createFileRoute("/_authenticated/agents/")({
+  head: () => ({
+    meta: [
+      { title: "Digital Agents - Kalexi" },
+      { name: "description", content: "Digital Agent Programme administration." },
+    ],
+  }),
+  component: AgentsPage,
+});
+
+function AgentsPage() {
+
+========== COMPLETE AGENT LIST COMPONENT ==========
+function AgentList() {
+  const qc = useQueryClient();
+  const access = useAccess();
+  const canManage = allows(access, "agents.manage");
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [draft, setDraft] = useState({
+    full_name: "",
+    phone: "",
+    email: "",
+    company_phone: "",
+    district: "",
+    village: "",
+    designation: "",
+    commission_rate: "2",
+    referral_code: "",
+    registered_on: "",
+    received_by: "",
+    status: "registered",
+  });
+
+  const q = useQuery({
+    queryKey: ["agents"],
+    queryFn: async () => {
+      const [agentsResult, registryResult] = await Promise.all([
+        supabase.from("agents").select("*").order("created_at", { ascending: false }),
+        supabase.from("agent_registry").select("*").order("created_at", { ascending: false }),
+      ]);
+
+      if (agentsResult.error) throw agentsResult.error;
+      if (registryResult.error) throw registryResult.error;
+
+      const officialRows = (agentsResult.data ?? []).map((a) => ({
+        id: a.id,
+        displayId: a.agent_code,
+        full_name: a.full_name,
+        phone: a.phone ?? "",
+        email: a.email ?? "",
+        company_phone: a.company_phone ?? "",
+        district: a.district ?? "",
+        village: a.village ?? "",
+        designation: a.designation ?? "",
+        commission_rate: String(a.commission_rate ?? 2),
+        referral_code: a.referral_code ?? "",
+        registered_on: "",
+        received_by: "",
+        status: a.status,
+        created_at: a.created_at,
+        recordType: "official" as const,
+      }));
+
+      const registryRows = (registryResult.data ?? []).map((r) => ({
+        id: r.id,
+        displayId: r.reg_id,
+        full_name: r.full_name,
+        phone: r.phone ?? "",
+        email: "",
+        company_phone: "",
+        district: r.district ?? "",
+        village: r.village ?? "",
+        designation: "",
+        commission_rate: "2",
+        referral_code: "",
+        registered_on: r.registered_on ?? "",
+        received_by: r.received_by ?? "",
+        status: r.status,
+        created_at: r.created_at,
+        recordType: "field" as const,
+      }));
+
+      return [...officialRows, ...registryRows].sort((a, b) =>
+        b.created_at.localeCompare(a.created_at),
+      );
+    },
+  });
+
+  const records = q.data ?? [];
+  const selected = records.find(
+    (a) => `${a.recordType}-${a.id}` === selectedKey,
+  );
+
+  function openRecord(a: (typeof records)[number]) {
+    setSelectedKey(`${a.recordType}-${a.id}`);
+    setEditing(false);
+    setDraft({
+      full_name: a.full_name,
+      phone: a.phone,
+      email: a.email,
+      company_phone: a.company_phone,
+      district: a.district,
+      village: a.village,
+      designation: a.designation,
+      commission_rate: a.commission_rate,
+      referral_code: a.referral_code,
+      registered_on: a.registered_on,
+      received_by: a.received_by,
+      status: a.status,
+    });
+  }
+
+  async function saveRecord() {
+    if (!selected || !canManage) return;
+
+    if (!draft.full_name.trim() || !draft.phone.trim()) {
+      toast.error("Full name and phone number are required.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (selected.recordType === "official") {
+        const rate = Number(draft.commission_rate);
+        if (!Number.isFinite(rate) || rate < 0 || rate > 100) {
+          toast.error("Commission rate must be between 0 and 100.");
+          return;
+        }
+
+        const { error } = await supabase
+          .from("agents")
+          .update({
+            full_name: draft.full_name.trim(),
+            phone: draft.phone.trim(),
+            email: draft.email.trim(),
+            company_phone: draft.company_phone.trim() || null,
+            district: draft.district.trim() || null,
+            village: draft.village.trim() || null,
+            designation: draft.designation.trim(),
+            commission_rate: rate,
+            referral_code: draft.referral_code.trim(),
+          })
+          .eq("id", selected.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("agent_registry")
+          .update({
+            full_name: draft.full_name.trim(),
+            phone: draft.phone.trim() || null,
+            district: draft.district.trim() || null,
+            village: draft.village.trim() || null,
+            registered_on: draft.registered_on || null,
+            received_by: draft.received_by.trim() || null,
+            status: draft.status,
+          })
+          .eq("id", selected.id);
+
+        if (error) throw error;
+      }
+
+      toast.success("Agent information updated.");
+      setEditing(false);
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["agents"] }),
+        qc.invalidateQueries({ queryKey: ["agent-registry"] }),
+      ]);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Could not save agent information.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const field = (
+    label: string,
+    key: keyof typeof draft,
+    type = "text",
+  ) => (
+    <label className="block space-y-1 text-sm">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <Input
+        type={type}
+        value={draft[key]}
+        disabled={!editing || saving}
+        onChange={(e) =>
+          setDraft((previous) => ({ ...previous, [key]: e.target.value }))
+        }
+      />
+    </label>
+  );
+
+  if (q.isLoading) return <DataTableSkeleton rows={6} columns={6} />;
+
+  if (q.isError) {
+    return (
+      <ErrorState
+        title="Agent records could not be retrieved"
+        onRetry={() => void q.refetch()}
+      />
+    );
+  }
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-[1fr_1.1fr]">
+      <Panel title={`Agent directory (${records.length})`}>
+        <p className="mb-3 text-sm text-muted-foreground">
+          Select a record to view its details, edit information or open an official ID card.
+        </p>
+
+        {records.length ? (
+          <div className="max-h-[680px] overflow-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-background text-left text-xs text-muted-foreground">
+                <tr>
+                  <th className="py-2">Name / ID</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {records.map((a) => {
+                  const key = `${a.recordType}-${a.id}`;
+                  return (
+                    <tr
+                      key={key}
+                      className={selectedKey === key ? "bg-muted" : ""}
+                    >
+                      <td className="py-3 pr-2">
+                        <button
+                          className="text-left hover:underline"
+                          onClick={() => openRecord(a)}
+                        >
+                          <span className="font-medium">{a.full_name}</span>
+                          <br />
+                          <span className="font-mono text-xs text-muted-foreground">
+                            {a.displayId}
+                          </span>
+                        </button>
+                      </td>
+                      <td className="pr-2 text-xs">
+                        {a.recordType === "official" ? "Official agent" : "Field register"}
+                      </td>
+                      <td><StatusPill value={a.status} /></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState title="No agent records yet" />
+        )}
+      </Panel>
+
+      {selected ? (
+        <Panel title={`${selected.full_name} - Profile`}>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="font-mono text-xs text-muted-foreground">{selected.displayId}</p>
+              <StatusPill value={selected.status} />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {selected.recordType === "official"
+                  ? "Official agent record"
+                  : "Field registration only; not an official agent ID"}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {selected.recordType === "official" ? (
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    window.open(
+                      `/agents/${encodeURIComponent(selected.id)}`,
+                      "_blank",
+                      "noopener,noreferrer",
+                    )
+                  }
+                >
+                  View ID card
+                </Button>
+              ) : null}
+
+              {canManage && !editing ? (
+                <Button onClick={() => setEditing(true)}>Edit details</Button>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {field("Full name *", "full_name")}
+            {field("Phone *", "phone")}
+            {selected.recordType === "official" ? field("Email", "email", "email") : null}
+            {selected.recordType === "official"
+              ? field("Company phone", "company_phone")
+              : null}
+            {field("District", "district")}
+            {field("Village", "village")}
+
+            {selected.recordType === "official" ? (
+              <>
+                {field("Designation", "designation")}
+                {field("Commission rate (%)", "commission_rate", "number")}
+                {field("Referral code", "referral_code")}
+              </>
+            ) : (
+              <>
+                {field("Registration date", "registered_on", "date")}
+                {field("Received by", "received_by")}
+                {editing ? (
+                  <label className="block space-y-1 text-sm">
+                    <span className="text-xs text-muted-foreground">Registration status</span>
+                    <select
+                      className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                      value={draft.status}
+                      onChange={(e) =>
+                        setDraft((previous) => ({ ...previous, status: e.target.value }))
+                      }
+                    >
+                      <option value="registered">Registered</option>
+                      <option value="verified">Verified</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </label>
+                ) : null}
+              </>
+            )}
+          </div>
+
+          {editing && canManage ? (
+            <div className="mt-5 flex flex-wrap gap-2 border-t pt-4">
+              <Button disabled={saving} onClick={() => void saveRecord()}>
+                {saving ? "Saving..." : "Save changes"}
+              </Button>
+              <Button
+                variant="outline"
+                disabled={saving}
+                onClick={() => {
+                  openRecord(selected);
+                  setEditing(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : null}
+
+          {!canManage ? (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Your account has view-only access to agent information.
+            </p>
+          ) : null}
+        </Panel>
+      ) : (
+        <Panel title="Agent details">
+          <EmptyState
+            title="Select an agent"
+            hint="Choose a record from the directory to view its details and available actions."
+          />
+        </Panel>
+      )}
+    </div>
+  );
+}

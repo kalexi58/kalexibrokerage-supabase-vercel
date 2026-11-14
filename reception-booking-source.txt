@@ -1,0 +1,69 @@
+$ErrorActionPreference = "Stop"
+
+$Root = (Get-Location).Path
+$Output = Join-Path $Root "kalexi_reception_inspection.txt"
+
+$Excluded = '\\(node_modules|dist|build|\.git|\.next)\\'
+
+$SourceFiles = Get-ChildItem ".\src" -Recurse -File -ErrorAction SilentlyContinue |
+    Where-Object {
+        $_.FullName -notmatch $Excluded -and
+        $_.Extension -in @(".tsx", ".ts", ".jsx", ".js")
+    }
+
+$MigrationFiles = Get-ChildItem ".\supabase\migrations" -Recurse -File -Filter "*.sql" -ErrorAction SilentlyContinue
+
+$RelevantSource = $SourceFiles | Where-Object {
+    Select-String -Path $_.FullName `
+        -Pattern 'ReceptionSchedulingPage|officer_appointments|officer_programmes|officer_availability|calendar_events|appointment' `
+        -Quiet -ErrorAction SilentlyContinue
+} | Select-Object -First 12
+
+$RelevantMigrations = $MigrationFiles | Where-Object {
+    Select-String -Path $_.FullName `
+        -Pattern 'officer_appointments|officer_programmes|officer_availability|calendar_events|appointment' `
+        -Quiet -ErrorAction SilentlyContinue
+} | Select-Object -Last 15
+
+$FilesToRead = @()
+
+if (Test-Path ".\package.json") {
+    $FilesToRead += Get-Item ".\package.json"
+}
+
+$FilesToRead += $RelevantSource
+$FilesToRead += $RelevantMigrations
+
+$FilesToRead = $FilesToRead | Sort-Object FullName -Unique
+
+$Report = [System.Collections.Generic.List[string]]::new()
+
+$Report.Add("KALEXI BROKERAGE - RECEPTION APPOINTMENT INSPECTION")
+$Report.Add("Project: $Root")
+$Report.Add("Generated: $(Get-Date)")
+$Report.Add("Files collected: $($FilesToRead.Count)")
+$Report.Add("")
+
+foreach ($File in $FilesToRead) {
+    $Report.Add("")
+    $Report.Add(("=" * 90))
+    $Report.Add("FILE: " + $File.FullName.Replace($Root, "."))
+    $Report.Add(("=" * 90))
+
+    $Content = Get-Content -LiteralPath $File.FullName -ErrorAction SilentlyContinue
+
+    if ($Content.Count -gt 700) {
+        $Content = $Content | Select-Object -First 700
+        $Report.Add("[File truncated after 700 lines]")
+    }
+
+    $Report.Add(($Content -join "`r`n"))
+}
+
+$Report | Set-Content -LiteralPath $Output -Encoding UTF8
+
+Write-Host ""
+Write-Host "Inspection file created:" -ForegroundColor Green
+Write-Host $Output -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Upload kalexi_reception_inspection.txt here."

@@ -1,17 +1,23 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useRef } from "react";
+import JsBarcode from "jsbarcode";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { KalexiMark } from "@/components/KalexiMark";
+import { ErrorState } from "@/components/LoadingStates";
 
 export const Route = createFileRoute("/_authenticated/clients/$clientId/acknowledgement")({
   head: () => ({
     meta: [
       { title: "Registration Acknowledgement — Kalexi Brokerage" },
-      { name: "description", content: "Printable QR-verified client registration acknowledgement." },
+      {
+        name: "description",
+        content: "Printable QR-verified client registration acknowledgement.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -21,17 +27,27 @@ export const Route = createFileRoute("/_authenticated/clients/$clientId/acknowle
 function Acknowledgement() {
   const { clientId } = useParams({ from: "/_authenticated/clients/$clientId/acknowledgement" });
   const [qr, setQr] = useState<string | null>(null);
+  const [profileQr, setProfileQr] = useState<string | null>(null);
+  const barcodeRef = useRef<SVGSVGElement>(null);
 
   const client = useQuery({
     queryKey: ["client-ack", clientId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clients")
-        .select("client_ref, verification_ref, full_name, phone, company_name, client_type, sector, requirement, created_at")
+        .select(
+          "client_ref, verification_ref, full_name, phone, company_name, client_type, sector, requirement, created_at, photo_path",
+        )
         .eq("id", clientId)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!data) return null;
+      if (!data.photo_path) return { ...data, photo_url: null };
+      const { data: photoData, error: photoError } = await supabase.storage
+        .from("client-photos")
+        .createSignedUrl(data.photo_path, 600);
+      if (photoError) throw photoError;
+      return { ...data, photo_url: photoData.signedUrl };
     },
   });
 
@@ -40,15 +56,67 @@ function Acknowledgement() {
   useEffect(() => {
     if (!verificationRef || typeof window === "undefined") return;
     const url = `${window.location.origin}/verify/${verificationRef}`;
-    void QRCode.toDataURL(url, { margin: 1, width: 220, color: { dark: "#0b1b34", light: "#ffffff" } }).then(
-      setQr,
-    );
+    void QRCode.toDataURL(url, {
+      margin: 1,
+      width: 220,
+      color: { dark: "#0b1b34", light: "#ffffff" },
+    })
+      .then(setQr)
+      .catch((error: unknown) => {
+        console.error("[clients] Could not create the verification QR code.", error);
+        setQr(null);
+      });
   }, [verificationRef]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let cancelled = false;
+    void QRCode.toDataURL(`${window.location.origin}/clients/${clientId}`, {
+      margin: 1,
+      width: 220,
+      color: { dark: "#0b1b34", light: "#ffffff" },
+    })
+      .then((url) => {
+        if (!cancelled) setProfileQr(url);
+      })
+      .catch((error: unknown) => {
+        console.error("[clients] Could not create the profile QR code.", error);
+        if (!cancelled) setProfileQr(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [clientId]);
+
+  useEffect(() => {
+    if (!client.data?.client_ref || !barcodeRef.current) return;
+    try {
+      JsBarcode(barcodeRef.current, client.data.client_ref, {
+        format: "CODE128",
+        displayValue: true,
+        font: "monospace",
+        fontSize: 10,
+        height: 34,
+        margin: 0,
+        width: 1.4,
+      });
+    } catch (error) {
+      console.error("[clients] Could not create the client barcode.", error);
+    }
+  }, [client.data?.client_ref]);
 
   if (!client.data) {
     return (
       <AppShell>
-        <p className="text-sm text-muted-foreground">Loading document…</p>
+        {client.isError ? (
+          <ErrorState
+            title="Acknowledgement could not be retrieved"
+            description="Check your access and connection, then retry."
+            onRetry={() => void client.refetch()}
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground">Loading document…</p>
+        )}
       </AppShell>
     );
   }
@@ -79,7 +147,9 @@ function Acknowledgement() {
           <div className="flex items-center gap-3">
             <KalexiMark className="h-11 w-11" />
             <div>
-              <p className="font-display text-lg font-semibold tracking-tight">KALEXI BROKERAGE LTD</p>
+              <p className="font-display text-lg font-semibold tracking-tight">
+                KALEXI BROKERAGE LTD
+              </p>
               <p className="text-xs text-muted-foreground">Brokerage · Facilitation · Advisory</p>
             </div>
           </div>
@@ -90,7 +160,7 @@ function Acknowledgement() {
           </div>
         </header>
 
-        <section className="grid gap-8 py-8 sm:grid-cols-[minmax(0,1fr)_200px]">
+        <section className="grid gap-8 py-8 sm:grid-cols-[minmax(0,1fr)_240px]">
           <dl className="space-y-3 text-sm">
             <Row k="Client name" v={c.full_name} />
             <Row k="Company" v={c.company_name ?? "—"} />
@@ -104,21 +174,53 @@ function Acknowledgement() {
             </div>
           </dl>
 
-          <div className="text-center">
-            {qr ? (
-              <img src={qr} alt={`Verification QR code for ${c.client_ref}`} className="mx-auto h-[180px] w-[180px]" />
-            ) : (
-              <div className="mx-auto h-[180px] w-[180px] rounded border border-dashed" />
-            )}
-            <p className="mt-2 text-xs text-muted-foreground">Scan to verify authenticity</p>
-            <p className="ref-mono mt-1 text-[10px] break-all text-muted-foreground">{c.verification_ref}</p>
+          <div className="space-y-4 text-center">
+            {c.photo_url ? (
+              <img
+                src={c.photo_url}
+                alt={`${c.full_name} profile`}
+                className="mx-auto h-24 w-24 rounded-lg border object-cover"
+              />
+            ) : null}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                {profileQr ? (
+                  <img
+                    src={profileQr}
+                    alt={`Private profile link for ${c.client_ref}`}
+                    className="mx-auto h-24 w-24"
+                  />
+                ) : (
+                  <div className="mx-auto h-24 w-24 rounded border border-dashed" />
+                )}
+                <p className="mt-1 text-[10px] text-muted-foreground">Staff profile link</p>
+              </div>
+              <div>
+                {qr ? (
+                  <img
+                    src={qr}
+                    alt={`Verification QR code for ${c.client_ref}`}
+                    className="mx-auto h-24 w-24"
+                  />
+                ) : (
+                  <div className="mx-auto h-24 w-24 rounded border border-dashed" />
+                )}
+                <p className="mt-1 text-[10px] text-muted-foreground">Verify acknowledgement</p>
+              </div>
+            </div>
+            <svg
+              ref={barcodeRef}
+              className="mx-auto max-w-full"
+              aria-label={`Barcode for ${c.client_ref}`}
+            />
           </div>
         </section>
 
         <footer className="border-t pt-6 text-xs leading-relaxed text-muted-foreground">
           This acknowledgement confirms that the above party has been officially registered in the
-          records of Kalexi Brokerage Ltd. It is not a contract, offer, valuation or guarantee of any
-          transaction. Verification of this document is available only through the QR reference above.
+          records of Kalexi Brokerage Ltd. It is not a contract, offer, valuation or guarantee of
+          any transaction. The acknowledgement verification QR is for public authenticity checks;
+          the separate staff profile QR requires an authenticated Kalexi account.
         </footer>
       </article>
     </AppShell>

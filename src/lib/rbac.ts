@@ -45,12 +45,17 @@ export const WORKSPACE_LABEL: Record<AppRole, string> = {
   auditor: "Audit Workspace",
 };
 
-/** Granular permission catalogue — configurable per role by the Super Admin. */
+/** Granular permission catalogue - configurable per role by the Super Admin. */
 export const PERMISSION_GROUPS: { module: string; label: string; actions: string[] }[] = [
   {
     module: "clients",
     label: "Clients",
     actions: ["view", "create", "edit", "archive", "delete", "export"],
+  },
+  {
+    module: "properties",
+    label: "Properties & Assets",
+    actions: ["view", "create", "edit", "verify", "archive"],
   },
   {
     module: "requirements",
@@ -87,7 +92,11 @@ export const PERMISSION_GROUPS: { module: string; label: string; actions: string
     label: "Documents & Media",
     actions: ["view", "create", "edit", "download", "archive", "delete"],
   },
-  { module: "finance", label: "Finance", actions: ["view", "create", "edit", "export"] },
+  {
+    module: "finance",
+    label: "Finance & Accounts",
+    actions: ["view", "create", "edit", "approve", "configure", "export"],
+  },
   { module: "agents", label: "Digital Agents", actions: ["view", "manage"] },
   { module: "forms", label: "Forms", actions: ["view", "create", "edit", "archive"] },
   { module: "tasks", label: "Tasks", actions: ["view", "create", "edit"] },
@@ -115,6 +124,9 @@ export const ACTION_LABEL: Record<string, string> = {
   delete: "Delete",
   export: "Export",
   download: "Download",
+  approve: "Approve",
+  configure: "Configure",
+  verify: "Verify",
   users: "Manage users",
   roles: "Manage roles & permissions",
   settings: "System settings",
@@ -164,6 +176,19 @@ export interface NavGroup {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
+    label: "Company",
+    items: [{ to: "/calendar", label: "Company Calendar", permission: "clients.view" }],
+  },
+  {
+    label: "Reception",
+    items: [{ to: "/reception/scheduling", label: "Appointments & Officer Schedule", permission: "clients.view" }],
+  },
+  {
+    label: "My Workspace",
+    items: [
+      { to: "/my-availability", label: "My Schedule", permission: "clients.view" },
+    ],
+  },  {
     label: "Overview",
     items: [{ to: "/dashboard", label: "Dashboard", permission: "clients.view" }],
   },
@@ -174,6 +199,13 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: "/clients/new", label: "New Client", permission: "clients.create" },
       { to: "/requirements", label: "Requirements", permission: "requirements.view" },
       { to: "/forms", label: "Forms", permission: "forms.view" },
+    ],
+  },
+  {
+    label: "Properties",
+    items: [
+      { to: "/properties", label: "Property Register", permission: "properties.view" },
+      { to: "/properties/new", label: "Register Property", permission: "properties.create" },
     ],
   },
   {
@@ -201,6 +233,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: "/risk", label: "Risk & Investigations", permission: "risk.view" },
       { to: "/risk/search", label: "Internal Search", permission: "risk.view" },
       { to: "/research", label: "Research", permission: "research.view" },
+      { to: "/intelligence", label: "Intelligence & Analytics", permission: "admin.users" },
     ],
   },
   {
@@ -211,9 +244,11 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Transactions",
+    label: "Finance & Accounts",
     items: [
-      { to: "/finance", label: "Transactions", permission: "finance.view" },
+      { to: "/finance", label: "Overview & Transactions", permission: "finance.view" },
+      { to: "/finance/approvals", label: "Approvals", permission: "finance.view" },
+      { to: "/finance/ledger", label: "General Ledger", permission: "finance.view" },
       { to: "/finance/receipts", label: "Receipts", permission: "finance.view" },
     ],
   },
@@ -236,6 +271,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Administration",
     items: [
       { to: "/admin", label: "Control Centre", permission: "admin.users" },
+      { to: "/employee-intelligence", label: "Employee Intelligence", permission: "admin.users" },
       { to: "/brand", label: "Brand Centre", permission: "admin.users" },
       { to: "/admin/maintenance", label: "System Maintenance", permission: "admin.settings" },
       { to: "/admin/users", label: "Users", permission: "admin.users" },
@@ -251,3 +287,4 @@ export function navFor(access: AccessState | undefined | null): NavGroup[] {
     items: g.items.filter((i) => allows(access, i.permission)),
   })).filter((g) => g.items.length > 0);
 }
+

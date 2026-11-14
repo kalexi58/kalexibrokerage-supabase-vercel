@@ -6,6 +6,10 @@ import { AppShell, PageHeader } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ClientEditor } from "@/components/ClientEditor";
+import { useSession } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { StatusPill } from "@/components/records";
+import { formatMoney } from "@/lib/records";
 
 export const Route = createFileRoute("/_authenticated/clients/$clientId/")({
   head: () => ({
@@ -20,11 +24,16 @@ export const Route = createFileRoute("/_authenticated/clients/$clientId/")({
 
 function ClientDetail() {
   const { clientId } = useParams({ from: "/_authenticated/clients/$clientId/" });
+  const { data: session } = useSession();
 
   const client = useQuery({
     queryKey: ["client", clientId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("clients").select("*").eq("id", clientId).maybeSingle();
+      const { data, error } = await supabase
+        .from("clients")
+        .select("*")
+        .eq("id", clientId)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -43,6 +52,33 @@ function ClientDetail() {
     },
   });
 
+  const photo = useQuery({
+    queryKey: ["client-photo", client.data?.id, client.data?.photo_path],
+    enabled: !!client.data?.photo_path,
+    queryFn: async () => {
+      const { data, error } = await supabase.storage
+        .from("client-photos")
+        .createSignedUrl(client.data!.photo_path!, 600);
+      if (error) throw error;
+      return data.signedUrl;
+    },
+  });
+
+  const properties = useQuery({
+    queryKey: ["client-properties", clientId],
+    enabled: allows(session?.access, "properties.view"),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("id, property_ref, name, category, location, asking_price, currency, status")
+        .eq("client_id", clientId)
+        .is("archived_at", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   if (client.isLoading) {
     return (
       <AppShell>
@@ -54,7 +90,10 @@ function ClientDetail() {
   if (!client.data) {
     return (
       <AppShell>
-        <PageHeader title="Record not found" description="This client record is not available to you." />
+        <PageHeader
+          title="Record not found"
+          description="This client record is not available to you."
+        />
         <Button asChild variant="outline">
           <Link to="/clients">Back to client register</Link>
         </Button>
@@ -83,18 +122,32 @@ function ClientDetail() {
         title={c.full_name}
         description={`${c.client_ref} · ${c.client_type} · ${c.sector}`}
         actions={
-          <div className="flex flex-wrap gap-2"><ClientEditor client={c} />
-          <Button asChild variant="outline">
-            <Link to="/clients/$clientId/acknowledgement" params={{ clientId }}>
-              Registration acknowledgement
-            </Link>
-          </Button></div>
+          <div className="flex flex-wrap gap-2">
+            <ClientEditor client={c} />
+            <Button asChild variant="outline">
+              <Link to="/clients/$clientId/acknowledgement" params={{ clientId }}>
+                Registration acknowledgement
+              </Link>
+            </Button>
+          </div>
         }
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
         <Card className="shadow-[var(--shadow-panel)]">
           <CardContent className="p-0">
+            {photo.data ? (
+              <img
+                src={photo.data}
+                alt={`${c.full_name} profile`}
+                className="m-5 h-28 w-28 rounded-lg border object-cover"
+              />
+            ) : null}
+            {photo.isError ? (
+              <p className="px-5 pt-4 text-sm text-destructive">
+                The private client photo could not be loaded.
+              </p>
+            ) : null}
             <dl className="divide-y text-sm">
               {rows.map(([k, v]) => (
                 <div key={k} className="flex gap-4 px-5 py-3">
@@ -129,7 +182,64 @@ function ClientDetail() {
       <div className="mt-6">
         <MediaGallery parentType="clients" parentId={clientId} title="Client photos & videos" />
       </div>
-
+      {allows(session?.access, "properties.view") ? (
+        <section className="mt-6 rounded-lg border bg-card shadow-[var(--shadow-panel)]">
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4">
+            <div>
+              <h2 className="font-semibold">Linked properties and assets</h2>
+              <p className="text-xs text-muted-foreground">
+                Every property record remains linked to this client.
+              </p>
+            </div>
+            {allows(session?.access, "properties.create") ? (
+              <Button asChild size="sm">
+                <Link to="/properties/new">Register property</Link>
+              </Button>
+            ) : null}
+          </header>
+          {properties.isLoading ? (
+            <p className="p-5 text-sm text-muted-foreground">Loading linked properties…</p>
+          ) : properties.isError ? (
+            <div className="p-5 text-sm text-destructive">
+              Linked properties could not be retrieved. Retry from the property register.
+            </div>
+          ) : properties.data?.length ? (
+            <ul className="divide-y">
+              {properties.data.map((property) => (
+                <li
+                  key={property.id}
+                  className="flex flex-wrap items-center justify-between gap-3 px-5 py-3"
+                >
+                  <div>
+                    <Link
+                      to="/properties/$propertyId"
+                      params={{ propertyId: property.id }}
+                      className="font-medium text-primary hover:underline"
+                    >
+                      {property.name}
+                    </Link>
+                    <p className="ref-mono text-xs text-muted-foreground">
+                      {property.property_ref} · {property.category} · {property.location}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm">
+                      {property.asking_price === null
+                        ? "—"
+                        : formatMoney(property.asking_price, property.currency)}
+                    </span>
+                    <StatusPill value={property.status} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="p-5 text-sm text-muted-foreground">
+              No properties are currently linked to this client.
+            </p>
+          )}
+        </section>
+      ) : null}
     </AppShell>
   );
 }

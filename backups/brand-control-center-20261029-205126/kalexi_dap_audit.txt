@@ -1,0 +1,1323 @@
+﻿KALEXI BROKERAGE - DAP / COMMISSION / TAX AUDIT
+Generated: 2026-10-28 14:37:23
+Project: C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)
+Files scanned: 291
+
+IMPORTANT: Secrets and environment files are excluded.
+Review this report before sharing it.
+
+========== 1. RELEVANT FILES ==========
+AGENTS.md
+components.json
+DEPLOY.md
+drizzle.config.ts
+eslint.config.js
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md
+package-lock.json
+package.json
+README.md
+roadmap.md
+tsconfig.json
+vite.config.ts
+.output\nitro.json
+.output\public\assets\account-DHEL4vDi.js
+.output\public\assets\admin.audit-BhNRDxIT.js
+.output\public\assets\admin.functions-BweiLb4t.js
+.output\public\assets\admin.index-Da01fFNj.js
+.output\public\assets\admin.maintenance-BZB2B5rw.js
+.output\public\assets\admin.roles-DgIp3BQ_.js
+.output\public\assets\admin.users-DfZQtI9_.js
+.output\public\assets\agent-id-theme-e9f37d85.js
+.output\public\assets\agent-portal-BjC8lvi4.js
+.output\public\assets\agent.verify._token-XS3Mnx_6.js
+.output\public\assets\AgentIdCard-CsEzv11c.js
+.output\public\assets\AgentMessages-C5KPJx50.js
+.output\public\assets\agents.functions-GSHGq31q.js
+.output\public\assets\agents.index-VOAgP979.js
+.output\public\assets\agents.redemptions-DkRQ1l4h.js
+.output\public\assets\agents._agentId-CZP5ufVZ.js
+.output\public\assets\app-version-DN1DHbka.js
+.output\public\assets\AppShell-B3oP13jh.js
+.output\public\assets\archive.index-Dss_pJqB.js
+.output\public\assets\AreaChart-C48_BQOv.js
+.output\public\assets\BarChart-fgIaHFLO.js
+.output\public\assets\brand-CSXmcny2.js
+.output\public\assets\browser-DbcKXJlG.js
+.output\public\assets\button-DeSJf49K.js
+.output\public\assets\card-B-J2GUdt.js
+.output\public\assets\check-C94ADSaF.js
+.output\public\assets\checkbox-DFFLDM8o.js
+.output\public\assets\client-B3jDPlHb.js
+.output\public\assets\ClientOnly-DC03InjG.js
+.output\public\assets\clients.index-BAKLmsNq.js
+.output\public\assets\clients.new-f5E-BGsz.js
+.output\public\assets\clients._clientId.acknowledgement-Cm5-mlfv.js
+.output\public\assets\clients._clientId.index-LODtKO14.js
+.output\public\assets\createLucideIcon-CS5TKXz9.js
+.output\public\assets\dashboard-bjMvj4Bo.js
+.output\public\assets\deals.index-WJu3Y1Ww.js
+.output\public\assets\deals.new-DjhASl6r.js
+.output\public\assets\deals._dealId.index-DJSUfvKp.js
+.output\public\assets\dialog-cdrYIMCJ.js
+.output\public\assets\dist-bSHbPoK1.js
+.output\public\assets\dist-Bw6F1vFa.js
+.output\public\assets\dist-C0IECgcp.js
+.output\public\assets\documents.index-DMb4vCrm.js
+.output\public\assets\es2015-B3LwCd8l.js
+.output\public\assets\f._token-CP_HmM9g.js
+.output\public\assets\finance.index-_bNa9uGg.js
+.output\public\assets\finance.receipts.index-BoxOwoPQ.js
+.output\public\assets\finance.receipts.print-Fy0V8zd7.js
+.output\public\assets\finance.receipts._receiptId-BCanPPzu.js
+.output\public\assets\forms.index-D4rRnqE7.js
+.output\public\assets\forms._formId.index-C06R_mOG.js
+.output\public\assets\generateCategoricalChart-CwCayiNx.js
+.output\public\assets\index-DYcr6OF8.js
+.output\public\assets\input-bA6u9TMI.js
+.output\public\assets\join._token-CdkR_33K.js
+.output\public\assets\KalexiMark-4nTfSBpY.js
+.output\public\assets\maintenance-gr5lldfb.js
+.output\public\assets\matches.index-DUxxYJFW.js
+.output\public\assets\media.index-DB-l9WLT.js
+.output\public\assets\MediaGallery-DYzN8SEA.js
+.output\public\assets\objectives.index-D_L9HLpo.js
+.output\public\assets\opportunities.index-Bujus8yP.js
+.output\public\assets\opportunities.new-D1rUmEcN.js
+.output\public\assets\opportunities._opportunityId.index-aiG74wkU.js
+.output\public\assets\r._code-C1dR6n0d.js
+.output\public\assets\records-uj5wvPKw.js
+.output\public\assets\requirements.index-4n5_iiUp.js
+.output\public\assets\requirements.new-CjKORdrn.js
+.output\public\assets\requirements._requirementId.index-FBetaBO5.js
+.output\public\assets\research.index-CFvCnm6Y.js
+.output\public\assets\research._caseId.index-BFi4RhVU.js
+.output\public\assets\risk.index-CDpBiS85.js
+.output\public\assets\risk.search-BuWW1xLo.js
+.output\public\assets\risk._caseId.index-BrQeoaVj.js
+.output\public\assets\root-DLTE-HSj.js
+.output\public\assets\route-09xVqPeB.js
+.output\public\assets\routes-CODsuIiO.js
+.output\public\assets\select-CcAoVXao.js
+.output\public\assets\textarea-CNLucOpf.js
+.output\public\assets\types-Bf5BuPOo.js
+.output\public\assets\useMatch-EjXqkmhs.js
+.output\public\assets\useMutation-ByDfZdpi.js
+.output\public\assets\useRouter-DkpIHWI1.js
+.output\public\assets\useSelector-xmW3gk_b.js
+.output\public\assets\useSession-DbrVfUaS.js
+.output\public\assets\verification.index-CxpvHAfH.js
+.output\public\assets\verification._verificationId.index-BYRCjU6c.js
+.output\public\assets\verify._reference-kJgowKBE.js
+.output\server\package.json
+.vscode\extensions.json
+.vscode\settings.json
+backup-agent-card-20261028-120457\AgentIdCard.tsx
+drizzle\schema.ts
+drizzle\migrations\0000_digital_agent_programme.sql
+drizzle\migrations\0001_agent_seq_grants.sql
+drizzle\migrations\0002_agent_accounts_registry_brand.sql
+drizzle\migrations\0003_exclude_agents_from_staff.sql
+drizzle\migrations\0004_agent_self_signup_tokens.sql
+drizzle\migrations\0005_applicant_reads_own.sql
+drizzle\migrations\0006_agent_identity_and_private_messages.sql
+drizzle\migrations\meta\0000_snapshot.json
+drizzle\migrations\meta\0001_snapshot.json
+drizzle\migrations\meta\0002_snapshot.json
+drizzle\migrations\meta\0003_snapshot.json
+drizzle\migrations\meta\0004_snapshot.json
+drizzle\migrations\meta\0005_snapshot.json
+drizzle\migrations\meta\0006_snapshot.json
+drizzle\migrations\meta\_journal.json
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx
+src\app-version.d.ts
+src\router.tsx
+src\routeTree.gen.ts
+src\server.ts
+src\start.ts
+src\components\AgentIdCard.tsx
+src\components\AgentIdCardDesigner.tsx
+src\components\AgentIdentityEditor.tsx
+src\components\AgentImpact.tsx
+src\components\AgentMessages.tsx
+src\components\AppShell.tsx
+src\components\BrandAppearanceSettings.tsx
+src\components\ClientEditor.tsx
+src\components\CompanyBrand.tsx
+src\components\GlobalSearch.tsx
+src\components\KalexiMark.tsx
+src\components\LoadingStates.test.tsx
+src\components\LoadingStates.tsx
+src\components\MaintenanceNotice.tsx
+src\components\MediaGallery.tsx
+src\components\records.tsx
+src\components\SignatureInput.tsx
+src\components\SignInBackdrop.tsx
+src\components\StaffAvatar.tsx
+src\components\ui\accordion.tsx
+src\components\ui\alert-dialog.tsx
+src\components\ui\alert.tsx
+src\components\ui\aspect-ratio.tsx
+src\components\ui\avatar.tsx
+src\components\ui\badge.tsx
+src\components\ui\breadcrumb.tsx
+src\components\ui\button.tsx
+src\components\ui\calendar.tsx
+src\components\ui\card.tsx
+src\components\ui\carousel.tsx
+src\components\ui\chart.tsx
+src\components\ui\checkbox.tsx
+src\components\ui\collapsible.tsx
+src\components\ui\command.tsx
+src\components\ui\context-menu.tsx
+src\components\ui\dialog.tsx
+src\components\ui\drawer.tsx
+src\components\ui\dropdown-menu.tsx
+src\components\ui\form.tsx
+src\components\ui\hover-card.tsx
+src\components\ui\input-otp.tsx
+src\components\ui\input.tsx
+src\components\ui\label.tsx
+src\components\ui\menubar.tsx
+src\components\ui\navigation-menu.tsx
+src\components\ui\pagination.tsx
+src\components\ui\popover.tsx
+src\components\ui\progress.tsx
+src\components\ui\radio-group.tsx
+src\components\ui\resizable.tsx
+src\components\ui\scroll-area.tsx
+src\components\ui\select.tsx
+src\components\ui\separator.tsx
+src\components\ui\sheet.tsx
+src\components\ui\sidebar.tsx
+src\components\ui\skeleton.tsx
+src\components\ui\slider.tsx
+src\components\ui\sonner.tsx
+src\components\ui\switch.tsx
+src\components\ui\table.tsx
+src\components\ui\tabs.tsx
+src\components\ui\textarea.tsx
+src\components\ui\toggle-group.tsx
+src\components\ui\toggle.tsx
+src\components\ui\tooltip.tsx
+src\hooks\use-mobile.tsx
+src\hooks\useSession.ts
+src\integrations\supabase\auth-attacher.ts
+src\integrations\supabase\auth-middleware.ts
+src\integrations\supabase\client.server.ts
+src\integrations\supabase\client.ts
+src\integrations\supabase\types.ts
+src\lib\admin.functions.ts
+src\lib\agent-id-theme.ts
+src\lib\agent-messages.functions.ts
+src\lib\agent-rules.test.ts
+src\lib\agent-rules.ts
+src\lib\agents.functions.ts
+src\lib\app-version.ts
+src\lib\auth.functions.ts
+src\lib\brand.functions.ts
+src\lib\error-capture.ts
+src\lib\error-page.ts
+src\lib\maintenance-page.test.ts
+src\lib\maintenance-page.ts
+src\lib\maintenance.functions.ts
+src\lib\maintenance.server.ts
+src\lib\maintenance.ts
+src\lib\publicform.functions.ts
+src\lib\rbac.ts
+src\lib\records.ts
+src\lib\redemption-rules.test.ts
+src\lib\redemption-rules.ts
+src\lib\utils.ts
+src\routes\agent.verify.$token.tsx
+src\routes\f.$token.tsx
+src\routes\index.tsx
+src\routes\join.$token.tsx
+src\routes\maintenance.tsx
+src\routes\r.$code.tsx
+src\routes\README.md
+src\routes\verify.$reference.tsx
+src\routes\__root.tsx
+src\routes\_authenticated\account.tsx
+src\routes\_authenticated\admin.audit.tsx
+src\routes\_authenticated\admin.index.tsx
+src\routes\_authenticated\admin.maintenance.tsx
+src\routes\_authenticated\admin.roles.tsx
+src\routes\_authenticated\admin.users.tsx
+src\routes\_authenticated\agent-portal.tsx
+src\routes\_authenticated\agents.$agentId.tsx
+src\routes\_authenticated\agents.index.tsx
+src\routes\_authenticated\agents.redemptions.tsx
+src\routes\_authenticated\archive.index.tsx
+src\routes\_authenticated\brand.tsx
+src\routes\_authenticated\clients.$clientId.acknowledgement.tsx
+src\routes\_authenticated\clients.$clientId.index.tsx
+src\routes\_authenticated\clients.index.tsx
+src\routes\_authenticated\clients.new.tsx
+src\routes\_authenticated\dashboard.tsx
+src\routes\_authenticated\deals.$dealId.index.tsx
+src\routes\_authenticated\deals.index.tsx
+src\routes\_authenticated\deals.new.tsx
+src\routes\_authenticated\documents.index.tsx
+src\routes\_authenticated\finance.index.tsx
+src\routes\_authenticated\finance.receipts.$receiptId.tsx
+src\routes\_authenticated\finance.receipts.index.tsx
+src\routes\_authenticated\finance.receipts.print.tsx
+src\routes\_authenticated\forms.$formId.index.tsx
+src\routes\_authenticated\forms.index.tsx
+src\routes\_authenticated\matches.index.tsx
+src\routes\_authenticated\media.index.tsx
+src\routes\_authenticated\objectives.index.tsx
+src\routes\_authenticated\opportunities.$opportunityId.index.tsx
+src\routes\_authenticated\opportunities.index.tsx
+src\routes\_authenticated\opportunities.new.tsx
+src\routes\_authenticated\requirements.$requirementId.index.tsx
+src\routes\_authenticated\requirements.index.tsx
+src\routes\_authenticated\requirements.new.tsx
+src\routes\_authenticated\research.$caseId.index.tsx
+src\routes\_authenticated\research.index.tsx
+src\routes\_authenticated\risk.$caseId.index.tsx
+src\routes\_authenticated\risk.index.tsx
+src\routes\_authenticated\risk.search.tsx
+src\routes\_authenticated\route.tsx
+src\routes\_authenticated\verification.$verificationId.index.tsx
+src\routes\_authenticated\verification.index.tsx
+supabase\setup_all.sql
+supabase\migrations\20260810000000_create_storage_buckets.sql
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql
+supabase\migrations\20260810183607_27fb022b-9190-4fef-95ab-401dd97e086e.sql
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql
+supabase\migrations\20260811070025_56fabcfd-1eff-46ec-9183-fbbf25285203.sql
+supabase\migrations\20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql
+supabase\migrations\20260814162920_0cb94f30-e546-4b87-b52a-0da3fc1f43e3.sql
+supabase\migrations\20260816035733_d4bba811-549a-4efa-a1fb-e69056e0792b.sql
+supabase\migrations\20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql
+supabase\migrations\20261022190000_agent_phone_signin.sql
+supabase\migrations\20261022203000_system_maintenance.sql
+supabase\migrations\20261024000000_agent_registration_schema.sql
+supabase\migrations\20261025000000_company_branding.sql
+
+========== 2. PACKAGE CONFIGURATION ==========
+Name: kalexi-brokerage
+Scripts:
+  dev: vite dev
+  build: vite build
+  build:dev: vite build --mode development
+  preview: vite preview
+  lint: eslint .
+  format: prettier --write .
+Dependencies:
+  dependencies @radix-ui/react-accordion: ^1.2.12
+  dependencies @radix-ui/react-alert-dialog: ^1.1.15
+  dependencies @radix-ui/react-aspect-ratio: ^1.1.8
+  dependencies @radix-ui/react-avatar: ^1.1.11
+  dependencies @radix-ui/react-checkbox: ^1.3.3
+  dependencies @radix-ui/react-collapsible: ^1.1.12
+  dependencies @radix-ui/react-context-menu: ^2.2.16
+  dependencies @radix-ui/react-dialog: ^1.1.15
+  dependencies @radix-ui/react-dropdown-menu: ^2.1.16
+  dependencies @radix-ui/react-hover-card: ^1.1.15
+  dependencies @radix-ui/react-label: ^2.1.8
+  dependencies @radix-ui/react-menubar: ^1.1.16
+  dependencies @radix-ui/react-navigation-menu: ^1.2.14
+  dependencies @radix-ui/react-popover: ^1.1.15
+  dependencies @radix-ui/react-progress: ^1.1.8
+  dependencies @radix-ui/react-radio-group: ^1.3.8
+  dependencies @radix-ui/react-scroll-area: ^1.2.10
+  dependencies @radix-ui/react-select: ^2.2.6
+  dependencies @radix-ui/react-separator: ^1.1.8
+  dependencies @radix-ui/react-slider: ^1.3.6
+  dependencies @radix-ui/react-slot: ^1.2.4
+  dependencies @radix-ui/react-switch: ^1.2.6
+  dependencies @radix-ui/react-tabs: ^1.1.13
+  dependencies @radix-ui/react-toggle: ^1.1.10
+  dependencies @radix-ui/react-toggle-group: ^1.1.11
+  dependencies @radix-ui/react-tooltip: ^1.2.8
+  dependencies @supabase/supabase-js: ^2.112.2
+  dependencies @tanstack/react-query: ^5.101.1
+  dependencies @tanstack/react-router: 1.170.41
+  dependencies @tanstack/react-start: 1.168.60
+  dependencies @tanstack/router-plugin: 1.168.42
+  dependencies class-variance-authority: ^0.7.1
+  dependencies embla-carousel-react: ^8.6.0
+  dependencies lucide-react: ^0.575.0
+  dependencies react: ^19.2.0
+  dependencies react-day-picker: ^9.14.0
+  dependencies react-dom: ^19.2.0
+  dependencies react-hook-form: ^7.71.2
+  dependencies react-resizable-panels: ^4.6.5
+  dependencies zod: ^3.24.2
+  devDependencies @types/react: ^19.2.0
+  devDependencies @types/react-dom: ^19.2.0
+  devDependencies @vitejs/plugin-react: ^5.2.0
+  devDependencies drizzle-kit: 0.x
+  devDependencies drizzle-orm: 0.x
+  devDependencies eslint-plugin-react-hooks: ^5.2.0
+  devDependencies eslint-plugin-react-refresh: ^0.4.20
+
+========== 3. MATCHING CODE AND SQL ==========
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:14: Agent registration expects the objects in `20261024000000_agent_registration_schema.sql`, including the `clients.agent_id` and `clients.referral_code` columns. Maintenance expects `20261022203000_system_maintenance.sql`. File existence does not mean either migration has been applied.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:35: | Agents | `agent_campaigns`, `agent_registry`, `agent_applications`, `agents`, `agent_redemptions`, `agent_notices`, `agent_messages` |
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:65: agent_applications: id, application_ref, campaign_id, full_name, phone, email, date_of_birth, gender, nationality, address, district, village, occupation, id_type, id_number, photo_path, id_front_path, id_back_path, payment_method, payment_provider, payment_account_name, payment_account_number, declarations, registry_id, user_id, status, review_not ... [truncated]
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:66: agent_campaigns: id, title, token, active, expires_at, created_by, created_at, updated_at
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:69: agent_redemptions: id, agent_id, tokens_used, amount, currency, status, processed_by, processed_at, created_at
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:70: agent_registry: id, reg_id, full_name, phone, village, district, registered_on, received_by, signature_path, linked_application_id, status, created_by, created_at, updated_at
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:71: agents: id, agent_code, application_id, registry_id, full_name, phone, email, company_phone, district, village, designation, commission_rate, referral_code, verification_token, photo_path, signature_path, issued_at, expires_at, status, user_id, created_by, created_at, updated_at
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:76: clients: id, client_ref, full_name, phone, email, company_name, client_type, sector, requirement, branch, status, verification_ref, registered_by, created_at, updated_at, address, id_type, id_number, legal_name, kyc_status, kyc_details, archived_at, archived_by, archive_reason, agent_id, referral_code
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:82: deals: id, deal_ref, title, sector, client_id, opportunity_id, requirement_id, stage, status, value, currency, commission_rate, expected_close, closed_at, close_outcome, notes, created_by, assigned_to, created_at, updated_at, archived_at, archived_by, archive_reason
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:86: [REDACTED - POSSIBLE SECRET]
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:104: transactions: id, transaction_ref, client_id, deal_id, amount, currency, payment_method, payment_reference, purpose, commission_amount, occurred_on, status, created_by, created_at, updated_at, archived_at, archived_by, archive_reason
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:115: | `clients` | `id uuid` PK; unique `client_ref`; required full name, phone, client type, sector, requirement; optional email/company/branch; `registered_by → auth.users`; `agent_id → agents`; `referral_code`; KYC/address/ID details. The referral columns are added by the agent migration. |
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:116: | `agent_campaigns` | UUID PK, unique token, title, active/expiry, creator. Public path: `/join/{token}`. |
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:117: | `agent_registry` | UUID PK, unique `reg_id`, identity/contact/location/signature fields, optional linked application. |
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:118: | `agent_applications` | UUID PK, unique generated application reference; campaign, registry, auth user, reviewer relations; identity documents, declarations, payment fields, status. Unique case-insensitive ID index for pending/approved applications. |
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:119: | `agents` | UUID PK; unique agent code/referral/verification token and unique application link; user/registry links; commission rate, status, issue/expiry, signature/photo. |
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:121: | `forms` / `form_submissions` | Form UUID/token/JSON schema and target; submissions link to form/client and store JSON answers. Broker agreement signature data is represented in a signature answer, not a dedicated column. |
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:127: 1. Authorized staff creates an `agent_campaigns` row and shares `/join/{token}`.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:128: 2. Public applicant checks campaign; optionally matches `agent_registry` by registration ID or normalized phone.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:130: 4. Server creates Auth user, updates `profiles`, inserts `agent_applications`, optionally links registry row, and logs audit.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:131: 5. Staff permission-gated review updates application; approval inserts `agents` row. Separate functions issue agent login and support referral/verification links.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:135: - `src/lib/agents.functions.ts` supplies all these operations; `src/routes/join.$token.tsx` and `src/routes/_authenticated/agents.index.tsx` are the public/staff pages.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:136: - The latest agent migration defines the app's expected agent tables, sequences, index and `clients` referral columns. Live availability remains unknown.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:137: - RLS in that migration limits direct table use to authenticated staff with `agents.view`/`agents.manage` and owner reads; public registration executes through server handlers using the privileged server client. Do not expose its secret key.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:144: - Internal registration in `src/routes/_authenticated/clients.new.tsx` validates full name, phone, client type, sector, requirement; optionally resolves referral code; inserts a client with `registered_by`; logs audit; then opens acknowledgement.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:145: - Public referral registration in `src/routes/r.$code.tsx` calls `lookupReferral` and `registerReferredClient` from `agents.functions.ts`. Public server handler resolves active agent, checks exact phone duplicate, inserts `clients`, logs audit and returns reference.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:147: - Referral insert adds `agent_id` and `referral_code`; these are required by current code and supplied by the later agent migration.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:149: - Public referral uses service-role client, bypassing RLS; server validation, abuse/rate limits and write auditing must be maintained.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:169: [REDACTED - POSSIBLE SECRET]
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:179: | DB-03 | Client attribution | Verify `clients.agent_id` FK and `referral_code`; add only if absent. | Nullable attribution fields should not alter current rows; ensure FK and client RLS. | High / code requirement confirmed |
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:209: - Client internal/public referral registrations persist; duplicate phone policy is tested; invalid inputs show errors.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:223: 4. Are agent tables and client referral columns present, with the expected types/FKs/indexes?
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:382: UNION ALL SELECT 'agent_applications', status, count(*) FROM public.agent_applications GROUP BY status
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:398: - `src/lib/agents.functions.ts`, `src/routes/join.$token.tsx`, `src/routes/_authenticated/agents.index.tsx`: agent registration and staff review.
+KALEXI_DATABASE_AUDIT_AND_UPGRADE_PLAN.md:401: - `src/lib/publicform.functions.ts`, `src/routes/f.$token.tsx`, `src/routes/_authenticated/forms.index.tsx`: public submissions and broker signing.
+package-lock.json:98: "js-tokens": "^4.0.0",
+package-lock.json:5093: "integrity": "sha512-GERT7L2TiYcYDtYk1IpD+ASAYXjKbLTDPhBtYj7X1NuRMDTMtAx9kyBenub1Ev41lo91OHCKdmP+egTDmfQ7Ig==",
+package-lock.json:7132: "node_modules/js-tokens": {
+package-lock.json:7134: "resolved": "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz",
+package-lock.json:7524: "js-tokens": "^3.0.0 || ^4.0.0"
+roadmap.md:5: - [ ] Add secure token redemption review and payment screen.
+roadmap.md:9: - [ ] Show agents approximate token value in UGX.
+tsconfig.json:12: "verbatimModuleSyntax": false,
+.output\public\assets\admin.index-Da01fFNj.js:1: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\agent-portal-BjC8lvi4.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,t as i}from"./button-DeSJf49K.js";import{O as a,c as o,t as s}from"./KalexiMark-4nTfSBpY.js";import{h as c}from"./useSession-DbrVfUaS.js";import{t as l}from"./client-B3jDPlHb.js";import{t as u}from"./AgentMessages-C5KPJx50.js";import{_ as d}from"./index-DYcr6OF8.js";import{g as ... [truncated]
+.output\public\assets\agent.verify._token-XS3Mnx_6.js:1: import{r as e}from"./useRouter-DkpIHWI1.js";import{c as t,t as n}from"./KalexiMark-4nTfSBpY.js";import{V as r}from"./index-DYcr6OF8.js";import{v as i}from"./agents.functions-GSHGq31q.js";var a=e();function o(){let{token:e}=r({from:`/agent/verify/$token`}),o=t({queryKey:[`verify-agent`,e],queryFn:()=>i({data:{token:e}})}),s=o.data,c=s?.status===`act ... [truncated]
+.output\public\assets\AgentIdCard-CsEzv11c.js:1: import{a as e,c as t,o as n,r}from"./useRouter-DkpIHWI1.js";import{c as i,t as a}from"./KalexiMark-4nTfSBpY.js";import{t as o}from"./client-B3jDPlHb.js";import{t as s}from"./browser-DbcKXJlG.js";import{n as c,r as l,t as u}from"./agent-id-theme-e9f37d85.js";var d=n((e=>{Object.defineProperty(e,"__esModule",{value:!0});function t(e,t){if(!(e instanc ... [truncated]
+.output\public\assets\AgentMessages-C5KPJx50.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,t as i}from"./button-DeSJf49K.js";import{A as a,M as o,O as s,c,s as l}from"./KalexiMark-4nTfSBpY.js";import{t as u}from"./client-B3jDPlHb.js";import{t as d}from"./createLucideIcon-CS5TKXz9.js";import{t as f}from"./textarea-CNLucOpf.js";var p=d(`paperclip`,[[`path`,{d:`m16 6-8. ... [truncated]
+.output\public\assets\agents.index-VOAgP979.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,t as i}from"./button-DeSJf49K.js";import{O as a,c as o}from"./KalexiMark-4nTfSBpY.js";import{n as s,t as c}from"./AppShell-B3oP13jh.js";import{d as l,r as u}from"./useSession-DbrVfUaS.js";import{t as d}from"./client-B3jDPlHb.js";import{t as f}from"./input-bA6u9TMI.js";import{S  ... [truncated]
+.output\public\assets\agents.redemptions-DkRQ1l4h.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,t as i}from"./button-DeSJf49K.js";import{O as a,c as o,j as s}from"./KalexiMark-4nTfSBpY.js";import{a as c,n as l,t as u}from"./AppShell-B3oP13jh.js";import{a as d,d as f}from"./useSession-DbrVfUaS.js";import{t as p}from"./client-B3jDPlHb.js";import{t as m}from"./createLucideIc ... [truncated]
+.output\public\assets\agents._agentId-CZP5ufVZ.js:1: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\AreaChart-C48_BQOv.js:1: import{a as e,c as t}from"./useRouter-DkpIHWI1.js";import{i as n}from"./button-DeSJf49K.js";import{C as r,D as i,E as a,S as o,T as s,_ as c,a as l,b as u,c as d,d as f,f as p,l as m,m as h,n as g,p as _,r as v,s as y,t as b,u as x,w as S,x as C,y as w}from"./generateCategoricalChart-CwCayiNx.js";var T=t(e()),E=t(i()),D=t(h()),O=t(a()),k=t(s()),A=t ... [truncated]
+.output\public\assets\BarChart-fgIaHFLO.js:1: import{a as e,n as t,o as n,r,t as i}from"./generateCategoricalChart-CwCayiNx.js";var a=i({chartName:`BarChart`,GraphicalChild:n,defaultTooltipEventType:`axis`,validateTooltipEventTypes:[`axis`,`item`],axisComponents:[{axisType:`xAxis`,AxisComp:r},{axisType:`yAxis`,AxisComp:t}],formatAxisMap:e});export{a as t};
+.output\public\assets\brand-CSXmcny2.js:1: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\brand-CSXmcny2.js:3: The agent may refer clients and share the official referral link. The agent may not receive payments, sign contracts or make guarantees on behalf of the company.`},{name:`Appointment letter`,kind:`appointment`,heading:`Letter of Appointment`,body:`Dear [Name],
+.output\public\assets\brand-CSXmcny2.js:15: `}];function R(){let{data:e}=g(),t=a(),[n,o]=(0,A.useState)(null),[u,d]=(0,A.useState)(F),[y,E]=(0,A.useState)(null),[M,N]=(0,A.useState)(null),[R,z]=(0,A.useState)(!1),[B,V]=(0,A.useState)(!1),H=l(f),U=l(c),W=!!e?.profile&&e.profile.status===`active`&&e.roles.length>0,G=s({queryKey:[`brand-templates`],enabled:W,queryFn:async()=>{let{data:e,error:t ... [truncated]
+.output\public\assets\client-B3jDPlHb.js:1: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\client-B3jDPlHb.js:2: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\client-B3jDPlHb.js:7: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\client-B3jDPlHb.js:8: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\client-B3jDPlHb.js:10: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\client-B3jDPlHb.js:11: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\clients.new-f5E-BGsz.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,t as i}from"./button-DeSJf49K.js";import{c as a}from"./KalexiMark-4nTfSBpY.js";import{n as o,t as s}from"./AppShell-B3oP13jh.js";import{a as c,h as l,n as u}from"./useSession-DbrVfUaS.js";import{t as d}from"./client-B3jDPlHb.js";import{t as f}from"./useMutation-ByDfZdpi.js";imp ... [truncated]
+.output\public\assets\dashboard-bjMvj4Bo.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{t as r}from"./button-DeSJf49K.js";import{O as i,c as a}from"./KalexiMark-4nTfSBpY.js";import{n as o,s,t as c}from"./AppShell-B3oP13jh.js";import{a as l,d as u,f as d,l as f,m as p,u as m}from"./useSession-DbrVfUaS.js";import{t as h}from"./client-B3jDPlHb.js";import{t as g}from"./creat ... [truncated]
+.output\public\assets\dashboard-bjMvj4Bo.js:2: `),r=URL.createObjectURL(new Blob([n],{type:`text/csv;charset=utf-8`})),i=document.createElement(`a`);i.href=r,i.download=`kalexi-performance-${new Date().toISOString().slice(0,10)}.csv`,i.click(),URL.revokeObjectURL(r)}function W({label:e,value:t,detail:n,icon:r}){return(0,L.jsx)(E,{className:`overflow-hidden shadow-[var(--shadow-panel)]`,children ... [truncated]
+.output\public\assets\deals.new-DjhASl6r.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,t as i}from"./button-DeSJf49K.js";import{c as a}from"./KalexiMark-4nTfSBpY.js";import{n as o,t as s}from"./AppShell-B3oP13jh.js";import{a as c,d as l,h as u,n as d}from"./useSession-DbrVfUaS.js";import{t as f}from"./client-B3jDPlHb.js";import{t as p}from"./useMutation-ByDfZdpi. ... [truncated]
+.output\public\assets\deals._dealId.index-DJSUfvKp.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,t as i}from"./button-DeSJf49K.js";import{O as a,c as o}from"./KalexiMark-4nTfSBpY.js";import{n as s,t as c}from"./AppShell-B3oP13jh.js";import{a as l,d as u,n as d}from"./useSession-DbrVfUaS.js";import{t as f}from"./client-B3jDPlHb.js";import{t as p}from"./useMutation-ByDfZdpi. ... [truncated]
+.output\public\assets\es2015-B3LwCd8l.js:38: `},Qe=function(){var e=parseInt(document.body.getAttribute(`data-scroll-locked`)||`0`,10);return isFinite(e)?e:0},$e=function(){f.useEffect(function(){return document.body.setAttribute(K,(Qe()+1).toString()),function(){var e=Qe()-1;e<=0?document.body.removeAttribute(K):document.body.setAttribute(K,e.toString())}},[])},et=function(e){var t=e.noRelat ... [truncated]
+.output\public\assets\es2015-B3LwCd8l.js:41: `},_t=0,X=[];function vt(e){var t=f.useRef([]),n=f.useRef([0,0]),r=f.useRef(),i=f.useState(_t++)[0],o=f.useState(Ge)[0],s=f.useRef(e);f.useEffect(function(){s.current=e},[e]),f.useEffect(function(){if(e.inert){document.body.classList.add(`block-interactivity-${i}`);var t=a([e.lockRef.current],(e.shards||[]).map(mt),!0).filter(Boolean);return t.forE ... [truncated]
+.output\public\assets\f._token-CP_HmM9g.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,t as i}from"./button-DeSJf49K.js";import{A as a,M as o,c as s,t as c}from"./KalexiMark-4nTfSBpY.js";import{t as l}from"./client-B3jDPlHb.js";import{t as u}from"./useMutation-ByDfZdpi.js";import{a as d,i as f,n as p,r as m,t as h}from"./select-CcAoVXao.js";import{t as g}from"./i ... [truncated]
+.output\public\assets\finance.index-_bNa9uGg.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{c as r,n as i,o as a,t as o}from"./button-DeSJf49K.js";import{O as s,c}from"./KalexiMark-4nTfSBpY.js";import{n as l,s as u,t as d}from"./AppShell-B3oP13jh.js";import{a as f,d as p,n as m}from"./useSession-DbrVfUaS.js";import{t as h}from"./client-B3jDPlHb.js";import{t as g}from"./useMu ... [truncated]
+.output\public\assets\forms.index-D4rRnqE7.js:1: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\forms._formId.index-C06R_mOG.js:1: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\generateCategoricalChart-CwCayiNx.js:56: In order to be iterable, non-array objects must have a [Symbol.iterator]() method.`)}function SO(e,t){if(e){if(typeof e==`string`)return TO(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);if(n===`Object`&&e.constructor&&(n=e.constructor.name),n===`Map`||n===`Set`)return Array.from(e);if(n===`Arguments`||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?A ... [truncated]
+.output\public\assets\index-DYcr6OF8.js:1: const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/routes-CODsuIiO.js","assets/useRouter-DkpIHWI1.js","assets/button-DeSJf49K.js","assets/KalexiMark-4nTfSBpY.js","assets/useSession-DbrVfUaS.js","assets/client-B3jDPlHb.js","assets/input-bA6u9TMI.js","assets/app-version-DN1DHbka.js","assets/route-09xVqPeB.js","assets/maintenance-gr5lldf ... [truncated]
+.output\public\assets\index-DYcr6OF8.js:9: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\index-DYcr6OF8.js:11: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\join._token-CdkR_33K.js:1: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\KalexiMark-4nTfSBpY.js:1: import{a as e,c as t,i as n,r,t as i}from"./useRouter-DkpIHWI1.js";var a=`__TSS_CONTEXT`,o=Symbol.for(`TSS_SERVER_FUNCTION`),s=Symbol.for(`TSS_SERVER_FUNCTION_FACTORY`),c=`application/x-tss-framed`;`${c}`;var l=()=>window.__TSS_START_OPTIONS__;function u(e){e.statusCode=e.statusCode||e.code||307;let t=new Headers(e.headers);e.href&&t.get(`Location` ... [truncated]
+.output\public\assets\KalexiMark-4nTfSBpY.js:3: `;case`\\r`:return`\r`;case`\\b`:return`\b`;case`\\t`:return`	`;case`\\f`:return`\f`;case`\\x3C`:return`<`;case`\\u2028`:return`\u2028`;case`\\u2029`:return`\u2029`;default:return e}}function T(e){return typeof e==`string`&&!e.includes(`\\`)?e:e.replace(/(\\\\|\\"|\\n|\\r|\\b|\\t|\\f|\\u2028|\\u2029|\\x3C)/g,we)}var{toString:Te}=Object.prototype,Ee ... [truncated]
+.output\public\assets\routes-CODsuIiO.js:1: [REDACTED - POSSIBLE SECRET]
+.output\public\assets\select-CcAoVXao.js:1: import{a as e,c as t,r as n}from"./useRouter-DkpIHWI1.js";import{a as r,l as i,n as a,o}from"./button-DeSJf49K.js";import{t as s}from"./createLucideIcon-CS5TKXz9.js";import{t as c}from"./check-C94ADSaF.js";import{t as l}from"./dist-Bw6F1vFa.js";import{a as u,i as d,n as f,r as p,t as m}from"./dist-bSHbPoK1.js";import{a as h,c as g,d as _,i as v,n a ... [truncated]
+.output\public\assets\useSession-DbrVfUaS.js:1: import{a as e,c as t,t as n}from"./useRouter-DkpIHWI1.js";import{O as r,c as i}from"./KalexiMark-4nTfSBpY.js";import{t as a}from"./client-B3jDPlHb.js";var o=t(e(),1);function s(e){let t=n();return o.useCallback(n=>t.navigate({...n,from:n.from??e?.from}),[e?.from,t])}var c=[`super_admin`,`receptionist`,`onboarding_officer`,`deals_manager`,`verificat ... [truncated]
+backup-agent-card-20261028-120457\AgentIdCard.tsx:6: import { AGENT_ID_THEME_ID, DEFAULT_AGENT_ID_THEME, parseAgentIdTheme } from "@/lib/agent-id-theme";
+backup-agent-card-20261028-120457\AgentIdCard.tsx:15: referral_code: string;
+backup-agent-card-20261028-120457\AgentIdCard.tsx:16: verification_token: string;
+backup-agent-card-20261028-120457\AgentIdCard.tsx:49: .eq("id", AGENT_ID_THEME_ID)
+backup-agent-card-20261028-120457\AgentIdCard.tsx:55: const theme = themeQuery.data ?? DEFAULT_AGENT_ID_THEME;
+backup-agent-card-20261028-120457\AgentIdCard.tsx:62: `${window.location.origin}/agent/verify/${encodeURIComponent(a.verification_token)}`,
+backup-agent-card-20261028-120457\AgentIdCard.tsx:75: }, [a.verification_token]);
+backup-agent-card-20261028-120457\AgentIdCard.tsx:202: <p className="font-semibold">Referral: {a.referral_code}</p>
+backup-agent-card-20261028-120457\AgentIdCard.tsx:210: Authorised for client referrals only.
+drizzle\migrations\0000_digital_agent_programme.sql:4: CREATE TABLE public.agent_campaigns (
+drizzle\migrations\0000_digital_agent_programme.sql:7: token text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(18),'hex'),
+drizzle\migrations\0000_digital_agent_programme.sql:14: CREATE TABLE public.agent_applications (
+drizzle\migrations\0000_digital_agent_programme.sql:17: campaign_id uuid REFERENCES public.agent_campaigns(id),
+drizzle\migrations\0000_digital_agent_programme.sql:29: CREATE TABLE public.agents (
+drizzle\migrations\0000_digital_agent_programme.sql:32: application_id uuid UNIQUE REFERENCES public.agent_applications(id),
+drizzle\migrations\0000_digital_agent_programme.sql:35: referral_code text NOT NULL UNIQUE DEFAULT upper(encode(gen_random_bytes(4),'hex')),
+drizzle\migrations\0000_digital_agent_programme.sql:36: verification_token text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(16),'hex'),
+drizzle\migrations\0000_digital_agent_programme.sql:37: commission_rate numeric NOT NULL DEFAULT 0.9,
+drizzle\migrations\0000_digital_agent_programme.sql:46: GRANT SELECT, INSERT, UPDATE ON public.agent_campaigns, public.agent_applications, public.agents TO authenticated;
+drizzle\migrations\0000_digital_agent_programme.sql:47: [REDACTED - POSSIBLE SECRET]
+drizzle\migrations\0000_digital_agent_programme.sql:48: ALTER TABLE public.agent_campaigns ENABLE ROW LEVEL SECURITY;
+drizzle\migrations\0000_digital_agent_programme.sql:49: ALTER TABLE public.agent_applications ENABLE ROW LEVEL SECURITY;
+drizzle\migrations\0000_digital_agent_programme.sql:52: CREATE POLICY "agents staff read" ON public.agent_campaigns FOR SELECT TO authenticated USING (public.has_permission(auth.uid(),'agents.view'));
+drizzle\migrations\0000_digital_agent_programme.sql:53: CREATE POLICY "agents staff write" ON public.agent_campaigns FOR INSERT TO authenticated WITH CHECK (public.has_permission(auth.uid(),'agents.manage'));
+drizzle\migrations\0000_digital_agent_programme.sql:54: CREATE POLICY "agents staff update" ON public.agent_campaigns FOR UPDATE TO authenticated USING (public.has_permission(auth.uid(),'agents.manage'));
+drizzle\migrations\0000_digital_agent_programme.sql:55: CREATE POLICY "apps staff read" ON public.agent_applications FOR SELECT TO authenticated USING (public.has_permission(auth.uid(),'agents.view'));
+drizzle\migrations\0000_digital_agent_programme.sql:56: CREATE POLICY "apps staff update" ON public.agent_applications FOR UPDATE TO authenticated USING (public.has_permission(auth.uid(),'agents.manage'));
+drizzle\migrations\0000_digital_agent_programme.sql:57: CREATE POLICY "agent staff read" ON public.agents FOR SELECT TO authenticated USING (public.has_permission(auth.uid(),'agents.view'));
+drizzle\migrations\0000_digital_agent_programme.sql:58: CREATE POLICY "agent staff insert" ON public.agents FOR INSERT TO authenticated WITH CHECK (public.has_permission(auth.uid(),'agents.manage'));
+drizzle\migrations\0000_digital_agent_programme.sql:59: CREATE POLICY "agent staff update" ON public.agents FOR UPDATE TO authenticated USING (public.has_permission(auth.uid(),'agents.manage'));
+drizzle\migrations\0000_digital_agent_programme.sql:61: CREATE TRIGGER agent_campaigns_touch BEFORE UPDATE ON public.agent_campaigns FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+drizzle\migrations\0000_digital_agent_programme.sql:62: CREATE TRIGGER agent_applications_touch BEFORE UPDATE ON public.agent_applications FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:4: ALTER TABLE public.agent_applications ADD COLUMN IF NOT EXISTS registry_id uuid;
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:5: ALTER TABLE public.agent_applications ADD COLUMN IF NOT EXISTS village text;
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:6: ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS agent_id uuid REFERENCES public.agents(id);
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:8: CREATE TABLE public.agent_registry (
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:24: CREATE TABLE public.agent_notices (
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:46: GRANT SELECT, INSERT, UPDATE, DELETE ON public.agent_registry, public.agent_notices, public.brand_templates TO authenticated;
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:47: [REDACTED - POSSIBLE SECRET]
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:48: ALTER TABLE public.agent_registry ENABLE ROW LEVEL SECURITY;
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:52: CREATE POLICY "registry staff all" ON public.agent_registry FOR ALL TO authenticated
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:53: USING (public.has_permission(auth.uid(),'agents.manage')) WITH CHECK (public.has_permission(auth.uid(),'agents.manage'));
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:54: CREATE POLICY "registry staff read" ON public.agent_registry FOR SELECT TO authenticated USING (public.has_permission(auth.uid(),'agents.view'));
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:55: CREATE POLICY "notices staff all" ON public.agent_notices FOR ALL TO authenticated
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:56: USING (public.has_permission(auth.uid(),'agents.manage')) WITH CHECK (public.has_permission(auth.uid(),'agents.manage'));
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:57: CREATE POLICY "notices agents read" ON public.agent_notices FOR SELECT TO authenticated
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:59: CREATE POLICY "brand staff all" ON public.brand_templates FOR ALL TO authenticated
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:61: CREATE POLICY "agent reads self" ON public.agents FOR SELECT TO authenticated USING (user_id = auth.uid());
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:62: CREATE POLICY "agent reads own clients" ON public.clients FOR SELECT TO authenticated
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:63: USING (agent_id IN (SELECT a.id FROM public.agents a WHERE a.user_id = auth.uid()));
+drizzle\migrations\0002_agent_accounts_registry_brand.sql:65: CREATE TRIGGER agent_registry_touch BEFORE UPDATE ON public.agent_registry FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+drizzle\migrations\0004_agent_self_signup_tokens.sql:1: ALTER TABLE public.agent_applications ADD COLUMN IF NOT EXISTS user_id uuid UNIQUE;
+drizzle\migrations\0004_agent_self_signup_tokens.sql:2: ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS referral_code text;
+drizzle\migrations\0004_agent_self_signup_tokens.sql:4: CREATE TABLE public.agent_redemptions (
+drizzle\migrations\0004_agent_self_signup_tokens.sql:6: agent_id uuid NOT NULL REFERENCES public.agents(id),
+drizzle\migrations\0004_agent_self_signup_tokens.sql:7: tokens_used integer NOT NULL,
+drizzle\migrations\0004_agent_self_signup_tokens.sql:15: GRANT SELECT, UPDATE ON public.agent_redemptions TO authenticated;
+drizzle\migrations\0004_agent_self_signup_tokens.sql:16: [REDACTED - POSSIBLE SECRET]
+drizzle\migrations\0004_agent_self_signup_tokens.sql:17: ALTER TABLE public.agent_redemptions ENABLE ROW LEVEL SECURITY;
+drizzle\migrations\0004_agent_self_signup_tokens.sql:18: CREATE POLICY "redemptions staff read" ON public.agent_redemptions FOR SELECT TO authenticated USING (public.has_permission(auth.uid(),'agents.view'));
+drizzle\migrations\0004_agent_self_signup_tokens.sql:19: CREATE POLICY "redemptions staff update" ON public.agent_redemptions FOR UPDATE TO authenticated USING (public.has_permission(auth.uid(),'agents.manage'));
+drizzle\migrations\0004_agent_self_signup_tokens.sql:26: AND NOT EXISTS (SELECT 1 FROM public.agent_applications WHERE user_id = _user_id);
+drizzle\migrations\0005_applicant_reads_own.sql:1: CREATE POLICY "applicant reads own" ON public.agent_applications FOR SELECT TO authenticated USING (user_id = auth.uid());
+drizzle\migrations\0006_agent_identity_and_private_messages.sql:2: CREATE TABLE public.agent_messages (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), owner_user_id uuid NOT NULL REFERENCES public.profiles(id), sender_id uuid NOT NULL REFERENCES public.profiles(id), body text NOT NULL DEFAULT '', attachments jsonb NOT NULL DEFAULT '[]'::jsonb, created_at timestamptz NOT NULL DEFAULT now(), CONSTRAINT message_conten ... [truncated]
+drizzle\migrations\0006_agent_identity_and_private_messages.sql:6: CREATE POLICY agent_message_read ON public.agent_messages FOR SELECT TO authenticated USING (owner_user_id = auth.uid() OR public.has_permission(auth.uid(), 'agents.view'));
+drizzle\migrations\0006_agent_identity_and_private_messages.sql:7: CREATE POLICY agent_message_send ON public.agent_messages FOR INSERT TO authenticated WITH CHECK (sender_id = auth.uid() AND ((owner_user_id = auth.uid() AND (EXISTS (SELECT 1 FROM public.agents WHERE user_id = auth.uid()) OR EXISTS (SELECT 1 FROM public.agent_applications WHERE user_id = auth.uid()))) OR public.has_permission(auth.uid(), 'agents.m ... [truncated]
+drizzle\migrations\meta\_journal.json:37: "tag": "0004_agent_self_signup_tokens",
+drizzle\migrations\meta\_journal.json:51: "tag": "0006_agent_identity_and_private_messages",
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:1: export const AGENT_ID_THEME_ID = "a11d1d00-0000-4000-8000-000000000001";
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:10: export const DEFAULT_AGENT_ID_THEME: AgentIdTheme = {
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:26: ...DEFAULT_AGENT_ID_THEME,
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:32: if (!data || typeof data !== "object") return DEFAULT_AGENT_ID_THEME;
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:37: : DEFAULT_AGENT_ID_THEME.background,
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:42: : DEFAULT_AGENT_ID_THEME.accent,
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:43: text: isHexColor(values["text"]) ? values["text"] : DEFAULT_AGENT_ID_THEME.text,
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:46: : DEFAULT_AGENT_ID_THEME.accentText,
+kalexi-id-designer-backup-20261028-101351\agent-id-theme.ts:50: return DEFAULT_AGENT_ID_THEME;
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:6: import { AGENT_ID_THEME_ID, DEFAULT_AGENT_ID_THEME, parseAgentIdTheme } from "@/lib/agent-id-theme";
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:15: referral_code: string;
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:16: verification_token: string;
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:49: .eq("id", AGENT_ID_THEME_ID)
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:55: const theme = themeQuery.data ?? DEFAULT_AGENT_ID_THEME;
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:62: `${window.location.origin}/agent/verify/${encodeURIComponent(a.verification_token)}`,
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:75: }, [a.verification_token]);
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:202: <p className="font-semibold">Referral: {a.referral_code}</p>
+kalexi-id-designer-backup-20261028-101351\AgentIdCard.tsx:210: Authorised for client referrals only.
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:5: import { approximateReward, agentPermissions, validAgent } from "@/lib/agent-rules";
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:6: import { AGENT_ID_THEME_ID } from "@/lib/agent-id-theme";
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:9: const token = z.string().trim().min(10).max(200);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:18: .from("agent_campaigns")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:20: .eq("token", t)
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:51: .inputValidator((i: unknown) => z.object({ token }).parse(i))
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:53: const c = await openCampaign(data.token);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:59: z.object({ token, fileName: z.string().trim().min(1).max(200) }).parse(i),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:62: const c = await openCampaign(data.token);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:72: return { path, uploadToken: s.token, bucket: BUCKET };
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:81: token,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:113: const c = await openCampaign(data.token);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:117: .from("agent_applications")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:144: .from("agent_applications")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:178: .from("agent_registry")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:185: export const reviewAgentApplication = createServerFn({ method: "POST" })
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:197: await assertPerm(context.supabase, context.userId, "agents.manage");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:200: .from("agent_applications")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:209: .from("agent_applications")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:256: await assertPerm(context.supabase, context.userId, "agents.manage");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:283: .inputValidator((i: unknown) => z.object({ token: z.string().trim().min(10).max(80) }).parse(i))
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:289: "full_name, agent_code, district, status, issued_at, expires_at, photo_path, referral_code, designation, application_id",
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:291: .eq("verification_token", data.token)
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:307: referralCode: a.referral_code,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:320: token,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:327: const c = await openCampaign(data.token);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:332: .from("agent_registry")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:364: await assertPerm(context.supabase, context.userId, "agents.manage");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:413: const REDEEM_TOKENS = 100; // tokens needed for one reward — kept server-side only
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:414: const REDEEM_AMOUNT = 100000;
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:416: async function tokenState(db: any, agentId: string) {
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:418: db.from("clients").select("id", { count: "exact", head: true }).eq("agent_id", agentId),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:419: db.from("agent_redemptions").select("tokens_used, status").eq("agent_id", agentId),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:423: .reduce((n: number, r: any) => n + r.tokens_used, 0);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:428: canRedeem: earned - used >= REDEEM_TOKENS,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:433: export const getAgentDashboard = createServerFn({ method: "POST" })
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:444: .from("agent_applications")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:455: .select("id, agent_id, client_ref, full_name, status, sector, created_at")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:456: .not("agent_id", "is", null),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:463: .from("agent_redemptions")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:465: .eq("agent_id", me.id)
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:470: if (c.agent_id) counts.set(c.agent_id, (counts.get(c.agent_id) ?? 0) + 1);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:478: const myClients = (clients ?? []).filter((c) => c.agent_id === me.id);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:488: mine: inMonth.filter((c) => c.agent_id === me.id).length,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:496: const tokens = await tokenState(db, me.id);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:516: tokens: {
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:517: available: tokens.available,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:518: earned: tokens.earned,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:519: canRedeem: tokens.canRedeem,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:520: approximateValue: approximateReward(tokens.available),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:527: export const redeemAgentTokens = createServerFn({ method: "POST" })
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:537: throw new Error("Only active, verified agents can redeem tokens.");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:538: const t = await tokenState(db, me.id);
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:540: throw new Error("You don't have enough tokens to redeem yet. Keep referring clients!");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:542: .from("agent_redemptions")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:543: .insert({ agent_id: me.id, tokens_used: REDEEM_TOKENS, amount: REDEEM_AMOUNT });
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:547: "agent.tokens_redeemed",
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:549: { amount: REDEEM_AMOUNT },
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:551: return { amount: REDEEM_AMOUNT };
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:561: db.from("clients").select("id, agent_id, created_at").not("agent_id", "is", null),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:563: db.from("transactions").select("client_id, amount, currency, status"),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:564: db.from("agent_redemptions").select("amount, status, currency"),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:586: referrals: referred.filter(
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:595: referrals: referred.filter((y) => y.agent_id === x.id).length,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:597: referred.some((z) => z.id === y.client_id && z.agent_id === x.id),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:600: .sort((x, y) => y.referrals - x.referrals),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:601: referrals: referred.length,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:624: await assertPerm(context.supabase, context.userId, "agents.manage");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:632: return { path: p, token: slot.token };
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:647: referral_code: z.string().trim().min(4).max(20),
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:661: await assertPerm(context.supabase, context.userId, "agents.manage");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:672: .update({ ...clean, referral_code: payload.referral_code.toUpperCase() })
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:707: await assertPerm(context.supabase, context.userId, "agents.manage");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:710: id: AGENT_ID_THEME_ID,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:712: kind: "agent_id_theme",
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:724: AGENT_ID_THEME_ID,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:730: export const setRedemptionStatus = createServerFn({ method: "POST" })
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:736: await assertPerm(context.supabase, context.userId, "agents.manage");
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:739: .from("agent_redemptions")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:746: .from("agent_redemptions")
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:768: /** Public: confirm a referral code belongs to an active agent. */
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:769: export const lookupReferral = createServerFn({ method: "POST" })
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:777: .eq("referral_code", data.code.toUpperCase())
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:783: /** Public: a client registers themselves through an agent's referral link. */
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:784: export const registerReferredClient = createServerFn({ method: "POST" })
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:805: .eq("referral_code", data.code.toUpperCase())
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:825: agent_id: agentId,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:826: referral_code: agentId ? (data.code?.toUpperCase() ?? null) : null,
+kalexi-id-designer-backup-20261028-101351\agents.functions.ts:831: await audit(null, data.email || null, "client.self_registered", row.id, { agent_id: agentId });
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:12: import { reviewAgentApplication, signAgentFiles } from "@/lib/agents.functions";
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:66: <Applications canManage={allows(access, "agents.manage")} />
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:87: .from("agent_applications")
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:111: await reviewAgentApplication({ data: { id: open!, decision, note: note || null } });
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:234: const canManage = allows(access, "agents.manage");
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:246: commission_rate: "2",
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:247: referral_code: "",
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:258: supabase.from("agent_registry").select("*").order("created_at", { ascending: false }),
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:274: commission_rate: String(a.commission_rate ?? 2),
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:275: referral_code: a.referral_code ?? "",
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:293: commission_rate: "2",
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:294: referral_code: "",
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:324: commission_rate: a.commission_rate,
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:325: referral_code: a.referral_code,
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:343: const rate = Number(draft.commission_rate);
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:359: commission_rate: rate,
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:360: referral_code: draft.referral_code.trim(),
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:367: .from("agent_registry")
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:526: {field("Commission rate (%)", "commission_rate", "number")}
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:527: {field("Referral code", "referral_code")}
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:595: .from("agent_campaigns")
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:605: .from("agent_campaigns")
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:614: const { error } = await supabase.from("agent_campaigns").update({ active }).eq("id", id);
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:637: <span className="break-all text-xs text-muted-foreground">{url(c.token)}</span>
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:644: navigator.clipboard.writeText(url(c.token));
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:681: .from("agent_registry")
+kalexi-id-designer-backup-20261028-101351\agents.index.tsx:702: const { error } = await supabase.from("agent_registry").insert({
+src\routeTree.gen.ts:19: import { Route as FTokenRouteImport } from './routes/f.$token'
+src\routeTree.gen.ts:20: import { Route as JoinTokenRouteImport } from './routes/join.$token'
+src\routeTree.gen.ts:50: import { Route as AgentVerifyTokenRouteImport } from './routes/agent.verify.$token'
+src\routeTree.gen.ts:99: const FTokenRoute = FTokenRouteImport.update({
+src\routeTree.gen.ts:100: id: '/f/$token',
+src\routeTree.gen.ts:101: path: '/f/$token',
+src\routeTree.gen.ts:104: const JoinTokenRoute = JoinTokenRouteImport.update({
+src\routeTree.gen.ts:105: id: '/join/$token',
+src\routeTree.gen.ts:106: path: '/join/$token',
+src\routeTree.gen.ts:270: const AgentVerifyTokenRoute = AgentVerifyTokenRouteImport.update({
+src\routeTree.gen.ts:271: id: '/agent/verify/$token',
+src\routeTree.gen.ts:272: path: '/agent/verify/$token',
+src\routeTree.gen.ts:355: '/f/$token': typeof FTokenRoute
+src\routeTree.gen.ts:356: '/join/$token': typeof JoinTokenRoute
+src\routeTree.gen.ts:370: '/agent/verify/$token': typeof AgentVerifyTokenRoute
+src\routeTree.gen.ts:407: '/f/$token': typeof FTokenRoute
+src\routeTree.gen.ts:408: '/join/$token': typeof JoinTokenRoute
+src\routeTree.gen.ts:422: '/agent/verify/$token': typeof AgentVerifyTokenRoute
+src\routeTree.gen.ts:461: '/f/$token': typeof FTokenRoute
+src\routeTree.gen.ts:462: '/join/$token': typeof JoinTokenRoute
+src\routeTree.gen.ts:476: '/agent/verify/$token': typeof AgentVerifyTokenRoute
+src\routeTree.gen.ts:515: | '/f/$token'
+src\routeTree.gen.ts:516: | '/join/$token'
+src\routeTree.gen.ts:530: | '/agent/verify/$token'
+src\routeTree.gen.ts:567: | '/f/$token'
+src\routeTree.gen.ts:568: | '/join/$token'
+src\routeTree.gen.ts:582: | '/agent/verify/$token'
+src\routeTree.gen.ts:620: | '/f/$token'
+src\routeTree.gen.ts:621: | '/join/$token'
+src\routeTree.gen.ts:635: | '/agent/verify/$token'
+src\routeTree.gen.ts:670: FTokenRoute: typeof FTokenRoute
+src\routeTree.gen.ts:671: JoinTokenRoute: typeof JoinTokenRoute
+src\routeTree.gen.ts:674: AgentVerifyTokenRoute: typeof AgentVerifyTokenRoute
+src\routeTree.gen.ts:728: '/f/$token': {
+src\routeTree.gen.ts:729: id: '/f/$token'
+src\routeTree.gen.ts:730: path: '/f/$token'
+src\routeTree.gen.ts:731: fullPath: '/f/$token'
+src\routeTree.gen.ts:732: preLoaderRoute: typeof FTokenRouteImport
+src\routeTree.gen.ts:735: '/join/$token': {
+src\routeTree.gen.ts:736: id: '/join/$token'
+src\routeTree.gen.ts:737: path: '/join/$token'
+src\routeTree.gen.ts:738: fullPath: '/join/$token'
+src\routeTree.gen.ts:739: preLoaderRoute: typeof JoinTokenRouteImport
+src\routeTree.gen.ts:945: '/agent/verify/$token': {
+src\routeTree.gen.ts:946: id: '/agent/verify/$token'
+src\routeTree.gen.ts:947: path: '/agent/verify/$token'
+src\routeTree.gen.ts:948: fullPath: '/agent/verify/$token'
+src\routeTree.gen.ts:949: preLoaderRoute: typeof AgentVerifyTokenRouteImport
+src\routeTree.gen.ts:1146: FTokenRoute: FTokenRoute,
+src\routeTree.gen.ts:1147: JoinTokenRoute: JoinTokenRoute,
+src\routeTree.gen.ts:1150: AgentVerifyTokenRoute: AgentVerifyTokenRoute,
+src\components\AgentIdCard.tsx:6: import { AGENT_ID_THEME_ID, DEFAULT_AGENT_ID_THEME, parseAgentIdTheme } from "@/lib/agent-id-theme";
+src\components\AgentIdCard.tsx:15: referral_code: string;
+src\components\AgentIdCard.tsx:16: verification_token: string;
+src\components\AgentIdCard.tsx:49: .eq("id", AGENT_ID_THEME_ID)
+src\components\AgentIdCard.tsx:55: const theme = themeQuery.data ?? DEFAULT_AGENT_ID_THEME;
+src\components\AgentIdCard.tsx:62: `${window.location.origin}/agent/verify/${encodeURIComponent(a.verification_token)}`,
+src\components\AgentIdCard.tsx:75: }, [a.verification_token]);
+src\components\AgentIdCard.tsx:221: <p className="font-semibold">Referral: {a.referral_code}</p>
+src\components\AgentIdCard.tsx:229: Authorised for client referrals only.
+src\components\AgentIdCardDesigner.tsx:10: AGENT_ID_THEME_ID,
+src\components\AgentIdCardDesigner.tsx:11: DEFAULT_AGENT_ID_THEME,
+src\components\AgentIdCardDesigner.tsx:33: const [draft, setDraft] = useState<AgentIdTheme>(DEFAULT_AGENT_ID_THEME);
+src\components\AgentIdCardDesigner.tsx:42: .eq("id", AGENT_ID_THEME_ID)
+src\components\AgentIdCardDesigner.tsx:147: onClick={() => setDraft(DEFAULT_AGENT_ID_THEME)}>
+src\components\AgentIdCardDesigner.tsx:205: <p>Referral code: KBLR000001</p>
+src\components\AgentIdentityEditor.tsx:9: AGENT_ID_THEME_ID,
+src\components\AgentIdentityEditor.tsx:10: DEFAULT_AGENT_ID_THEME,
+src\components\AgentIdentityEditor.tsx:38: referral_code: agent.referral_code,
+src\components\AgentIdentityEditor.tsx:45: const [theme, setTheme] = useState<AgentIdTheme>(DEFAULT_AGENT_ID_THEME);
+src\components\AgentIdentityEditor.tsx:55: .eq("id", AGENT_ID_THEME_ID)
+src\components\AgentIdentityEditor.tsx:84: .uploadToSignedUrl(slot.path, slot.token, file);
+src\components\AgentIdentityEditor.tsx:131: ["referral_code", "Referral code"],
+src\components\AgentImpact.tsx:14: <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[["Agent referrals", d.referrals], ["Share of all clients", `${d.share}%`], ["Linked deals", d.deals], ["Rewards paid · UGX", d.paidRewards.toLocaleString()]].map(([l, v]) => <div key={l} className="rounded-lg border bg-card p-4"><p className="text-xs text-muted-foreground">{l}</p><p className ... [truncated]
+src\components\AgentImpact.tsx:15: <div className="grid gap-6 lg:grid-cols-2"><div><h3 className="mb-3 font-semibold">Monthly referrals</h3><div className="h-60"><ResponsiveContainer width="100%" height="100%"><BarChart data={d.months}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} /><YAxis allowDecimals ... [truncated]
+src\components\AgentMessages.tsx:17: for (const f of files) { const s = await createMessageUpload({ data: { owner, name: f.name } }); const { error } = await supabase.storage.from("kalexi-vault").uploadToSignedUrl(s.path, s.token, f); if (error) throw error; attachments.push({ path: s.path, name: f.name, type: f.type }); }
+src\components\BrandAppearanceSettings.tsx:67: .uploadToSignedUrl(slot.path, slot.token, logo, { contentType: logo.type });
+src\integrations\supabase\auth-attacher.ts:6: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\auth-attacher.ts:10: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\auth-attacher.ts:12: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\auth-middleware.ts:62: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\auth-middleware.ts:65: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\auth-middleware.ts:66: if (!token) {
+src\integrations\supabase\auth-middleware.ts:67: throw new Error('Unauthorized: No token provided');
+src\integrations\supabase\auth-middleware.ts:70: if (token.split('.').length !== 3) {
+src\integrations\supabase\auth-middleware.ts:71: throw new Error('Unauthorized: Invalid token');
+src\integrations\supabase\auth-middleware.ts:81: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\auth-middleware.ts:87: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\auth-middleware.ts:92: const { data, error } = await supabase.auth.getClaims(token);
+src\integrations\supabase\auth-middleware.ts:94: throw new Error('Unauthorized: Invalid token');
+src\integrations\supabase\auth-middleware.ts:98: throw new Error('Unauthorized: No user ID found in token');
+src\integrations\supabase\client.server.ts:53: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\client.ts:52: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\types.ts:68: agent_applications: {
+src\integrations\supabase\types.ts:170: foreignKeyName: "agent_applications_campaign_id_fkey";
+src\integrations\supabase\types.ts:173: referencedRelation: "agent_campaigns";
+src\integrations\supabase\types.ts:178: agent_campaigns: {
+src\integrations\supabase\types.ts:186: token: string;
+src\integrations\supabase\types.ts:196: token?: string;
+src\integrations\supabase\types.ts:206: token?: string;
+src\integrations\supabase\types.ts:277: agent_redemptions: {
+src\integrations\supabase\types.ts:279: agent_id: string;
+src\integrations\supabase\types.ts:287: tokens_used: number;
+src\integrations\supabase\types.ts:290: agent_id: string;
+src\integrations\supabase\types.ts:298: tokens_used: number;
+src\integrations\supabase\types.ts:301: agent_id?: string;
+src\integrations\supabase\types.ts:309: tokens_used?: number;
+src\integrations\supabase\types.ts:313: foreignKeyName: "agent_redemptions_agent_id_fkey";
+src\integrations\supabase\types.ts:314: columns: ["agent_id"];
+src\integrations\supabase\types.ts:321: agent_registry: {
+src\integrations\supabase\types.ts:376: commission_rate: number;
+src\integrations\supabase\types.ts:389: referral_code: string;
+src\integrations\supabase\types.ts:395: verification_token: string;
+src\integrations\supabase\types.ts:401: commission_rate?: number;
+src\integrations\supabase\types.ts:414: referral_code?: string;
+src\integrations\supabase\types.ts:420: verification_token?: string;
+src\integrations\supabase\types.ts:426: commission_rate?: number;
+src\integrations\supabase\types.ts:439: referral_code?: string;
+src\integrations\supabase\types.ts:445: verification_token?: string;
+src\integrations\supabase\types.ts:453: referencedRelation: "agent_applications";
+src\integrations\supabase\types.ts:694: agent_id: string | null;
+src\integrations\supabase\types.ts:712: referral_code: string | null;
+src\integrations\supabase\types.ts:722: agent_id?: string | null;
+src\integrations\supabase\types.ts:740: referral_code?: string | null;
+src\integrations\supabase\types.ts:750: agent_id?: string | null;
+src\integrations\supabase\types.ts:768: referral_code?: string | null;
+src\integrations\supabase\types.ts:778: foreignKeyName: "clients_agent_id_fkey";
+src\integrations\supabase\types.ts:779: columns: ["agent_id"];
+src\integrations\supabase\types.ts:1139: commission_rate: number | null;
+src\integrations\supabase\types.ts:1164: commission_rate?: number | null;
+src\integrations\supabase\types.ts:1189: commission_rate?: number | null;
+src\integrations\supabase\types.ts:1417: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\types.ts:1438: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\types.ts:1459: [REDACTED - POSSIBLE SECRET]
+src\integrations\supabase\types.ts:2519: commission_amount: number | null;
+src\integrations\supabase\types.ts:2527: payment_reference: string | null;
+src\integrations\supabase\types.ts:2539: commission_amount?: number | null;
+src\integrations\supabase\types.ts:2547: payment_reference?: string | null;
+src\integrations\supabase\types.ts:2559: commission_amount?: number | null;
+src\integrations\supabase\types.ts:2567: payment_reference?: string | null;
+src\lib\agent-id-theme.ts:1: export const AGENT_ID_THEME_ID = "a11d1d00-0000-4000-8000-000000000001";
+src\lib\agent-id-theme.ts:14: export const DEFAULT_AGENT_ID_THEME: AgentIdTheme = {
+src\lib\agent-id-theme.ts:51: ...DEFAULT_AGENT_ID_THEME,
+src\lib\agent-messages.functions.ts:8: const { data } = await context.supabase.rpc("has_permission", { _user_id: context.userId, _perm: write ? "agents.manage" : "agents.view" });
+src\lib\agent-messages.functions.ts:11: const [a, b] = await Promise.all([context.supabase.from("agents").select("id").eq("user_id", uid).maybeSingle(), context.supabase.from("agent_applications").select("id").eq("user_id", uid).maybeSingle()]);
+src\lib\agent-messages.functions.ts:32: return { path, token: slot.token };
+src\lib\agent-rules.test.ts:2: import { approximateReward, validAgent, agentPermissions } from "./agent-rules";
+src\lib\agent-rules.test.ts:4: test("100 tokens approximate UGX 100000", () => { expect(approximateReward(100)).toBe(100000); expect(approximateReward(25)).toBe(25000); });
+src\lib\agent-rules.test.ts:6: test("unverified agents have no approved referral permissions", () => expect(agentPermissions("pending", "2099-01-01")).toEqual([]));
+src\lib\agent-rules.ts:1: export function approximateReward(tokens: number) { return Math.max(0, tokens) * 100000 / 100; }
+src\lib\agent-rules.ts:3: export function agentPermissions(status: string, expiry: string) { return validAgent(status, expiry) ? ["Refer clients", "Share official referral link"] : []; }
+src\lib\agents.functions.ts:5: import { approximateReward, agentPermissions, validAgent } from "@/lib/agent-rules";
+src\lib\agents.functions.ts:6: import { AGENT_ID_THEME_ID } from "@/lib/agent-id-theme";
+src\lib\agents.functions.ts:9: const token = z.string().trim().min(10).max(200);
+src\lib\agents.functions.ts:18: .from("agent_campaigns")
+src\lib\agents.functions.ts:20: .eq("token", t)
+src\lib\agents.functions.ts:51: .inputValidator((i: unknown) => z.object({ token }).parse(i))
+src\lib\agents.functions.ts:53: const c = await openCampaign(data.token);
+src\lib\agents.functions.ts:59: z.object({ token, fileName: z.string().trim().min(1).max(200) }).parse(i),
+src\lib\agents.functions.ts:62: const c = await openCampaign(data.token);
+src\lib\agents.functions.ts:72: return { path, uploadToken: s.token, bucket: BUCKET };
+src\lib\agents.functions.ts:81: token,
+src\lib\agents.functions.ts:113: const c = await openCampaign(data.token);
+src\lib\agents.functions.ts:117: .from("agent_applications")
+src\lib\agents.functions.ts:144: .from("agent_applications")
+src\lib\agents.functions.ts:178: .from("agent_registry")
+src\lib\agents.functions.ts:185: export const reviewAgentApplication = createServerFn({ method: "POST" })
+src\lib\agents.functions.ts:197: await assertPerm(context.supabase, context.userId, "agents.manage");
+src\lib\agents.functions.ts:200: .from("agent_applications")
+src\lib\agents.functions.ts:209: .from("agent_applications")
+src\lib\agents.functions.ts:256: await assertPerm(context.supabase, context.userId, "agents.manage");
+src\lib\agents.functions.ts:283: .inputValidator((i: unknown) => z.object({ token: z.string().trim().min(10).max(80) }).parse(i))
+src\lib\agents.functions.ts:289: "full_name, agent_code, district, status, issued_at, expires_at, photo_path, referral_code, designation, application_id",
+src\lib\agents.functions.ts:291: .eq("verification_token", data.token)
+src\lib\agents.functions.ts:307: referralCode: a.referral_code,
+src\lib\agents.functions.ts:320: token,
+src\lib\agents.functions.ts:327: const c = await openCampaign(data.token);
+src\lib\agents.functions.ts:332: .from("agent_registry")
+src\lib\agents.functions.ts:364: await assertPerm(context.supabase, context.userId, "agents.manage");
+src\lib\agents.functions.ts:413: const REDEEM_TOKENS = 100; // tokens needed for one reward â€” kept server-side only
+src\lib\agents.functions.ts:414: const REDEEM_AMOUNT = 100000;
+src\lib\agents.functions.ts:416: async function tokenState(db: any, agentId: string) {
+src\lib\agents.functions.ts:418: db.from("clients").select("id", { count: "exact", head: true }).eq("agent_id", agentId),
+src\lib\agents.functions.ts:419: db.from("agent_redemptions").select("tokens_used, status").eq("agent_id", agentId),
+src\lib\agents.functions.ts:423: .reduce((n: number, r: any) => n + r.tokens_used, 0);
+src\lib\agents.functions.ts:428: canRedeem: earned - used >= REDEEM_TOKENS,
+src\lib\agents.functions.ts:433: export const getAgentDashboard = createServerFn({ method: "POST" })
+src\lib\agents.functions.ts:444: .from("agent_applications")
+src\lib\agents.functions.ts:455: .select("id, agent_id, client_ref, full_name, status, sector, created_at")
+src\lib\agents.functions.ts:456: .not("agent_id", "is", null),
+src\lib\agents.functions.ts:463: .from("agent_redemptions")
+src\lib\agents.functions.ts:465: .eq("agent_id", me.id)
+src\lib\agents.functions.ts:470: if (c.agent_id) counts.set(c.agent_id, (counts.get(c.agent_id) ?? 0) + 1);
+src\lib\agents.functions.ts:478: const myClients = (clients ?? []).filter((c) => c.agent_id === me.id);
+src\lib\agents.functions.ts:488: mine: inMonth.filter((c) => c.agent_id === me.id).length,
+src\lib\agents.functions.ts:496: const tokens = await tokenState(db, me.id);
+src\lib\agents.functions.ts:516: tokens: {
+src\lib\agents.functions.ts:517: available: tokens.available,
+src\lib\agents.functions.ts:518: earned: tokens.earned,
+src\lib\agents.functions.ts:519: canRedeem: tokens.canRedeem,
+src\lib\agents.functions.ts:520: approximateValue: approximateReward(tokens.available),
+src\lib\agents.functions.ts:527: export const redeemAgentTokens = createServerFn({ method: "POST" })
+src\lib\agents.functions.ts:537: throw new Error("Only active, verified agents can redeem tokens.");
+src\lib\agents.functions.ts:538: const t = await tokenState(db, me.id);
+src\lib\agents.functions.ts:540: throw new Error("You don't have enough tokens to redeem yet. Keep referring clients!");
+src\lib\agents.functions.ts:542: .from("agent_redemptions")
+src\lib\agents.functions.ts:543: .insert({ agent_id: me.id, tokens_used: REDEEM_TOKENS, amount: REDEEM_AMOUNT });
+src\lib\agents.functions.ts:547: "agent.tokens_redeemed",
+src\lib\agents.functions.ts:549: { amount: REDEEM_AMOUNT },
+src\lib\agents.functions.ts:551: return { amount: REDEEM_AMOUNT };
+src\lib\agents.functions.ts:561: db.from("clients").select("id, agent_id, created_at").not("agent_id", "is", null),
+src\lib\agents.functions.ts:563: db.from("transactions").select("client_id, amount, currency, status"),
+src\lib\agents.functions.ts:564: db.from("agent_redemptions").select("amount, status, currency"),
+src\lib\agents.functions.ts:586: referrals: referred.filter(
+src\lib\agents.functions.ts:595: referrals: referred.filter((y) => y.agent_id === x.id).length,
+src\lib\agents.functions.ts:597: referred.some((z) => z.id === y.client_id && z.agent_id === x.id),
+src\lib\agents.functions.ts:600: .sort((x, y) => y.referrals - x.referrals),
+src\lib\agents.functions.ts:601: referrals: referred.length,
+src\lib\agents.functions.ts:624: await assertPerm(context.supabase, context.userId, "agents.manage");
+src\lib\agents.functions.ts:632: return { path: p, token: slot.token };
+src\lib\agents.functions.ts:647: referral_code: z.string().trim().min(4).max(20),
+src\lib\agents.functions.ts:661: await assertPerm(context.supabase, context.userId, "agents.manage");
+src\lib\agents.functions.ts:672: .update({ ...clean, referral_code: payload.referral_code.toUpperCase() })
+src\lib\agents.functions.ts:717: await assertPerm(context.supabase, context.userId, "agents.manage");
+src\lib\agents.functions.ts:720: id: AGENT_ID_THEME_ID,
+src\lib\agents.functions.ts:722: kind: "agent_id_theme",
+src\lib\agents.functions.ts:734: AGENT_ID_THEME_ID,
+src\lib\agents.functions.ts:740: export const setRedemptionStatus = createServerFn({ method: "POST" })
+src\lib\agents.functions.ts:746: await assertPerm(context.supabase, context.userId, "agents.manage");
+src\lib\agents.functions.ts:749: .from("agent_redemptions")
+src\lib\agents.functions.ts:756: .from("agent_redemptions")
+src\lib\agents.functions.ts:778: /** Public: confirm a referral code belongs to an active agent. */
+src\lib\agents.functions.ts:779: export const lookupReferral = createServerFn({ method: "POST" })
+src\lib\agents.functions.ts:787: .eq("referral_code", data.code.toUpperCase())
+src\lib\agents.functions.ts:793: /** Public: a client registers themselves through an agent's referral link. */
+src\lib\agents.functions.ts:794: export const registerReferredClient = createServerFn({ method: "POST" })
+src\lib\agents.functions.ts:815: .eq("referral_code", data.code.toUpperCase())
+src\lib\agents.functions.ts:835: agent_id: agentId,
+src\lib\agents.functions.ts:836: referral_code: agentId ? (data.code?.toUpperCase() ?? null) : null,
+src\lib\agents.functions.ts:841: await audit(null, data.email || null, "client.self_registered", row.id, { agent_id: agentId });
+src\lib\brand.functions.ts:61: return { path, token: upload.token };
+src\lib\brand.functions.ts:132: return { path, token: upload.token };
+src\lib\maintenance.ts:76: [REDACTED - POSSIBLE SECRET]
+src\lib\maintenance.ts:77: if (!token) return false;
+src\lib\maintenance.ts:81: const { data, error } = await supabaseAdmin.auth.getUser(token);
+src\lib\maintenance.ts:143: if (error instanceof SyntaxError) return undefined;
+src\lib\publicform.functions.ts:26: const tokenSchema = z.string().trim().min(10).max(200);
+src\lib\publicform.functions.ts:28: async function loadForm(token: string) {
+src\lib\publicform.functions.ts:35: [REDACTED - POSSIBLE SECRET]
+src\lib\publicform.functions.ts:43: /** Public read of a shared form via its secret link token. */
+src\lib\publicform.functions.ts:45: .inputValidator((input: unknown) => z.object({ token: tokenSchema }).parse(input))
+src\lib\publicform.functions.ts:47: const form = await loadForm(data.token);
+src\lib\publicform.functions.ts:80: token: tokenSchema,
+src\lib\publicform.functions.ts:86: const form = await loadForm(data.token);
+src\lib\publicform.functions.ts:98: return { path, signedUrl: signed.signedUrl, uploadToken: signed.token, bucket: BUCKET };
+src\lib\publicform.functions.ts:106: token: tokenSchema,
+src\lib\publicform.functions.ts:125: const form = await loadForm(data.token);
+src\lib\rbac.ts:224: { to: "/agents/redemptions", label: "Token Redemptions", permission: "agents.view" },
+src\routes\agent.verify.$token.tsx:6: export const Route = createFileRoute("/agent/verify/$token")({
+src\routes\agent.verify.$token.tsx:22: const { token } = useParams({ from: "/agent/verify/$token" });
+src\routes\agent.verify.$token.tsx:23: const q = useQuery({ queryKey: ["verify-agent", token], queryFn: () => verifyAgent({ data: { token } }) });
+src\routes\f.$token.tsx:26: export const Route = createFileRoute("/f/$token")({
+src\routes\f.$token.tsx:64: const { token } = useParams({ from: "/f/$token" });
+src\routes\f.$token.tsx:73: queryKey: ["public-form", token],
+src\routes\f.$token.tsx:74: queryFn: () => getPublicForm({ data: { token } }),
+src\routes\f.$token.tsx:93: data: { token, fileName: file.name },
+src\routes\f.$token.tsx:97: .uploadToSignedUrl(slot.path, slot.uploadToken, file);
+src\routes\f.$token.tsx:126: token,
+src\routes\index.tsx:102: .from("agent_applications")
+src\routes\join.$token.tsx:12: export const Route = createFileRoute("/join/$token")({
+src\routes\join.$token.tsx:32: const { token } = useParams({ from: "/join/$token" });
+src\routes\join.$token.tsx:33: const campaign = useQuery({ queryKey: ["agent-campaign", token], queryFn: () => getAgentCampaign({ data: { token } }) });
+src\routes\join.$token.tsx:43: const r = await matchAgentRegistry({ data: { token, regId: f.regId || null, phone: f.phone || null } });
+src\routes\join.$token.tsx:66: const slot = await createAgentUpload({ data: { token, fileName: file.name } });
+src\routes\join.$token.tsx:67: const { error } = await supabase.storage.from(slot.bucket).uploadToSignedUrl(slot.path, slot.uploadToken, file);
+src\routes\join.$token.tsx:85: token, fullName, phone, email, dateOfBirth: f.dateOfBirth, gender: f.gender,
+src\routes\r.$code.tsx:5: import { lookupReferral, registerReferredClient } from "@/lib/agents.functions";
+src\routes\r.$code.tsx:22: component: ReferralRegister,
+src\routes\r.$code.tsx:28: function ReferralRegister() {
+src\routes\r.$code.tsx:30: const ref = useQuery({ queryKey: ["ref", code], queryFn: () => lookupReferral({ data: { code } }) });
+src\routes\r.$code.tsx:38: const r = await registerReferredClient({ data: { ...f, code: ref.data ? code : null } });
+src\routes\_authenticated\admin.index.tsx:97: label: "Token redemptions",
+src\routes\_authenticated\admin.index.tsx:110: "Financial results, deal pipeline, agent referrals and audited staff activity.",
+src\routes\_authenticated\agent-portal.tsx:7: import { getAgentDashboard, redeemAgentTokens } from "@/lib/agents.functions";
+src\routes\_authenticated\agent-portal.tsx:16: head: () => ({ meta: [{ title: "My Agent Dashboard — Kalexi" }, { name: "description", content: "Your referrals, approximate rewards and private Kalexi conversations." }, { property: "og:title", content: "My Agent Dashboard — Kalexi" }, { property: "og:description", content: "Your Kalexi agent performance and rewards." }, { property: "og:type", con ... [truncated]
+src\routes\_authenticated\agent-portal.tsx:22: "Ask satisfied clients to refer friends — each referral counts for you.",
+src\routes\_authenticated\agent-portal.tsx:30: const q = useQuery({ queryKey: ["agent-dashboard"], queryFn: () => getAgentDashboard() });
+src\routes\_authenticated\agent-portal.tsx:60: <p className="mt-2 text-sm text-muted-foreground">Kalexi is reviewing your identity and details. Once approved you'll unlock your official ID card, your referral link, tokens and performance tracking.</p>
+src\routes\_authenticated\agent-portal.tsx:63: {["Digital ID card download", "Referral link", "Tokens & rewards", "Performance charts"].map((x) => (
+src\routes\_authenticated\agent-portal.tsx:75: const { me, performance: p, tokens, clients } = d;
+src\routes\_authenticated\agent-portal.tsx:77: const refLink = `${typeof window !== "undefined" ? window.location.origin : ""}/r/${me.referral_code}`;
+src\routes\_authenticated\agent-portal.tsx:81: try { const r = await redeemAgentTokens(); toast.success(`Redemption of UGX ${r.amount.toLocaleString()} requested. Finance will contact you.`); qc.invalidateQueries({ queryKey: ["agent-dashboard"] }); }
+src\routes\_authenticated\agent-portal.tsx:103: {[["Referred clients", p.mine], ["My rank", `#${p.rank} of ${p.totalAgents}`], ["Standing", `Top ${p.topPercent}%`], ["Tokens", tokens.available]].map(([l, v]) => (
+src\routes\_authenticated\agent-portal.tsx:127: <h2 className="font-display font-semibold">My tokens</h2>
+src\routes\_authenticated\agent-portal.tsx:128: <p className="mt-1 text-xs text-muted-foreground">You earn a token for every client you refer. Collect enough to redeem a UGX 100,000 reward.</p>
+src\routes\_authenticated\agent-portal.tsx:129: <p className="my-4 font-display text-5xl font-semibold text-primary">{tokens.available}</p>
+src\routes\_authenticated\agent-portal.tsx:130: <div className="mb-5 border-l-4 border-success pl-4"><p className="text-xs text-muted-foreground">Approximate reward value</p><p className="text-2xl font-semibold text-success">UGX {tokens.approximateValue.toLocaleString()}</p><p className="mt-1 text-xs text-muted-foreground">Estimate only. Payment follows reward eligibility and company approval.</ ... [truncated]
+src\routes\_authenticated\agent-portal.tsx:131: <Button className="w-full" disabled={!active || !tokens.canRedeem} onClick={redeem}>{tokens.canRedeem ? "Redeem UGX 100,000" : "Keep referring to unlock"}</Button>
+src\routes\_authenticated\agent-portal.tsx:141: <h2 className="mb-2 font-display font-semibold">Share my referral link</h2>
+src\routes\_authenticated\agent-portal.tsx:142: <p className="text-sm">Code: <b className="font-mono">{me.referral_code}</b></p>
+src\routes\_authenticated\agents.$agentId.tsx:47: <PageHeader title={a.full_name} description={`${a.agent_code} · referral ${a.referral_code}`}
+src\routes\_authenticated\agents.index.tsx:12: import { reviewAgentApplication, signAgentFiles } from "@/lib/agents.functions";
+src\routes\_authenticated\agents.index.tsx:68: <AgentIdCardDesigner canManage={allows(access, "agents.manage")} />
+src\routes\_authenticated\agents.index.tsx:70: <Applications canManage={allows(access, "agents.manage")} />
+src\routes\_authenticated\agents.index.tsx:91: .from("agent_applications")
+src\routes\_authenticated\agents.index.tsx:115: const result = await reviewAgentApplication({
+src\routes\_authenticated\agents.index.tsx:244: const canManage = allows(access, "agents.manage");
+src\routes\_authenticated\agents.index.tsx:256: commission_rate: "2",
+src\routes\_authenticated\agents.index.tsx:257: referral_code: "",
+src\routes\_authenticated\agents.index.tsx:268: supabase.from("agent_registry").select("*").order("created_at", { ascending: false }),
+src\routes\_authenticated\agents.index.tsx:284: commission_rate: String(a.commission_rate ?? 2),
+src\routes\_authenticated\agents.index.tsx:285: referral_code: a.referral_code ?? "",
+src\routes\_authenticated\agents.index.tsx:303: commission_rate: "2",
+src\routes\_authenticated\agents.index.tsx:304: referral_code: "",
+src\routes\_authenticated\agents.index.tsx:334: commission_rate: a.commission_rate,
+src\routes\_authenticated\agents.index.tsx:335: referral_code: a.referral_code,
+src\routes\_authenticated\agents.index.tsx:353: const rate = Number(draft.commission_rate);
+src\routes\_authenticated\agents.index.tsx:369: commission_rate: rate,
+src\routes\_authenticated\agents.index.tsx:370: referral_code: draft.referral_code.trim(),
+src\routes\_authenticated\agents.index.tsx:377: .from("agent_registry")
+src\routes\_authenticated\agents.index.tsx:536: {field("Commission rate (%)", "commission_rate", "number")}
+src\routes\_authenticated\agents.index.tsx:537: {field("Referral code", "referral_code")}
+src\routes\_authenticated\agents.index.tsx:606: .from("agent_campaigns")
+src\routes\_authenticated\agents.index.tsx:637: .from("agent_campaigns")
+src\routes\_authenticated\agents.index.tsx:670: .from("agent_campaigns")
+src\routes\_authenticated\agents.index.tsx:772: .from("agent_registry")
+src\routes\_authenticated\agents.index.tsx:793: const { error } = await supabase.from("agent_registry").insert({
+src\routes\_authenticated\agents.redemptions.tsx:13: import { setRedemptionStatus } from "@/lib/agents.functions";
+src\routes\_authenticated\agents.redemptions.tsx:16: head: () => ({ meta: [{ title: "Token Redemption Review — Kalexi" }, { name: "description", content: "Review, approve and record agent reward payments." }, { property: "og:title", content: "Token Redemption Review — Kalexi" }, { property: "og:description", content: "Kalexi agent reward approvals and payment records." }, { property: "og:type", conte ... [truncated]
+src\routes\_authenticated\agents.redemptions.tsx:21: const read = allows(session?.access, "agents.view"); const manage = allows(session?.access, "agents.manage");
+src\routes\_authenticated\agents.redemptions.tsx:23: const qc = useQueryClient(); const process = useServerFn(setRedemptionStatus);
+src\routes\_authenticated\agents.redemptions.tsx:25: const { data, error } = await supabase.from("agent_redemptions").select("*, agents(full_name, agent_code, phone, application_id)").order("created_at", { ascending: false });
+src\routes\_authenticated\agents.redemptions.tsx:28: const payments = ids.length ? await supabase.from("agent_applications").select("id,payment_method,payment_provider,payment_account_name,payment_account_number").in("id", ids) : null;
+src\routes\_authenticated\agents.redemptions.tsx:40: return <AppShell><PageHeader title="Token redemptions" />{!read ? <NoAccess module="Agent rewards" /> : <>
+src\routes\_authenticated\brand.tsx:25: [REDACTED - POSSIBLE SECRET]
+src\routes\_authenticated\brand.tsx:55: const { error } = await supabase.storage.from("kalexi-vault").uploadToSignedUrl(slot.path, slot.token, signature); if (error) throw error;
+src\routes\_authenticated\clients.new.tsx:7: import { lookupReferral } from "@/lib/agents.functions";
+src\routes\_authenticated\clients.new.tsx:68: referral_code: "",
+src\routes\_authenticated\clients.new.tsx:101: if (form.referral_code.trim()) {
+src\routes\_authenticated\clients.new.tsx:102: const ref = await lookupReferral({ data: { code: form.referral_code.trim() } });
+src\routes\_authenticated\clients.new.tsx:103: if (!ref) throw new Error("That referral code does not belong to an active agent.");
+src\routes\_authenticated\clients.new.tsx:118: agent_id: agentId,
+src\routes\_authenticated\clients.new.tsx:119: referral_code: agentId ? form.referral_code.trim().toUpperCase() : null,
+src\routes\_authenticated\clients.new.tsx:228: <Field label="Agent referral code (if referred by an agent)" error={undefined}>
+src\routes\_authenticated\clients.new.tsx:230: value={form.referral_code}
+src\routes\_authenticated\clients.new.tsx:231: onChange={(e) => set("referral_code")(e.target.value)}
+src\routes\_authenticated\dashboard.tsx:74: type DashboardReferral = Pick<Database["public"]["Tables"]["clients"]["Row"], "id" | "agent_id">;
+src\routes\_authenticated\dashboard.tsx:98: agents: (DashboardAgent & { referrals: number; deals: number | null })[];
+src\routes\_authenticated\dashboard.tsx:163: .from("transactions")
+src\routes\_authenticated\dashboard.tsx:305: const [agents, referrals, linkedDeals] = await Promise.all([
+src\routes\_authenticated\dashboard.tsx:313: collectPages<DashboardReferral>((from, to) =>
+src\routes\_authenticated\dashboard.tsx:316: .select("id, agent_id")
+src\routes\_authenticated\dashboard.tsx:318: .not("agent_id", "is", null)
+src\routes\_authenticated\dashboard.tsx:334: referrals.flatMap((client) => (client.agent_id ? [[client.id, client.agent_id] as const] : [])),
+src\routes\_authenticated\dashboard.tsx:336: const referralCounts = new Map<string, number>();
+src\routes\_authenticated\dashboard.tsx:338: referralCounts.set(agentId, (referralCounts.get(agentId) ?? 0) + 1);
+src\routes\_authenticated\dashboard.tsx:352: referrals: referralCounts.get(agent.id) ?? 0,
+src\routes\_authenticated\dashboard.tsx:355: .sort((left, right) => right.referrals - left.referrals),
+src\routes\_authenticated\dashboard.tsx:938: ? "Client referrals and deals linked to those clients"
+src\routes\_authenticated\dashboard.tsx:939: : "Client referrals linked to each agent"}
+src\routes\_authenticated\dashboard.tsx:962: <th className="pb-2 text-right font-medium">Referrals</th>
+src\routes\_authenticated\dashboard.tsx:983: <td className="py-3 text-right tabular-nums">{agent.referrals}</td>
+src\routes\_authenticated\dashboard.tsx:997: ? "Referral and linked-deal activity will appear here."
+src\routes\_authenticated\dashboard.tsx:998: : "Referral activity will appear here."
+src\routes\_authenticated\deals.$dealId.index.tsx:313: {d['commission_rate'] ? `${d['commission_rate']}%` : "—"}
+src\routes\_authenticated\deals.new.tsx:47: commission_rate: "",
+src\routes\_authenticated\deals.new.tsx:109: commission_rate: form.commission_rate ? Number(form.commission_rate) : null,
+src\routes\_authenticated\deals.new.tsx:268: value={form.commission_rate}
+src\routes\_authenticated\deals.new.tsx:269: onChange={(e) => setForm((f) => ({ ...f, commission_rate: e.target.value }))}
+src\routes\_authenticated\finance.index.tsx:40: const TX_STATUSES = ["pending", "cleared", "failed", "archived"];
+src\routes\_authenticated\finance.index.tsx:42: const COMMISSION_STATUSES = ["pending", "approved", "paid", "archived"];
+src\routes\_authenticated\finance.index.tsx:52: payment_reference: string | null;
+src\routes\_authenticated\finance.index.tsx:54: commission_amount: number | null;
+src\routes\_authenticated\finance.index.tsx:137: .from("transactions")
+src\routes\_authenticated\finance.index.tsx:139: "id, transaction_ref, client_id, deal_id, amount, currency, payment_method, payment_reference, purpose, commission_amount, occurred_on, status, clients(full_name), deals(title)",
+src\routes\_authenticated\finance.index.tsx:179: .from("commissions")
+src\routes\_authenticated\finance.index.tsx:195: const { error } = await supabase.from("transactions").update({ status: value }).eq("id", id);
+src\routes\_authenticated\finance.index.tsx:219: const { error } = await supabase.from("commissions").update({ status: value }).eq("id", id);
+src\routes\_authenticated\finance.index.tsx:325: ? TX_STATUSES
+src\routes\_authenticated\finance.index.tsx:328: : COMMISSION_STATUSES
+src\routes\_authenticated\finance.index.tsx:400: <td className="px-4 py-2">{formatMoney(t.commission_amount, t.currency)}</td>
+src\routes\_authenticated\finance.index.tsx:412: {TX_STATUSES.map((s) => (
+src\routes\_authenticated\finance.index.tsx:557: {COMMISSION_STATUSES.map((s) => (
+src\routes\_authenticated\finance.index.tsx:644: .from("transactions")
+src\routes\_authenticated\finance.index.tsx:651: payment_reference: paymentReference || null,
+src\routes\_authenticated\finance.index.tsx:653: commission_amount: commissionAmount ? Number(commissionAmount) : null,
+src\routes\_authenticated\finance.index.tsx:948: .from("transactions")
+src\routes\_authenticated\finance.index.tsx:962: .from("commissions")
+src\routes\_authenticated\finance.receipts.index.tsx:176: .from("transactions")
+src\routes\_authenticated\forms.$formId.index.tsx:109: [REDACTED - POSSIBLE SECRET]
+src\routes\_authenticated\forms.index.tsx:73: [REDACTED - POSSIBLE SECRET]
+src\routes\_authenticated\forms.index.tsx:115: function copyLink(token: string) {
+src\routes\_authenticated\forms.index.tsx:116: const url = `${window.location.origin}/f/${token}`;
+src\routes\_authenticated\forms.index.tsx:193: [REDACTED - POSSIBLE SECRET]
+src\routes\_authenticated\forms.index.tsx:299: const token = crypto.randomUUID().replace(/-/g, "");
+src\routes\_authenticated\forms.index.tsx:305: [REDACTED - POSSIBLE SECRET]
+src\routes\_authenticated\requirements.$requirementId.index.tsx:35: function tokenize(text: string) {
+src\routes\_authenticated\requirements.$requirementId.index.tsx:66: const reqTokens = tokenize(`${req.title} ${req.description}`);
+src\routes\_authenticated\requirements.$requirementId.index.tsx:67: const oppTokens = tokenize(`${opp.title} ${opp.description ?? ""}`);
+src\routes\_authenticated\requirements.$requirementId.index.tsx:69: for (const t of reqTokens) if (oppTokens.has(t)) overlap += 1;
+src\routes\_authenticated\requirements.new.tsx:53: function tokenize(text: string) {
+src\routes\_authenticated\requirements.new.tsx:88: const reqTokens = tokenize(`${req.title} ${req.description}`);
+src\routes\_authenticated\requirements.new.tsx:89: const oppTokens = tokenize(`${opp.title} ${opp.description ?? ""}`);
+src\routes\_authenticated\requirements.new.tsx:91: for (const t of reqTokens) if (oppTokens.has(t)) overlap += 1;
+supabase\setup_all.sql:61: CREATE POLICY "Staff can view profiles" ON public.profiles FOR SELECT TO authenticated
+supabase\setup_all.sql:63: CREATE POLICY "Super admin can insert profiles" ON public.profiles FOR INSERT TO authenticated
+supabase\setup_all.sql:65: CREATE POLICY "Update own profile" ON public.profiles FOR UPDATE TO authenticated
+supabase\setup_all.sql:67: CREATE POLICY "Super admin can update profiles" ON public.profiles FOR UPDATE TO authenticated
+supabase\setup_all.sql:71: CREATE POLICY "Staff can view roles" ON public.user_roles FOR SELECT TO authenticated
+supabase\setup_all.sql:98: CREATE POLICY "Active staff can view clients" ON public.clients FOR SELECT TO authenticated
+supabase\setup_all.sql:100: CREATE POLICY "Active staff can register clients" ON public.clients FOR INSERT TO authenticated
+supabase\setup_all.sql:102: CREATE POLICY "Authorised staff can update clients" ON public.clients FOR UPDATE TO authenticated
+supabase\setup_all.sql:132: CREATE POLICY "Oversight roles can read audit log" ON public.audit_logs FOR SELECT TO authenticated
+supabase\setup_all.sql:138: CREATE POLICY "Active staff can append audit entries" ON public.audit_logs FOR INSERT TO authenticated
+supabase\setup_all.sql:250: CREATE POLICY "Staff can view roles catalogue" ON public.roles FOR SELECT TO authenticated USING (is_active_staff(auth.uid()));
+supabase\setup_all.sql:261: CREATE POLICY "Staff can view role permissions" ON public.role_permissions FOR SELECT TO authenticated USING (is_active_staff(auth.uid()));
+supabase\setup_all.sql:273: CREATE POLICY "Staff can view role assignments" ON public.user_role_assignments FOR SELECT TO authenticated USING (is_active_staff(auth.uid()) OR user_id = auth.uid());
+supabase\setup_all.sql:441: commission_rate numeric,
+supabase\setup_all.sql:594: [REDACTED - POSSIBLE SECRET]
+supabase\setup_all.sql:616: CREATE TABLE public.transactions (
+supabase\setup_all.sql:622: payment_method text, payment_reference text, purpose text NOT NULL,
+supabase\setup_all.sql:623: commission_amount numeric,
+supabase\setup_all.sql:654: CREATE TABLE public.commissions (
+supabase\setup_all.sql:735: CREATE POLICY "Own notifications" ON public.notifications FOR SELECT TO authenticated USING (user_id = auth.uid());
+supabase\setup_all.sql:736: CREATE POLICY "Update own notifications" ON public.notifications FOR UPDATE TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+supabase\setup_all.sql:763: EXECUTE format('CREATE POLICY %I ON public.%I FOR SELECT TO authenticated USING (has_permission(auth.uid(), %L))', t||'_view', t, md||'.view');
+supabase\setup_all.sql:764: EXECUTE format('CREATE POLICY %I ON public.%I FOR INSERT TO authenticated WITH CHECK (has_permission(auth.uid(), %L) AND created_by = auth.uid())', t||'_create', t, md||'.create');
+supabase\setup_all.sql:765: EXECUTE format('CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated USING (has_permission(auth.uid(), %L)) WITH CHECK (has_permission(auth.uid(), %L))', t||'_edit', t, md||'.edit', md||'.edit');
+supabase\setup_all.sql:766: EXECUTE format('CREATE POLICY %I ON public.%I FOR DELETE TO authenticated USING (has_role(auth.uid(), ''super_admin''::app_role))', t||'_delete', t);
+supabase\setup_all.sql:773: CREATE POLICY archive_records_create ON public.archive_records FOR INSERT TO authenticated
+supabase\setup_all.sql:807: CREATE POLICY "Vault read for document viewers" ON storage.objects FOR SELECT TO authenticated
+supabase\setup_all.sql:809: CREATE POLICY "Vault upload for document creators" ON storage.objects FOR INSERT TO authenticated
+supabase\setup_all.sql:811: CREATE POLICY "Vault update for document editors" ON storage.objects FOR UPDATE TO authenticated
+supabase\setup_all.sql:814: CREATE POLICY "Vault delete for super admin" ON storage.objects FOR DELETE TO authenticated
+supabase\setup_all.sql:839: 'CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated USING ((%s) OR created_by = auth.uid()) WITH CHECK ((%s) OR created_by = auth.uid())',
+supabase\setup_all.sql:845: CREATE POLICY "Authorised staff can update clients"
+supabase\setup_all.sql:857: CREATE POLICY "Avatar read for staff"
+supabase\setup_all.sql:861: CREATE POLICY "Avatar upload for admin or owner"
+supabase\setup_all.sql:868: CREATE POLICY "Avatar update for admin or owner"
+supabase\setup_all.sql:879: CREATE POLICY "Avatar delete for admin or owner"
+supabase\setup_all.sql:945: AND policyname = 'maintenance_access_gate'
+supabase\setup_all.sql:948: 'CREATE POLICY maintenance_access_gate ON %I.%I AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())',
+supabase\setup_all.sql:963: AND policyname = 'maintenance_access_gate'
+supabase\setup_all.sql:967: 'CREATE POLICY maintenance_access_gate ON storage.objects AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())';
+supabase\setup_all.sql:974: CREATE SEQUENCE IF NOT EXISTS public.agent_referral_seq;
+supabase\setup_all.sql:976: CREATE TABLE IF NOT EXISTS public.agent_campaigns (
+supabase\setup_all.sql:979: token text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(24), 'hex'),
+supabase\setup_all.sql:987: CREATE TABLE IF NOT EXISTS public.agent_registry (
+supabase\setup_all.sql:1004: CREATE TABLE IF NOT EXISTS public.agent_applications (
+supabase\setup_all.sql:1009: campaign_id uuid REFERENCES public.agent_campaigns(id) ON DELETE SET NULL,
+supabase\setup_all.sql:1030: registry_id uuid REFERENCES public.agent_registry(id) ON DELETE SET NULL,
+supabase\setup_all.sql:1040: CREATE UNIQUE INDEX IF NOT EXISTS agent_applications_active_id_number_idx
+supabase\setup_all.sql:1041: ON public.agent_applications (lower(id_number))
+supabase\setup_all.sql:1044: CREATE TABLE IF NOT EXISTS public.agents (
+supabase\setup_all.sql:1049: application_id uuid UNIQUE REFERENCES public.agent_applications(id) ON DELETE SET NULL,
+supabase\setup_all.sql:1050: registry_id uuid REFERENCES public.agent_registry(id) ON DELETE SET NULL,
+supabase\setup_all.sql:1058: commission_rate numeric NOT NULL DEFAULT 5,
+supabase\setup_all.sql:1059: referral_code text NOT NULL UNIQUE DEFAULT (
+supabase\setup_all.sql:1060: 'KBLR' || lpad(nextval('public.agent_referral_seq')::text, 6, '0')
+supabase\setup_all.sql:1062: verification_token text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(24), 'hex'),
+supabase\setup_all.sql:1074: ALTER TABLE public.agent_registry
+supabase\setup_all.sql:1075: ADD CONSTRAINT agent_registry_linked_application_id_fkey
+supabase\setup_all.sql:1077: REFERENCES public.agent_applications(id) ON DELETE SET NULL;
+supabase\setup_all.sql:1079: CREATE TABLE IF NOT EXISTS public.agent_redemptions (
+supabase\setup_all.sql:1081: agent_id uuid NOT NULL REFERENCES public.agents(id) ON DELETE CASCADE,
+supabase\setup_all.sql:1082: tokens_used integer NOT NULL,
+supabase\setup_all.sql:1091: CREATE TABLE IF NOT EXISTS public.agent_notices (
+supabase\setup_all.sql:1099: CREATE TABLE IF NOT EXISTS public.agent_messages (
+supabase\setup_all.sql:1131: ADD COLUMN IF NOT EXISTS agent_id uuid REFERENCES public.agents(id) ON DELETE SET NULL,
+supabase\setup_all.sql:1132: ADD COLUMN IF NOT EXISTS referral_code text;
+supabase\setup_all.sql:1134: CREATE INDEX IF NOT EXISTS clients_agent_id_idx ON public.clients (agent_id);
+supabase\setup_all.sql:1135: CREATE INDEX IF NOT EXISTS agent_applications_status_created_idx
+supabase\setup_all.sql:1136: ON public.agent_applications (status, created_at DESC);
+supabase\setup_all.sql:1140: GRANT SELECT, INSERT, UPDATE, DELETE ON public.agent_campaigns TO authenticated;
+supabase\setup_all.sql:1141: GRANT SELECT, INSERT, UPDATE, DELETE ON public.agent_registry TO authenticated;
+supabase\setup_all.sql:1142: GRANT SELECT, UPDATE ON public.agent_applications TO authenticated;
+supabase\setup_all.sql:1144: GRANT SELECT, UPDATE ON public.agent_redemptions TO authenticated;
+supabase\setup_all.sql:1149: GRANT ALL ON public.agent_campaigns, public.agent_registry, public.agent_applications,
+supabase\setup_all.sql:1150: public.agents, public.agent_redemptions, public.agent_notices, public.agent_messages,
+supabase\setup_all.sql:1153: [REDACTED - POSSIBLE SECRET]
+supabase\setup_all.sql:1155: ALTER TABLE public.agent_campaigns ENABLE ROW LEVEL SECURITY;
+supabase\setup_all.sql:1156: ALTER TABLE public.agent_registry ENABLE ROW LEVEL SECURITY;
+supabase\setup_all.sql:1157: ALTER TABLE public.agent_applications ENABLE ROW LEVEL SECURITY;
+supabase\setup_all.sql:1159: ALTER TABLE public.agent_redemptions ENABLE ROW LEVEL SECURITY;
+supabase\setup_all.sql:1169: 'agent_campaigns', 'agent_registry', 'agent_applications', 'agents',
+supabase\setup_all.sql:1170: 'agent_redemptions', 'agent_notices', 'agent_messages', 'brand_templates'
+supabase\setup_all.sql:1177: AND policyname = 'maintenance_access_gate'
+supabase\setup_all.sql:1180: 'CREATE POLICY maintenance_access_gate ON public.%I AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())',
+supabase\setup_all.sql:1187: CREATE POLICY agent_campaigns_view ON public.agent_campaigns
+supabase\setup_all.sql:1189: CREATE POLICY agent_campaigns_manage ON public.agent_campaigns
+supabase\setup_all.sql:1191: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\setup_all.sql:1192: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\setup_all.sql:1193: CREATE POLICY agent_registry_view ON public.agent_registry
+supabase\setup_all.sql:1195: CREATE POLICY agent_registry_manage ON public.agent_registry
+supabase\setup_all.sql:1197: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\setup_all.sql:1198: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\setup_all.sql:1199: CREATE POLICY agent_applications_view ON public.agent_applications
+supabase\setup_all.sql:1201: CREATE POLICY agent_applications_owner_view ON public.agent_applications
+supabase\setup_all.sql:1203: CREATE POLICY agent_applications_manage ON public.agent_applications
+supabase\setup_all.sql:1205: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\setup_all.sql:1206: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\setup_all.sql:1207: CREATE POLICY agents_view ON public.agents
+supabase\setup_all.sql:1209: CREATE POLICY agents_owner_view ON public.agents
+supabase\setup_all.sql:1211: CREATE POLICY agents_manage ON public.agents
+supabase\setup_all.sql:1213: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\setup_all.sql:1214: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\setup_all.sql:1215: CREATE POLICY agent_redemptions_view ON public.agent_redemptions
+supabase\setup_all.sql:1217: CREATE POLICY agent_redemptions_manage ON public.agent_redemptions
+supabase\setup_all.sql:1219: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\setup_all.sql:1220: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\setup_all.sql:1221: CREATE POLICY agent_notices_view ON public.agent_notices
+supabase\setup_all.sql:1223: CREATE POLICY agent_notices_manage ON public.agent_notices
+supabase\setup_all.sql:1226: public.has_permission(auth.uid(), 'agents.manage')
+supabase\setup_all.sql:1229: CREATE POLICY agent_messages_view ON public.agent_messages
+supabase\setup_all.sql:1235: CREATE POLICY agent_messages_send ON public.agent_messages
+supabase\setup_all.sql:1241: OR public.has_permission(auth.uid(), 'agents.manage')
+supabase\setup_all.sql:1244: CREATE POLICY brand_templates_staff_read ON public.brand_templates
+supabase\setup_all.sql:1246: CREATE POLICY brand_templates_staff_write ON public.brand_templates
+supabase\setup_all.sql:1251: CREATE POLICY "Agent registry signature uploads" ON storage.objects
+supabase\setup_all.sql:1256: AND public.has_permission(auth.uid(), 'agents.manage')
+supabase\setup_all.sql:1265: 'agent_campaigns', 'agent_registry', 'agent_applications', 'agents', 'brand_templates'
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:51: CREATE POLICY "Staff can view profiles" ON public.profiles FOR SELECT TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:53: CREATE POLICY "Super admin can insert profiles" ON public.profiles FOR INSERT TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:55: CREATE POLICY "Update own profile" ON public.profiles FOR UPDATE TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:57: CREATE POLICY "Super admin can update profiles" ON public.profiles FOR UPDATE TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:61: CREATE POLICY "Staff can view roles" ON public.user_roles FOR SELECT TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:88: CREATE POLICY "Active staff can view clients" ON public.clients FOR SELECT TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:90: CREATE POLICY "Active staff can register clients" ON public.clients FOR INSERT TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:92: CREATE POLICY "Authorised staff can update clients" ON public.clients FOR UPDATE TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:122: CREATE POLICY "Oversight roles can read audit log" ON public.audit_logs FOR SELECT TO authenticated
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql:128: CREATE POLICY "Active staff can append audit entries" ON public.audit_logs FOR INSERT TO authenticated
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:13: CREATE POLICY "Staff can view roles catalogue" ON public.roles FOR SELECT TO authenticated USING (is_active_staff(auth.uid()));
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:24: CREATE POLICY "Staff can view role permissions" ON public.role_permissions FOR SELECT TO authenticated USING (is_active_staff(auth.uid()));
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:36: CREATE POLICY "Staff can view role assignments" ON public.user_role_assignments FOR SELECT TO authenticated USING (is_active_staff(auth.uid()) OR user_id = auth.uid());
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:204: commission_rate numeric,
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:357: [REDACTED - POSSIBLE SECRET]
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:379: CREATE TABLE public.transactions (
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:385: payment_method text, payment_reference text, purpose text NOT NULL,
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:386: commission_amount numeric,
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:417: CREATE TABLE public.commissions (
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:498: CREATE POLICY "Own notifications" ON public.notifications FOR SELECT TO authenticated USING (user_id = auth.uid());
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:499: CREATE POLICY "Update own notifications" ON public.notifications FOR UPDATE TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:526: EXECUTE format('CREATE POLICY %I ON public.%I FOR SELECT TO authenticated USING (has_permission(auth.uid(), %L))', t||'_view', t, md||'.view');
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:527: EXECUTE format('CREATE POLICY %I ON public.%I FOR INSERT TO authenticated WITH CHECK (has_permission(auth.uid(), %L) AND created_by = auth.uid())', t||'_create', t, md||'.create');
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:528: EXECUTE format('CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated USING (has_permission(auth.uid(), %L)) WITH CHECK (has_permission(auth.uid(), %L))', t||'_edit', t, md||'.edit', md||'.edit');
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:529: EXECUTE format('CREATE POLICY %I ON public.%I FOR DELETE TO authenticated USING (has_role(auth.uid(), ''super_admin''::app_role))', t||'_delete', t);
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql:536: CREATE POLICY archive_records_create ON public.archive_records FOR INSERT TO authenticated
+supabase\migrations\20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql:1: CREATE POLICY "Vault read for document viewers" ON storage.objects FOR SELECT TO authenticated
+supabase\migrations\20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql:3: CREATE POLICY "Vault upload for document creators" ON storage.objects FOR INSERT TO authenticated
+supabase\migrations\20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql:5: CREATE POLICY "Vault update for document editors" ON storage.objects FOR UPDATE TO authenticated
+supabase\migrations\20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql:8: CREATE POLICY "Vault delete for super admin" ON storage.objects FOR DELETE TO authenticated
+supabase\migrations\20260816035733_d4bba811-549a-4efa-a1fb-e69056e0792b.sql:15: 'CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated USING ((%s) OR created_by = auth.uid()) WITH CHECK ((%s) OR created_by = auth.uid())',
+supabase\migrations\20260816035733_d4bba811-549a-4efa-a1fb-e69056e0792b.sql:21: CREATE POLICY "Authorised staff can update clients"
+supabase\migrations\20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql:1: CREATE POLICY "Avatar read for staff"
+supabase\migrations\20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql:5: CREATE POLICY "Avatar upload for admin or owner"
+supabase\migrations\20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql:12: CREATE POLICY "Avatar update for admin or owner"
+supabase\migrations\20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql:23: CREATE POLICY "Avatar delete for admin or owner"
+supabase\migrations\20261022203000_system_maintenance.sql:62: AND policyname = 'maintenance_access_gate'
+supabase\migrations\20261022203000_system_maintenance.sql:65: 'CREATE POLICY maintenance_access_gate ON %I.%I AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())',
+supabase\migrations\20261022203000_system_maintenance.sql:80: AND policyname = 'maintenance_access_gate'
+supabase\migrations\20261022203000_system_maintenance.sql:84: 'CREATE POLICY maintenance_access_gate ON storage.objects AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())';
+supabase\migrations\20261024000000_agent_registration_schema.sql:3: CREATE SEQUENCE IF NOT EXISTS public.agent_referral_seq;
+supabase\migrations\20261024000000_agent_registration_schema.sql:5: CREATE TABLE IF NOT EXISTS public.agent_campaigns (
+supabase\migrations\20261024000000_agent_registration_schema.sql:8: token text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(24), 'hex'),
+supabase\migrations\20261024000000_agent_registration_schema.sql:16: CREATE TABLE IF NOT EXISTS public.agent_registry (
+supabase\migrations\20261024000000_agent_registration_schema.sql:33: CREATE TABLE IF NOT EXISTS public.agent_applications (
+supabase\migrations\20261024000000_agent_registration_schema.sql:38: campaign_id uuid REFERENCES public.agent_campaigns(id) ON DELETE SET NULL,
+supabase\migrations\20261024000000_agent_registration_schema.sql:59: registry_id uuid REFERENCES public.agent_registry(id) ON DELETE SET NULL,
+supabase\migrations\20261024000000_agent_registration_schema.sql:69: CREATE UNIQUE INDEX IF NOT EXISTS agent_applications_active_id_number_idx
+supabase\migrations\20261024000000_agent_registration_schema.sql:70: ON public.agent_applications (lower(id_number))
+supabase\migrations\20261024000000_agent_registration_schema.sql:73: CREATE TABLE IF NOT EXISTS public.agents (
+supabase\migrations\20261024000000_agent_registration_schema.sql:78: application_id uuid UNIQUE REFERENCES public.agent_applications(id) ON DELETE SET NULL,
+supabase\migrations\20261024000000_agent_registration_schema.sql:79: registry_id uuid REFERENCES public.agent_registry(id) ON DELETE SET NULL,
+supabase\migrations\20261024000000_agent_registration_schema.sql:87: commission_rate numeric NOT NULL DEFAULT 5,
+supabase\migrations\20261024000000_agent_registration_schema.sql:88: referral_code text NOT NULL UNIQUE DEFAULT (
+supabase\migrations\20261024000000_agent_registration_schema.sql:89: 'KBLR' || lpad(nextval('public.agent_referral_seq')::text, 6, '0')
+supabase\migrations\20261024000000_agent_registration_schema.sql:91: verification_token text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(24), 'hex'),
+supabase\migrations\20261024000000_agent_registration_schema.sql:103: ALTER TABLE public.agent_registry
+supabase\migrations\20261024000000_agent_registration_schema.sql:104: ADD CONSTRAINT agent_registry_linked_application_id_fkey
+supabase\migrations\20261024000000_agent_registration_schema.sql:106: REFERENCES public.agent_applications(id) ON DELETE SET NULL;
+supabase\migrations\20261024000000_agent_registration_schema.sql:108: CREATE TABLE IF NOT EXISTS public.agent_redemptions (
+supabase\migrations\20261024000000_agent_registration_schema.sql:110: agent_id uuid NOT NULL REFERENCES public.agents(id) ON DELETE CASCADE,
+supabase\migrations\20261024000000_agent_registration_schema.sql:111: tokens_used integer NOT NULL,
+supabase\migrations\20261024000000_agent_registration_schema.sql:120: CREATE TABLE IF NOT EXISTS public.agent_notices (
+supabase\migrations\20261024000000_agent_registration_schema.sql:128: CREATE TABLE IF NOT EXISTS public.agent_messages (
+supabase\migrations\20261024000000_agent_registration_schema.sql:160: ADD COLUMN IF NOT EXISTS agent_id uuid REFERENCES public.agents(id) ON DELETE SET NULL,
+supabase\migrations\20261024000000_agent_registration_schema.sql:161: ADD COLUMN IF NOT EXISTS referral_code text;
+supabase\migrations\20261024000000_agent_registration_schema.sql:163: CREATE INDEX IF NOT EXISTS clients_agent_id_idx ON public.clients (agent_id);
+supabase\migrations\20261024000000_agent_registration_schema.sql:164: CREATE INDEX IF NOT EXISTS agent_applications_status_created_idx
+supabase\migrations\20261024000000_agent_registration_schema.sql:165: ON public.agent_applications (status, created_at DESC);
+supabase\migrations\20261024000000_agent_registration_schema.sql:169: GRANT SELECT, INSERT, UPDATE, DELETE ON public.agent_campaigns TO authenticated;
+supabase\migrations\20261024000000_agent_registration_schema.sql:170: GRANT SELECT, INSERT, UPDATE, DELETE ON public.agent_registry TO authenticated;
+supabase\migrations\20261024000000_agent_registration_schema.sql:171: GRANT SELECT, UPDATE ON public.agent_applications TO authenticated;
+supabase\migrations\20261024000000_agent_registration_schema.sql:173: GRANT SELECT, UPDATE ON public.agent_redemptions TO authenticated;
+supabase\migrations\20261024000000_agent_registration_schema.sql:178: GRANT ALL ON public.agent_campaigns, public.agent_registry, public.agent_applications,
+supabase\migrations\20261024000000_agent_registration_schema.sql:179: public.agents, public.agent_redemptions, public.agent_notices, public.agent_messages,
+supabase\migrations\20261024000000_agent_registration_schema.sql:182: [REDACTED - POSSIBLE SECRET]
+supabase\migrations\20261024000000_agent_registration_schema.sql:184: ALTER TABLE public.agent_campaigns ENABLE ROW LEVEL SECURITY;
+supabase\migrations\20261024000000_agent_registration_schema.sql:185: ALTER TABLE public.agent_registry ENABLE ROW LEVEL SECURITY;
+supabase\migrations\20261024000000_agent_registration_schema.sql:186: ALTER TABLE public.agent_applications ENABLE ROW LEVEL SECURITY;
+supabase\migrations\20261024000000_agent_registration_schema.sql:188: ALTER TABLE public.agent_redemptions ENABLE ROW LEVEL SECURITY;
+supabase\migrations\20261024000000_agent_registration_schema.sql:198: 'agent_campaigns', 'agent_registry', 'agent_applications', 'agents',
+supabase\migrations\20261024000000_agent_registration_schema.sql:199: 'agent_redemptions', 'agent_notices', 'agent_messages', 'brand_templates'
+supabase\migrations\20261024000000_agent_registration_schema.sql:206: AND policyname = 'maintenance_access_gate'
+supabase\migrations\20261024000000_agent_registration_schema.sql:209: 'CREATE POLICY maintenance_access_gate ON public.%I AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())',
+supabase\migrations\20261024000000_agent_registration_schema.sql:216: CREATE POLICY agent_campaigns_view ON public.agent_campaigns
+supabase\migrations\20261024000000_agent_registration_schema.sql:218: CREATE POLICY agent_campaigns_manage ON public.agent_campaigns
+supabase\migrations\20261024000000_agent_registration_schema.sql:220: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\migrations\20261024000000_agent_registration_schema.sql:221: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\migrations\20261024000000_agent_registration_schema.sql:223: CREATE POLICY agent_registry_view ON public.agent_registry
+supabase\migrations\20261024000000_agent_registration_schema.sql:225: CREATE POLICY agent_registry_manage ON public.agent_registry
+supabase\migrations\20261024000000_agent_registration_schema.sql:227: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\migrations\20261024000000_agent_registration_schema.sql:228: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\migrations\20261024000000_agent_registration_schema.sql:230: CREATE POLICY agent_applications_view ON public.agent_applications
+supabase\migrations\20261024000000_agent_registration_schema.sql:232: CREATE POLICY agent_applications_owner_view ON public.agent_applications
+supabase\migrations\20261024000000_agent_registration_schema.sql:234: CREATE POLICY agent_applications_manage ON public.agent_applications
+supabase\migrations\20261024000000_agent_registration_schema.sql:236: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\migrations\20261024000000_agent_registration_schema.sql:237: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\migrations\20261024000000_agent_registration_schema.sql:239: CREATE POLICY agents_view ON public.agents
+supabase\migrations\20261024000000_agent_registration_schema.sql:241: CREATE POLICY agents_owner_view ON public.agents
+supabase\migrations\20261024000000_agent_registration_schema.sql:243: CREATE POLICY agents_manage ON public.agents
+supabase\migrations\20261024000000_agent_registration_schema.sql:245: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\migrations\20261024000000_agent_registration_schema.sql:246: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\migrations\20261024000000_agent_registration_schema.sql:248: CREATE POLICY agent_redemptions_view ON public.agent_redemptions
+supabase\migrations\20261024000000_agent_registration_schema.sql:250: CREATE POLICY agent_redemptions_manage ON public.agent_redemptions
+supabase\migrations\20261024000000_agent_registration_schema.sql:252: USING (public.has_permission(auth.uid(), 'agents.manage'))
+supabase\migrations\20261024000000_agent_registration_schema.sql:253: WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+supabase\migrations\20261024000000_agent_registration_schema.sql:255: CREATE POLICY agent_notices_view ON public.agent_notices
+supabase\migrations\20261024000000_agent_registration_schema.sql:257: CREATE POLICY agent_notices_manage ON public.agent_notices
+supabase\migrations\20261024000000_agent_registration_schema.sql:260: public.has_permission(auth.uid(), 'agents.manage')
+supabase\migrations\20261024000000_agent_registration_schema.sql:264: CREATE POLICY agent_messages_view ON public.agent_messages
+supabase\migrations\20261024000000_agent_registration_schema.sql:270: CREATE POLICY agent_messages_send ON public.agent_messages
+supabase\migrations\20261024000000_agent_registration_schema.sql:276: OR public.has_permission(auth.uid(), 'agents.manage')
+supabase\migrations\20261024000000_agent_registration_schema.sql:280: CREATE POLICY brand_templates_staff_read ON public.brand_templates
+supabase\migrations\20261024000000_agent_registration_schema.sql:282: CREATE POLICY brand_templates_staff_write ON public.brand_templates
+supabase\migrations\20261024000000_agent_registration_schema.sql:287: CREATE POLICY "Agent registry signature uploads" ON storage.objects
+supabase\migrations\20261024000000_agent_registration_schema.sql:292: AND public.has_permission(auth.uid(), 'agents.manage')
+supabase\migrations\20261024000000_agent_registration_schema.sql:301: 'agent_campaigns', 'agent_registry', 'agent_applications', 'agents', 'brand_templates'
+supabase\migrations\20261025000000_company_branding.sql:15: CREATE POLICY company_branding_public_read
+supabase\migrations\20261025000000_company_branding.sql:41: CREATE POLICY company_branding_public_logo_read
+
+Matching lines: 925
+
+========== 4. MIGRATION FILES ==========
+drizzle\migrations\0000_digital_agent_programme.sql
+drizzle\migrations\0001_agent_seq_grants.sql
+drizzle\migrations\0002_agent_accounts_registry_brand.sql
+drizzle\migrations\0003_exclude_agents_from_staff.sql
+drizzle\migrations\0004_agent_self_signup_tokens.sql
+drizzle\migrations\0005_applicant_reads_own.sql
+drizzle\migrations\0006_agent_identity_and_private_messages.sql
+drizzle\migrations\meta\0000_snapshot.json
+drizzle\migrations\meta\0001_snapshot.json
+drizzle\migrations\meta\0002_snapshot.json
+drizzle\migrations\meta\0003_snapshot.json
+drizzle\migrations\meta\0004_snapshot.json
+drizzle\migrations\meta\0005_snapshot.json
+drizzle\migrations\meta\0006_snapshot.json
+drizzle\migrations\meta\_journal.json
+supabase\setup_all.sql
+supabase\migrations\20260810000000_create_storage_buckets.sql
+supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql
+supabase\migrations\20260810183607_27fb022b-9190-4fef-95ab-401dd97e086e.sql
+supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql
+supabase\migrations\20260811070025_56fabcfd-1eff-46ec-9183-fbbf25285203.sql
+supabase\migrations\20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql
+supabase\migrations\20260814162920_0cb94f30-e546-4b87-b52a-0da3fc1f43e3.sql
+supabase\migrations\20260816035733_d4bba811-549a-4efa-a1fb-e69056e0792b.sql
+supabase\migrations\20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql
+supabase\migrations\20261022190000_agent_phone_signin.sql
+supabase\migrations\20261022203000_system_maintenance.sql
+supabase\migrations\20261024000000_agent_registration_schema.sql
+supabase\migrations\20261025000000_company_branding.sql
+
+========== 5. SECURITY REMINDER ==========
+Environment files, node_modules, .git and build output were excluded.
+This is a source-code search, not a live database audit.
+No database queries or application edits were performed.

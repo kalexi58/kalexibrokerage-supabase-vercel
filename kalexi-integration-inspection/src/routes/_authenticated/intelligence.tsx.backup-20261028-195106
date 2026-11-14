@@ -1,0 +1,514 @@
+﻿import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+export const Route = createFileRoute("/_authenticated/intelligence")({
+  component: IntelligencePage,
+});
+
+const supabaseUrl =
+  import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const supabaseKey =
+  (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    import.meta.env.VITE_SUPABASE_ANON_KEY) as string | undefined;
+
+const supabase =
+  supabaseUrl && supabaseKey
+    ? createClient(supabaseUrl, supabaseKey)
+    : null;
+
+const TABLES = [
+  "clients",
+  "client_requirements",
+  "deals",
+  "transactions",
+  "cases",
+  "audit_logs",
+  "archive_records",
+  "documents",
+  "compliance_checks",
+  "tasks",
+  "calendar_events",
+  "agent_referrals",
+  "agent_commissions",
+  "expenses",
+  "invoices",
+  "payments",
+  "notifications",
+];
+
+type Metric = {
+  table: string;
+  count: number | null;
+  error?: string;
+};
+
+type SavedReport = {
+  id: string;
+  title: string;
+  createdAt: string;
+  content: string;
+};
+
+function titleCase(value: string) {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function downloadCsv(filename: string, rows: string[][]) {
+  const csv = rows
+    .map((row) =>
+      row
+        .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+        .join(",")
+    )
+    .join("\r\n");
+
+  const blob = new Blob(["\uFEFF" + csv], {
+    type: "text/csv;charset=utf-8;",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+function IntelligencePage() {
+  const [metrics, setMetrics] = useState<Metric[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
+  const [request, setRequest] = useState("");
+  const [period, setPeriod] = useState("30");
+  const [reportTitle, setReportTitle] = useState("");
+  const [reportText, setReportText] = useState("");
+  const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
+  const [selectedTables, setSelectedTables] = useState<string[]>(TABLES);
+
+  const refresh = useCallback(async () => {
+    if (!supabase) {
+      setStatus(
+        "Supabase configuration missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (or VITE_SUPABASE_ANON_KEY)."
+      );
+      return;
+    }
+
+    setLoading(true);
+    setStatus("Loading live metrics from tables accessible to your account…");
+
+    const results = await Promise.all(
+      TABLES.map(async (table): Promise<Metric> => {
+        const { count, error } = await supabase
+          .from(table)
+          .select("*", { count: "exact", head: true });
+
+        if (error) {
+          return { table, count: null, error: error.message };
+        }
+
+        return { table, count: count ?? 0 };
+      })
+    );
+
+    setMetrics(results);
+    const successful = results.filter((item) => item.count !== null).length;
+    setStatus(
+      `Checked ${TABLES.length} known tables. ${successful} returned metrics; unavailable tables may not exist or may be restricted by database permissions.`
+    );
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  const activeMetrics = useMemo(
+    () => metrics.filter((item) => item.count !== null),
+    [metrics]
+  );
+
+  const totalRecords = activeMetrics.reduce(
+    (sum, item) => sum + (item.count ?? 0),
+    0
+  );
+
+  const tableMatches = useCallback(
+    (prompt: string) => {
+      const text = prompt.toLowerCase();
+      const matches = selectedTables.filter((table) => {
+        const words = `${table} ${titleCase(table)}`.toLowerCase();
+        return text.split(/\s+/).some((word) => {
+          const clean = word.replace(/[^a-z0-9]/g, "");
+          return clean.length > 3 && words.includes(clean);
+        });
+      });
+
+      return matches.length
+        ? activeMetrics.filter((metric) => matches.includes(metric.table))
+        : activeMetrics.filter((metric) =>
+            selectedTables.includes(metric.table)
+          );
+    },
+    [activeMetrics, selectedTables]
+  );
+
+  function generateReport() {
+    const chosen = tableMatches(request);
+    const title = request.trim()
+      ? `Kalexi Report: ${request.trim()}`
+      : "Kalexi Company Operations Summary";
+
+    const now = new Date();
+    const lines = [
+      "KALEXI BROKERAGE OS",
+      "INTELLIGENCE & ANALYTICS REPORT",
+      "",
+      title,
+      `Generated: ${now.toLocaleString()}`,
+      `Requested period: Last ${period} days`,
+      "",
+      "DATA SUMMARY",
+      ...chosen.map(
+        (metric) =>
+          `${titleCase(metric.table)}: ${metric.count?.toLocaleString()} records`
+      ),
+      "",
+      `Total records across included tables: ${chosen
+        .reduce((sum, metric) => sum + (metric.count ?? 0), 0)
+        .toLocaleString()}`,
+      "",
+      "INTERPRETATION",
+      "These figures are current accessible table counts, not verified revenue, profit, deal value, or growth.",
+      "Time-based comparisons require a valid date field and business-specific definitions.",
+      "Unavailable tables are excluded. Review database permissions and schema before treating this report as complete.",
+    ];
+
+    setReportTitle(title);
+    setReportText(lines.join("\n"));
+    setStatus("Report generated from live table-count metrics.");
+  }
+
+  function saveReport() {
+    if (!reportText) {
+      setStatus("Generate a report before saving it.");
+      return;
+    }
+
+    const report: SavedReport = {
+      id: `${Date.now()}`,
+      title: reportTitle,
+      createdAt: new Date().toLocaleString(),
+      content: reportText,
+    };
+
+    setSavedReports((previous) => [report, ...previous]);
+    setStatus("Report added to this browser session's report library.");
+  }
+
+  return (
+    <main className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
+      <section className="overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-indigo-950 to-violet-800 p-6 text-white md:p-9 print:bg-white print:text-black">
+        <p className="text-xs font-bold uppercase tracking-[0.25em] text-violet-200">
+          Kalexi Brokerage OS
+        </p>
+        <h1 className="mt-3 text-3xl font-bold md:text-4xl">
+          Intelligence & Analytics
+        </h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200">
+          Company metrics, operational reporting, comparisons and management
+          insights, built from data available to your account.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3 print:hidden">
+          <button
+            onClick={() => void refresh()}
+            disabled={loading}
+            className="rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-slate-950 disabled:opacity-50"
+          >
+            {loading ? "Refreshing…" : "Refresh live metrics"}
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="rounded-xl border border-white/40 px-4 py-2.5 text-sm font-semibold"
+          >
+            Print / Save PDF
+          </button>
+        </div>
+      </section>
+
+      {status && (
+        <div
+          role="status"
+          className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700"
+        >
+          {status}
+        </div>
+      )}
+
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <MetricCard
+          label="Accessible records"
+          value={totalRecords.toLocaleString()}
+          detail="Exact counts from accessible tables"
+        />
+        <MetricCard
+          label="Tables with metrics"
+          value={`${activeMetrics.length}`}
+          detail={`Out of ${TABLES.length} configured table names`}
+        />
+        <MetricCard
+          label="Reports this session"
+          value={`${savedReports.length}`}
+          detail="Saved in this browser session"
+        />
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              Live data overview
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Counts only. Missing tables and permission errors are reported
+              separately instead of being disguised as zero.
+            </p>
+          </div>
+          <button
+            onClick={() =>
+              downloadCsv("kalexi-live-metrics.csv", [
+                ["Table", "Record count", "Status"],
+                ...metrics.map((metric) => [
+                  metric.table,
+                  metric.count === null ? "" : String(metric.count),
+                  metric.error || "Available",
+                ]),
+              ])
+            }
+            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 print:hidden"
+          >
+            Export metrics CSV
+          </button>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {metrics.map((metric) => (
+            <article
+              key={metric.table}
+              className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+            >
+              <p className="text-sm font-medium text-slate-600">
+                {titleCase(metric.table)}
+              </p>
+              <p className="mt-2 text-2xl font-bold text-slate-950">
+                {metric.count === null
+                  ? "Unavailable"
+                  : metric.count.toLocaleString()}
+              </p>
+              {metric.error && (
+                <p className="mt-2 break-words text-xs text-amber-700">
+                  {metric.error}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+        <h2 className="text-xl font-bold text-slate-900">
+          Report builder
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Describe the report you need. The current version creates a factual
+          summary from accessible table counts; detailed financial calculations
+          need mapped business fields.
+        </p>
+
+        <label
+          htmlFor="report-request"
+          className="mt-5 block text-sm font-semibold text-slate-700"
+        >
+          What should the report cover?
+        </label>
+        <textarea
+          id="report-request"
+          value={request}
+          onChange={(event) => setRequest(event.target.value)}
+          placeholder="Example: Prepare a management overview of clients, cases and transactions."
+          className="mt-2 min-h-28 w-full rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+        />
+
+        <div className="mt-4 max-w-xs">
+          <label
+            htmlFor="report-period"
+            className="block text-sm font-semibold text-slate-700"
+          >
+            Reporting period
+          </label>
+          <select
+            id="report-period"
+            value={period}
+            onChange={(event) => setPeriod(event.target.value)}
+            className="mt-2 w-full rounded-xl border border-slate-200 p-3 text-sm"
+          >
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last 12 months</option>
+          </select>
+          <p className="mt-2 text-xs text-slate-500">
+            The period is recorded in the report. Table counts currently reflect
+            all records, not just records within that period.
+          </p>
+        </div>
+
+        <details className="mt-5">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+            Choose tables to include
+          </summary>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {TABLES.map((table) => (
+              <label key={table} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={selectedTables.includes(table)}
+                  onChange={(event) =>
+                    setSelectedTables((previous) =>
+                      event.target.checked
+                        ? [...previous, table]
+                        : previous.filter((item) => item !== table)
+                    )
+                  }
+                />
+                {titleCase(table)}
+              </label>
+            ))}
+          </div>
+        </details>
+
+        <div className="mt-5 flex flex-wrap gap-3 print:hidden">
+          <button
+            onClick={generateReport}
+            className="rounded-xl bg-violet-700 px-5 py-3 text-sm font-bold text-white hover:bg-violet-800"
+          >
+            Generate report
+          </button>
+          <button
+            onClick={saveReport}
+            className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700"
+          >
+            Save to report library
+          </button>
+          <button
+            onClick={() =>
+              reportText &&
+              downloadCsv("kalexi-report.csv", [
+                ["Kalexi Brokerage OS Report"],
+                ...reportText.split("\n").map((line) => [line]),
+              ])
+            }
+            disabled={!reportText}
+            className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 disabled:opacity-40"
+          >
+            Export report CSV
+          </button>
+        </div>
+
+        {reportText && (
+          <article className="mt-6 rounded-xl border border-slate-200 p-5 md:p-7">
+            <div className="border-b border-slate-200 pb-4">
+              <p className="text-xs font-bold tracking-[0.2em] text-violet-700">
+                KALEXI BROKERAGE
+              </p>
+              <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                {reportTitle}
+              </h3>
+              <p className="mt-2 text-xs text-slate-500">
+                Internal management report · Generated from accessible system
+                data
+              </p>
+            </div>
+            <pre className="mt-5 whitespace-pre-wrap break-words font-sans text-sm leading-7 text-slate-700">
+              {reportText}
+            </pre>
+          </article>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+        <h2 className="text-xl font-bold text-slate-900">Report library</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Reports saved during this browser session.
+        </p>
+
+        {savedReports.length === 0 ? (
+          <p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+            No reports saved yet.
+          </p>
+        ) : (
+          <div className="mt-4 space-y-3">
+            {savedReports.map((report) => (
+              <article
+                key={report.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-100 p-4"
+              >
+                <div>
+                  <h3 className="font-semibold text-slate-900">
+                    {report.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {report.createdAt}
+                  </p>
+                </div>
+                <div className="flex gap-2 print:hidden">
+                  <button
+                    onClick={() => {
+                      setReportTitle(report.title);
+                      setReportText(report.content);
+                    }}
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  >
+                    Open
+                  </button>
+                  <button
+                    onClick={() =>
+                      downloadCsv("kalexi-saved-report.csv", [
+                        [report.title],
+                        ...report.content.split("\n").map((line) => [line]),
+                      ])
+                    }
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  >
+                    Export
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p className="text-sm font-medium text-slate-500">{label}</p>
+      <p className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
+        {value}
+      </p>
+      <p className="mt-2 text-xs text-slate-500">{detail}</p>
+    </article>
+  );
+}

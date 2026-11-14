@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import JsBarcode from "jsbarcode";
 import QRCode from "qrcode";
+import { jsPDF } from "jspdf";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { AGENT_ID_THEME_ID, DEFAULT_AGENT_ID_THEME, parseAgentIdTheme } from "@/lib/agent-id-theme";
+import { DEFAULT_AGENT_ID_THEME } from "@/lib/agent-id-theme";
+import { getAgentIdTheme } from "@/lib/agents.functions";
+import { useSession } from "@/hooks/useSession";
 import { KalexiMark } from "@/components/KalexiMark";
 
 export interface CardAgent {
@@ -21,6 +23,10 @@ export interface CardAgent {
   company_phone?: string | null;
 }
 
+type PdfDownload = () => Promise<void>;
+
+type PdfTheme = typeof DEFAULT_AGENT_ID_THEME;
+
 const fmt = (date: string) =>
   new Date(date).toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -28,36 +34,197 @@ const fmt = (date: string) =>
     year: "numeric",
   });
 
+function pdfRgb(value: string, fallback: [number, number, number]): [number, number, number] {
+  const hex = String(value || "").replace("#", "").trim();
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+    return [
+      parseInt(hex.slice(0, 2), 16),
+      parseInt(hex.slice(2, 4), 16),
+      parseInt(hex.slice(4, 6), 16),
+    ];
+  }
+  return fallback;
+}
+
+function blobToPng(blob: Blob): Promise<string | null> {
+  return new Promise((resolve) => {
+    const objectUrl = URL.createObjectURL(blob);
+    const image = new Image();
+
+    image.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.naturalWidth || 600;
+        canvas.height = image.naturalHeight || 400;
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+          URL.revokeObjectURL(objectUrl);
+          resolve(null);
+          return;
+        }
+
+        context.drawImage(image, 0, 0);
+        const result = canvas.toDataURL("image/png");
+        URL.revokeObjectURL(objectUrl);
+        resolve(result);
+      } catch {
+        URL.revokeObjectURL(objectUrl);
+        resolve(null);
+      }
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(null);
+    };
+
+    image.src = objectUrl;
+  });
+}
+
+async function urlToPng(url?: string | null): Promise<string | null> {
+  if (!url) return null;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    return await blobToPng(await response.blob());
+  } catch (error) {
+    console.warn("[Agent ID PDF] Image could not be loaded.", error);
+    return null;
+  }
+}
+
+async function svgToPng(svg: SVGSVGElement | null): Promise<string | null> {
+  if (!svg) return null;
+
+  try {
+    const clone = svg.cloneNode(true) as SVGSVGElement;
+
+    const rect = svg.getBoundingClientRect();
+    const width = Math.max(1, rect.width || 256);
+    const height = Math.max(1, rect.height || 256);
+
+    const existingViewBox = svg.getAttribute("viewBox");
+
+    if (!existingViewBox) {
+      clone.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    }
+
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    clone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+    clone.setAttribute("width", String(Math.ceil(width * 4)));
+    clone.setAttribute("height", String(Math.ceil(height * 4)));
+    clone.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+    // Copy the actual rendered styles into the SVG.
+    const originalElements = [
+      svg,
+      ...Array.from(svg.querySelectorAll("*")),
+    ];
+
+    const clonedElements = [
+      clone,
+      ...Array.from(clone.querySelectorAll("*")),
+    ];
+
+    originalElements.forEach((original, index) => {
+      const target = clonedElements[index];
+      if (!target) return;
+
+      const computed = window.getComputedStyle(original);
+
+      const properties = [
+        "fill",
+        "fill-opacity",
+        "fill-rule",
+        "stroke",
+        "stroke-width",
+        "stroke-linecap",
+        "stroke-linejoin",
+        "stroke-opacity",
+        "opacity",
+        "color",
+        "visibility",
+        "display",
+        "clip-rule",
+        "paint-order",
+      ];
+
+      properties.forEach((property) => {
+        const value = computed.getPropertyValue(property);
+        if (value && value !== "normal") {
+          target.setAttribute(property, value);
+        }
+      });
+
+      target.removeAttribute("class");
+    });
+
+    // Replace currentColor with its actual rendered colour.
+    clone.querySelectorAll("*").forEach((element) => {
+      ["fill", "stroke"].forEach((attribute) => {
+        const value = element.getAttribute(attribute);
+        if (value === "currentColor") {
+          const computed = window.getComputedStyle(element);
+          element.setAttribute(attribute, computed.color);
+        }
+      });
+    });
+
+    const markup = new XMLSerializer().serializeToString(clone);
+    const blob = new Blob([markup], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+
+    const result = await blobToPng(blob);
+
+    if (!result) {
+      throw new Error("Could not rasterize the original Kalexi logo.");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("[Agent ID PDF] Actual SVG logo conversion failed.", error);
+    throw error;
+  }
+}
+
 export function AgentIdCard({
   agent: a,
   photoUrl,
   signatureUrl,
+  onDownloadReady,
+  bulkPrint = false,
 }: {
   agent: CardAgent;
   photoUrl?: string | null;
   signatureUrl?: string | null;
+  onDownloadReady?: (download: PdfDownload | null) => void;
+  bulkPrint?: boolean;
 }) {
   const [qr, setQr] = useState("");
   const [qrError, setQrError] = useState(false);
   const barcodeRef = useRef<SVGSVGElement>(null);
+  const logoContainerRef = useRef<HTMLDivElement>(null);
+
+  const session = useSession();
   const themeQuery = useQuery({
-    queryKey: ["agent-id-theme"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("brand_templates")
-        .select("accent, body")
-        .eq("id", AGENT_ID_THEME_ID)
-        .maybeSingle();
-      if (error) throw error;
-      return parseAgentIdTheme(data?.body, data?.accent);
-    },
+    queryKey: ["agent-id-theme", session.data?.userId],
+    enabled: !!session.data?.userId,
+    queryFn: () => getAgentIdTheme(),
   });
-  const theme = themeQuery.data ?? DEFAULT_AGENT_ID_THEME;
+
+  const theme = themeQuery.data?.theme ?? DEFAULT_AGENT_ID_THEME;
+  const authorizedSignatureUrl =
+    themeQuery.data?.authorizedSignatureUrl ?? signatureUrl;
 
   useEffect(() => {
     let cancelled = false;
     setQr("");
     setQrError(false);
+
     void QRCode.toDataURL(
       `${window.location.origin}/agent/verify/${encodeURIComponent(a.verification_token)}`,
       { errorCorrectionLevel: "H", margin: 1, width: 260 },
@@ -69,6 +236,7 @@ export function AgentIdCard({
         console.error("[Agent ID] Could not generate verification QR code.", error);
         if (!cancelled) setQrError(true);
       });
+
     return () => {
       cancelled = true;
     };
@@ -76,6 +244,7 @@ export function AgentIdCard({
 
   useEffect(() => {
     if (!barcodeRef.current) return;
+
     try {
       JsBarcode(barcodeRef.current, a.agent_code, {
         format: "CODE128",
@@ -91,17 +260,386 @@ export function AgentIdCard({
     }
   }, [a.agent_code]);
 
+  const downloadPdf = useCallback(async () => {
+    const width = Number(theme.widthMm);
+    const height = Number(theme.heightMm);
+
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      throw new Error("The configured ID card dimensions are invalid.");
+    }
+
+    if (!qr) {
+      throw new Error(qrError ? "The verification QR code could not be generated." : "The QR code is still being generated. Try again shortly.");
+    }
+
+    const background = pdfRgb(theme.background, [255, 255, 255]);
+    const foreground = pdfRgb(theme.text, [30, 30, 30]);
+    const accent = pdfRgb(theme.accent, [20, 65, 100]);
+    const accentText = pdfRgb(theme.accentText, [255, 255, 255]);
+
+    const orientation = width >= height ? "landscape" : "portrait";
+
+    const pdf = new jsPDF({
+      orientation,
+      unit: "mm",
+      format: [width, height],
+      compress: true,
+    });
+
+    const photoPng = await urlToPng(photoUrl);
+    const signaturePng = await urlToPng(authorizedSignatureUrl);
+    const barcodePng = await svgToPng(barcodeRef.current);
+        const logoElement = document.querySelector<HTMLImageElement>(
+      ".agent-id-front header img[alt='Kalexi Brokerage Ltd']"
+    );
+
+    if (!logoElement || !logoElement.complete || !logoElement.naturalWidth) {
+      throw new Error("The displayed Kalexi logo has not finished loading.");
+    }
+
+    const logoPng = await urlToPng(
+      logoElement.currentSrc || logoElement.src
+    );
+
+    if (!logoPng) {
+      throw new Error("Could not convert the actual Kalexi logo into a PDF image. Check image access and CORS settings.");
+    }
+
+    const margin = 3.5;
+    const headerHeight = 10;
+    const footerHeight = 5.5;
+
+    const setText = (size: number, bold = false) => {
+      pdf.setFont("helvetica", bold ? "bold" : "normal");
+      pdf.setFontSize(size);
+      pdf.setTextColor(...foreground);
+    };
+
+    const drawBase = () => {
+      pdf.setFillColor(...background);
+      pdf.rect(0, 0, width, height, "F");
+      pdf.setDrawColor(...accent);
+      pdf.setLineWidth(0.35);
+      pdf.roundedRect(0.5, 0.5, width - 1, height - 1, 1.5, 1.5, "S");
+    };
+
+    const drawHeader = (heading: string, subtitle?: string) => {
+      pdf.setFillColor(...accent);
+      pdf.rect(0.5, 0.5, width - 1, headerHeight, "F");
+      pdf.setTextColor(...accentText);
+
+      // Embed the actual displayed Kalexi image logo in the PDF.
+      pdf.addImage(logoPng, "PNG", margin, 1.6, 6.5, 6.5);
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7);
+      pdf.text(heading, margin + 8, 4.7);
+
+      if (subtitle) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(4.5);
+        pdf.text(subtitle, margin + 8, 7.5);
+      }
+    };
+
+    const drawFooter = (left: string, right: string) => {
+      pdf.setDrawColor(...accent);
+      pdf.setLineWidth(0.2);
+      pdf.line(margin, height - footerHeight, width - margin, height - footerHeight);
+      pdf.setTextColor(...accent);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(4.7);
+      pdf.text(left, margin, height - 2.2);
+      pdf.text(right, width - margin, height - 2.2, { align: "right" });
+    };
+
+    const drawLabelValue = (label: string, value: string, x: number, y: number, maxWidth: number) => {
+      pdf.setTextColor(105, 105, 105);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(4.2);
+      pdf.text(label.toUpperCase(), x, y);
+
+      pdf.setTextColor(...foreground);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(5.8);
+      const safeValue = value || "â€”";
+      const lines = pdf.splitTextToSize(safeValue, maxWidth);
+      pdf.text(lines.slice(0, 2), x, y + 2.7);
+    };
+
+    // PAGE 1: FRONT OF AGENT ID
+    drawBase();
+    drawHeader("KALEXI BROKERAGE LTD", "DIGITAL AGENT PROGRAM (DAP)");
+
+    pdf.setTextColor(...accentText);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(5);
+    pdf.text(String(a.status || "UNKNOWN").toUpperCase(), width - margin, 5, { align: "right" });
+
+    const photoX = margin;
+    const photoY = 14;
+    const photoW = 19;
+    const photoH = 23;
+
+    pdf.setDrawColor(...accent);
+    pdf.setLineWidth(0.25);
+    pdf.rect(photoX, photoY, photoW, photoH, "S");
+
+    if (photoPng) {
+      pdf.addImage(photoPng, "PNG", photoX + 0.3, photoY + 0.3, photoW - 0.6, photoH - 0.6);
+    } else {
+      pdf.setFillColor(...accent);
+      pdf.rect(photoX + 0.3, photoY + 0.3, photoW - 0.6, photoH - 0.6, "F");
+      pdf.setTextColor(...accentText);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(17);
+      pdf.text((a.full_name || "A").slice(0, 1).toUpperCase(), photoX + photoW / 2, photoY + 14, { align: "center" });
+    }
+
+    if (signaturePng) {
+      pdf.addImage(signaturePng, "PNG", photoX, 38, photoW, 5);
+    } else {
+      pdf.setDrawColor(...accent);
+      pdf.line(photoX, 42, photoX + photoW, 42);
+    }
+
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(3.8);
+    pdf.text("AUTHORISED SIGNATURE", photoX + photoW / 2, 44.5, { align: "center" });
+
+    const textX = 25;
+    const textWidth = width - textX - margin;
+
+    pdf.setTextColor(...foreground);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    const nameLines = pdf.splitTextToSize(a.full_name || "Agent", textWidth);
+    pdf.text(nameLines.slice(0, 2), textX, 16);
+
+    pdf.setTextColor(...accent);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(5.5);
+    pdf.text(a.designation || "Digital Agent", textX, 22);
+
+    const colGap = 3;
+    const colWidth = (textWidth - colGap) / 2;
+
+    drawLabelValue("Agent ID", a.agent_code, textX, 28, colWidth);
+    drawLabelValue("Region", a.district || "â€”", textX + colWidth + colGap, 28, colWidth);
+    drawLabelValue("Issued", fmt(a.issued_at), textX, 36, colWidth);
+    drawLabelValue("Expires", fmt(a.expires_at), textX + colWidth + colGap, 36, colWidth);
+
+    const customFront = theme.customFields.slice(0, 2);
+    customFront.forEach((field, index) => {
+      const x = index === 0 ? textX : textX + colWidth + colGap;
+      drawLabelValue(field.label, field.value, x, 44, colWidth);
+    });
+
+    drawFooter("OFFICIAL AGENT IDENTIFICATION", "PROPERTY OF KALEXI");
+
+    // PAGE 2: BACK OF AGENT ID
+    pdf.addPage([width, height], orientation);
+    drawBase();
+    drawHeader("AGENT VERIFICATION & AUTHORISATION");
+
+    const qrX = margin;
+    const qrY = 14;
+    const qrSize = 20;
+
+    pdf.addImage(qr, "PNG", qrX, qrY, qrSize, qrSize);
+    pdf.setTextColor(...foreground);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(4.5);
+    pdf.text("SCAN TO VERIFY", qrX + qrSize / 2, qrY + qrSize + 2.5, { align: "center" });
+
+    const backX = 27;
+    const backWidth = width - backX - margin;
+    let backY = 15;
+
+    const writeBackLine = (text: string, bold = false, size = 4.7) => {
+      pdf.setTextColor(...foreground);
+      pdf.setFont("helvetica", bold ? "bold" : "normal");
+      pdf.setFontSize(size);
+
+      const lines = pdf.splitTextToSize(text, backWidth);
+      const visibleLines = lines.slice(0, 2);
+      pdf.text(visibleLines, backX, backY);
+      backY += visibleLines.length * (size * 0.42) + 1.2;
+    };
+
+    writeBackLine(`Referral: ${a.referral_code}`, true);
+
+    theme.customFields.slice(2).forEach((field) => {
+      writeBackLine(`${field.label}: ${field.value}`);
+    });
+
+    writeBackLine("info@kalexibrokerage.com");
+    writeBackLine("www.kalexibrokerage.com");
+    writeBackLine(a.company_phone || "Contact: official company email");
+
+    backY += 0.5;
+    pdf.setDrawColor(...accent);
+    pdf.line(backX, backY, width - margin, backY);
+    backY += 3;
+
+    writeBackLine(theme.authorizationMessage || "Authorised Kalexi Digital Agent.", true, 4.5);
+    writeBackLine("The holder may not collect money, sign contracts or make commitments. Pay only to official company accounts.", false, 4);
+    writeBackLine(theme.ifFoundMessage || "If found, return this card to Kalexi Brokerage Ltd.", false, 4);
+
+    if (theme.showCorporateSeal) {
+      const sealX = width - margin - 11;
+      const sealY = height - 17;
+      pdf.setDrawColor(...accent);
+      pdf.setTextColor(...accent);
+      pdf.setLineWidth(0.5);
+      pdf.circle(sealX + 5, sealY + 4, 4.5, "S");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(3.3);
+      pdf.text("SEAL", sealX + 5, sealY + 3.5, { align: "center" });
+      pdf.setFontSize(2.5);
+      pdf.text(String(theme.corporateSealText || "KALEXI").slice(0, 18), sealX + 5, sealY + 5.5, { align: "center" });
+    }
+
+    if (barcodePng) {
+      pdf.addImage(barcodePng, "PNG", margin, height - 15, 36, 8);
+    } else {
+      pdf.setTextColor(...foreground);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(5);
+      pdf.text(a.agent_code, margin, height - 10);
+    }
+
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(3.7);
+    pdf.text(
+      "Company property. Valid only while active and before expiry.",
+      width - margin,
+      height - 8,
+      { align: "right" },
+    );
+
+    const safeName = (a.full_name || "Agent")
+      .replace(/[^a-z0-9]+/gi, "-")
+      .replace(/^-|-$/g, "");
+
+    pdf.save(`Kalexi-Agent-ID-${safeName || "Agent"}.pdf`);
+  }, [
+    a,
+    theme,
+    qr,
+    qrError,
+    photoUrl,
+    authorizedSignatureUrl,
+  ]);
+
+  useEffect(() => {
+    if (!qr || !barcodeRef.current) {
+      onDownloadReady?.(null);
+      return;
+    }
+
+    onDownloadReady?.(downloadPdf);
+    return () => onDownloadReady?.(null);
+  }, [qr, downloadPdf, onDownloadReady]);
+
   return (
-    <div className="agent-id-set flex flex-wrap gap-6">
+    <>
+      {!bulkPrint ? (<style>{`
+      @media print {
+        @page {
+          size: ${Number(theme.widthMm)}mm ${Number(theme.heightMm)}mm;
+          margin: 0;
+        }
+
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+        }
+
+        body * {
+          visibility: hidden !important;
+        }
+
+        .agent-id-set,
+        .agent-id-set * {
+          visibility: visible !important;
+        }
+
+        .agent-id-set {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          width: ${Number(theme.widthMm)}mm !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          gap: 0 !important;
+          flex-direction: column !important;
+        }
+
+        .agent-id {
+          display: flex !important;
+          box-sizing: border-box !important;
+          width: ${Number(theme.widthMm)}mm !important;
+          min-width: ${Number(theme.widthMm)}mm !important;
+          max-width: ${Number(theme.widthMm)}mm !important;
+          height: ${Number(theme.heightMm)}mm !important;
+          min-height: ${Number(theme.heightMm)}mm !important;
+          max-height: ${Number(theme.heightMm)}mm !important;
+          margin: 0 !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+          overflow: hidden !important;
+          break-inside: avoid !important;
+          page-break-inside: avoid !important;
+        }
+
+        .agent-id-front {
+          break-after: page !important;
+          page-break-after: always !important;
+        }
+
+        .agent-id-back {
+          break-after: auto !important;
+          page-break-after: auto !important;
+        }
+
+        .no-print {
+          display: none !important;
+          visibility: hidden !important;
+        }
+
+        img, svg {
+          print-color-adjust: exact !important;
+          -webkit-print-color-adjust: exact !important;
+        }
+      }
+    `}</style>) : null}
+
+    <div
+      className="agent-id-set flex flex-col items-start gap-6"
+      
+    >
       <article
-        className="agent-id agent-id-front border shadow-[var(--shadow-panel)]"
-        style={{ backgroundColor: theme.background, color: theme.text }}
+        className="agent-id agent-id-front flex flex-col overflow-hidden border shadow-[var(--shadow-panel)]"
+        style={{
+          backgroundColor: theme.background,
+          color: theme.text,
+          width: `min(100%, ${theme.widthMm}mm)`,
+          height: `${theme.heightMm}mm`,
+          borderRadius: `${theme.radiusMm}mm`,
+          fontFamily: theme.fontFamily,
+        }}
       >
         <header
           className="flex items-center gap-2.5 px-3 py-2"
           style={{ backgroundColor: theme.accent, color: theme.accentText }}
         >
-          <KalexiMark className="h-8 w-8 shrink-0" />
+                    <div ref={logoContainerRef} className="flex h-8 w-8 shrink-0 items-center justify-center">
+            <KalexiMark className="h-8 w-8" />
+          </div>
           <div className="min-w-0">
             <p className="truncate font-display text-[11px] font-semibold">Kalexi Brokerage Ltd</p>
             <p className="truncate text-[8px] font-semibold uppercase tracking-wide opacity-85">
@@ -116,11 +654,7 @@ export function AgentIdCard({
         <div className="flex min-h-0 flex-1 gap-3 px-3 py-2.5">
           <div className="w-[64px] shrink-0">
             {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt={a.full_name}
-                className="h-[79px] w-[64px] rounded object-cover"
-              />
+              <img src={photoUrl} alt={a.full_name} className="h-[79px] w-[64px] rounded object-cover" />
             ) : (
               <div
                 className="flex h-[79px] w-[64px] items-center justify-center rounded text-2xl font-semibold"
@@ -129,12 +663,8 @@ export function AgentIdCard({
                 {a.full_name.slice(0, 1).toUpperCase()}
               </div>
             )}
-            {signatureUrl ? (
-              <img
-                src={signatureUrl}
-                alt="Authorised signature"
-                className="mt-1 h-5 w-full object-contain"
-              />
+            {authorizedSignatureUrl ? (
+              <img src={authorizedSignatureUrl} alt="Authorised signature" className="mt-1 h-5 w-full object-contain" />
             ) : (
               <div className="mt-1 h-5 border-b" style={{ borderColor: theme.accent }} />
             )}
@@ -142,22 +672,26 @@ export function AgentIdCard({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="truncate font-display text-[13px] font-bold leading-tight">
-              {a.full_name}
-            </p>
+            <p className="truncate font-display text-[13px] font-bold leading-tight">{a.full_name}</p>
             <p className="mt-0.5 truncate text-[8px] font-semibold" style={{ color: theme.accent }}>
               {a.designation ?? "Digital Agent"}
             </p>
             <dl className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1.5 text-[8px] leading-tight">
               {[
                 ["Agent ID", a.agent_code],
-                ["Region", a.district ?? "—"],
+                ["Region", a.district ?? "â€”"],
                 ["Issued", fmt(a.issued_at)],
                 ["Expires", fmt(a.expires_at)],
               ].map(([label, value]) => (
                 <div key={label} className="min-w-0">
                   <dt className="text-[6px] uppercase opacity-70">{label}</dt>
                   <dd className="truncate font-semibold">{value}</dd>
+                </div>
+              ))}
+              {theme.customFields.slice(0, 2).map((field) => (
+                <div key={field.label} className="min-w-0">
+                  <dt className="truncate text-[6px] uppercase opacity-70">{field.label}</dt>
+                  <dd className="truncate font-semibold">{field.value}</dd>
                 </div>
               ))}
             </dl>
@@ -174,8 +708,15 @@ export function AgentIdCard({
       </article>
 
       <article
-        className="agent-id agent-id-back border shadow-[var(--shadow-panel)]"
-        style={{ backgroundColor: theme.background, color: theme.text }}
+        className="agent-id agent-id-back flex flex-col overflow-hidden border shadow-[var(--shadow-panel)]"
+        style={{
+          backgroundColor: theme.background,
+          color: theme.text,
+          width: `min(100%, ${theme.widthMm}mm)`,
+          height: `${theme.heightMm}mm`,
+          borderRadius: `${theme.radiusMm}mm`,
+          fontFamily: theme.fontFamily,
+        }}
       >
         <header
           className="px-3 py-2 text-[9px] font-bold uppercase tracking-wide"
@@ -183,6 +724,7 @@ export function AgentIdCard({
         >
           Agent verification &amp; authorisation
         </header>
+
         <div className="flex min-h-0 flex-1 gap-2.5 px-3 py-2">
           <div className="w-[74px] shrink-0 text-center">
             {qr ? (
@@ -193,36 +735,45 @@ export function AgentIdCard({
                 className="flex h-[72px] w-[72px] items-center justify-center text-[7px]"
                 style={{ backgroundColor: `${theme.accent}18` }}
               >
-                {qrError ? "QR unavailable" : "Generating…"}
+                {qrError ? "QR unavailable" : "Generatingâ€¦"}
               </div>
             )}
             <p className="mt-0.5 text-[7px]">Scan to verify</p>
           </div>
-          <div className="min-w-0 flex-1 text-[7px] leading-snug">
+
+          <div className="min-w-0 flex-1 text-[6px] leading-tight">
             <p className="font-semibold">Referral: {a.referral_code}</p>
-            <p className="mt-0.5">info@kalexibrokerage.com</p>
+            {theme.customFields.slice(2).map((field) => (
+              <p key={field.label} className="mt-0.5 break-words">
+                <span className="font-semibold">{field.label}:</span> {field.value}
+              </p>
+            ))}
+            <p className="mt-0.5 break-words">info@kalexibrokerage.com</p>
             <p>www.kalexibrokerage.com</p>
             <p>{a.company_phone || "Contact: official company email"}</p>
-            <p
-              className="mt-1.5 border-t pt-1.5 font-semibold"
-              style={{ borderColor: `${theme.accent}66` }}
-            >
-              Authorised for client referrals only.
+            <p className="mt-1.5 border-t pt-1.5 font-semibold" style={{ borderColor: `${theme.accent}66` }}>
+              {theme.authorizationMessage}
             </p>
             <p className="mt-0.5">
-              The holder may not collect money, sign contracts or make commitments on behalf of
-              Kalexi. Pay only to official company accounts.
+              The holder may not collect money, sign contracts or make commitments. Pay only to official company accounts.
             </p>
-            <p className="mt-0.5">
-              Verify current status before dealing. Report suspected fraud to
-              info@kalexibrokerage.com.
-            </p>
+            <p className="mt-0.5">{theme.ifFoundMessage}</p>
+            {theme.showCorporateSeal ? (
+              <div className="mt-1 flex justify-end">
+                <div
+                  aria-label={`Corporate seal: ${theme.corporateSealText}`}
+                  className="grid h-8 w-8 place-content-center rounded-full border-2 text-center text-[5px] font-bold uppercase"
+                  style={{ borderColor: theme.accent, color: theme.accent }}
+                >
+                  <span>Seal</span>
+                  <span className="line-clamp-2 max-w-6 break-words">{theme.corporateSealText}</span>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
-        <div
-          className="flex items-center justify-between border-t px-3 py-1"
-          style={{ borderColor: `${theme.accent}66` }}
-        >
+
+        <div className="flex items-center justify-between border-t px-3 py-1" style={{ borderColor: `${theme.accent}66` }}>
           <svg
             ref={barcodeRef}
             role="img"
@@ -230,7 +781,7 @@ export function AgentIdCard({
             className="h-[30px] max-w-[145px]"
           />
           <p className="max-w-[110px] text-right text-[6px] opacity-75">
-            Company property · Valid only while active and before expiry.
+            Company property Â· Valid only while active and before expiry.
           </p>
         </div>
       </article>
@@ -240,9 +791,15 @@ export function AgentIdCard({
           Could not load the shared ID theme. Showing the default colors.
         </p>
       ) : null}
+
       <p className="no-print basis-full text-xs text-muted-foreground">
-        ID-1 card size: 85.60 × 53.98 mm. Print at 100% / actual size for physical dimensions.
+        ID-1 card size: 85.60 Ã— 53.98 mm. Download PDF to receive the front and back on separate pages.
       </p>
     </div>
+    </>
   );
 }
+
+
+
+

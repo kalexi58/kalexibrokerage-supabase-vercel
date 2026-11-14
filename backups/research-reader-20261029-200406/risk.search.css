@@ -1,0 +1,159 @@
+﻿/* KALEXI BROKERAGE INTELLIGENCE UI */
+.risk-intelligence-shell {
+  --ri-ink: #172b4d;
+  --ri-muted: #687b91;
+  --ri-border: rgba(148, 174, 205, .25);
+  --ri-accent: #2878e8;
+  --ri-surface: rgba(255, 255, 255, .88);
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100vh - 5rem);
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: clamp(16px, 2.2vw, 32px);
+  color: var(--ri-ink);
+  background:
+    radial-gradient(ellipse at 8% 0%, rgba(74, 144, 226, .15), transparent 38%),
+    radial-gradient(ellipse at 94% 12%, rgba(112, 91, 220, .11), transparent 32%),
+    linear-gradient(145deg, #f7faff 0%, #edf4fc 48%, #f8faff 100%);
+  border-radius: 24px;
+}
+
+.risk-intelligence-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: .42;
+  background-image:
+    linear-gradient(rgba(91, 130, 180, .055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 130, 180, .055) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+.risk-intelligence-shell,
+.risk-intelligence-shell * {
+  box-sizing: border-box;
+}
+
+.risk-intelligence-shell .ri-scroll {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  scrollbar-width: thin;
+  scrollbar-color: #b6c9e2 transparent;
+}
+
+.risk-intelligence-shell input,
+.risk-intelligence-shell textarea,
+.risk-intelligence-shell select,
+.risk-intelligence-shell .ri-field {
+  color: #172b4d;
+  background: rgba(255, 255, 255, .94);
+  border: 1px solid #d5e1ef;
+  border-radius: 12px;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.risk-intelligence-shell input:focus,
+.risk-intelligence-shell textarea:focus,
+.risk-intelligence-shell select:focus,
+.risk-intelligence-shell .ri-field:focus-within {
+  outline: none;
+  border-color: #4389ef;
+  box-shadow: 0 0 0 4px rgba(67, 137, 239, .13);
+}
+
+.risk-intelligence-shell button,
+.risk-intelligence-shell .ri-button {
+  transition: transform .18s ease, box-shadow .18s ease,
+    background .18s ease, border-color .18s ease;
+}
+
+.risk-intelligence-shell button:hover,
+.risk-intelligence-shell .ri-button:hover {
+  transform: translateY(-1px);
+}
+
+.risk-intelligence-shell .ri-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #2878e8, #4259d6);
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(40, 100, 205, .19);
+}
+
+.risk-intelligence-shell .ri-primary:hover {
+  box-shadow: 0 10px 24px rgba(40, 100, 205, .26);
+}
+
+.risk-intelligence-shell .ri-tab-active {
+  color: #1d5fbd;
+  background: #e9f2ff;
+  border-color: #c5dcfb;
+  box-shadow: inset 0 0 0 1px rgba(54, 123, 220, .06);
+}
+
+.risk-intelligence-shell [class*="rounded"],
+.risk-intelligence-shell article,
+.risk-intelligence-shell .ri-card {
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.risk-intelligence-shell article:hover,
+.risk-intelligence-shell .ri-card:hover {
+  border-color: rgba(73, 132, 211, .45);
+  box-shadow: 0 12px 32px rgba(30, 64, 110, .075);
+}
+
+.risk-intelligence-shell .ri-scroll > *,
+.risk-intelligence-shell article {
+  animation: ri-enter .35s ease both;
+}
+
+.risk-intelligence-shell article:nth-child(2) { animation-delay: .035s; }
+.risk-intelligence-shell article:nth-child(3) { animation-delay: .07s; }
+.risk-intelligence-shell article:nth-child(4) { animation-delay: .105s; }
+
+@keyframes ri-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .risk-intelligence-shell *,
+  .risk-intelligence-shell *::before,
+  .risk-intelligence-shell *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .risk-intelligence-shell {
+    padding: 14px;
+    border-radius: 16px;
+  }
+}
+
+@media print {
+  .risk-intelligence-shell {
+    color: #111 !important;
+    background: white !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    min-height: 0 !important;
+  }
+  .risk-intelligence-shell::before {
+    display: none !important;
+  }
+  .risk-intelligence-shell button,
+  .risk-intelligence-shell .ri-button {
+    display: none !important;
+  }
+}

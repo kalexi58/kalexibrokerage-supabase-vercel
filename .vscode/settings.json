@@ -1,3 +1,13 @@
 {
-    "python.terminal.useEnvFile": true
+    "python.terminal.useEnvFile": true,
+    "chat.tools.terminal.autoApprove": {
+        "/^npm\\.cmd run build$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^npx\\.cmd eslint 'src/components/ClientEditor\\.tsx' 'src/routes/_authenticated/clients\\.new\\.tsx' 'src/routes/_authenticated/clients\\.\\$clientId\\.index\\.tsx' 'src/routes/_authenticated/clients\\.\\$clientId\\.acknowledgement\\.tsx' 'src/integrations/supabase/types\\.ts'$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
 }

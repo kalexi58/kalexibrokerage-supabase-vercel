@@ -1,0 +1,503 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { AgentIdCard, type CardAgent } from "@/components/AgentIdCard";
+import { getAgentRecord, signAgentFiles } from "@/lib/agents.functions";
+
+type LoadedAgent = CardAgent & {
+  id: string;
+  photo_path?: string | null;
+};
+
+function isPrintableAgent(value: unknown): value is LoadedAgent {
+  if (!value || typeof value !== "object") return false;
+
+  const a = value as Record<string, unknown>;
+
+  return (
+    typeof a.id === "string" &&
+    typeof a.full_name === "string" &&
+    typeof a.agent_code === "string" &&
+    typeof a.phone === "string" &&
+    typeof a.referral_code === "string" &&
+    typeof a.verification_token === "string" &&
+    typeof a.issued_at === "string" &&
+    typeof a.expires_at === "string" &&
+    typeof a.status === "string"
+  );
+}
+
+function chunk<T>(items: T[], size: number): T[][] {
+  const result: T[][] = [];
+
+  for (let i = 0; i < items.length; i += size) {
+    result.push(items.slice(i, i + size));
+  }
+
+  return result;
+}
+
+export function BulkAgentIdPrint() {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [readyKeys, setReadyKeys] = useState<Set<string>>(new Set());
+  const printRootRef = useRef<HTMLDivElement>(null);
+
+  const agentsQuery = useQuery({
+    queryKey: ["bulk-agent-id-selection"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("agents")
+        .select("id, full_name, agent_code, status")
+        .order("full_name", { ascending: true });
+
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const selectedAgents = useMemo(
+    () => (agentsQuery.data ?? []).filter((agent) => selectedIds.includes(agent.id)),
+    [agentsQuery.data, selectedIds],
+  );
+
+  const recordsQuery = useQuery({
+    queryKey: ["bulk-agent-id-records", selectedIds],
+    enabled: selectedIds.length > 0,
+    queryFn: async () => {
+      const rows = await Promise.all(
+        selectedIds.map(async (id) => {
+          const record = await getAgentRecord({ data: { id } });
+
+          if (!isPrintableAgent(record)) {
+            throw new Error(
+              `Agent ${id} is missing required official ID information.`,
+            );
+          }
+
+          return record;
+        }),
+      );
+
+      return rows;
+    },
+  });
+
+  const loadedAgents = recordsQuery.data ?? [];
+
+  const photoPaths = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          loadedAgents
+            .map((agent) => agent.photo_path)
+            .filter((path): path is string => Boolean(path)),
+        ),
+      ),
+    [loadedAgents],
+  );
+
+  const photosQuery = useQuery({
+    queryKey: ["bulk-agent-id-photos", photoPaths],
+    enabled: photoPaths.length > 0,
+    queryFn: async () => {
+      return signAgentFiles({ data: { paths: photoPaths } });
+    },
+  });
+
+  const batches = useMemo(() => chunk(loadedAgents, 3), [loadedAgents]);
+
+  useEffect(() => {
+    setReadyKeys(new Set());
+  }, [selectedIds.join("|")]);
+
+  const toggleAgent = (id: string, checked: boolean) => {
+    setSelectedIds((previous) =>
+      checked
+        ? Array.from(new Set([...previous, id]))
+        : previous.filter((item) => item !== id),
+    );
+  };
+
+  const allIds = (agentsQuery.data ?? []).map((agent) => agent.id);
+  const allSelected =
+    allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
+
+  const markReady = (key: string, download: (() => Promise<void>) | null) => {
+    if (!download) return;
+
+    setReadyKeys((previous) => {
+      if (previous.has(key)) return previous;
+      const next = new Set(previous);
+      next.add(key);
+      return next;
+    });
+  };
+
+  const expectedReady = loadedAgents.length * 2;
+
+  const handlePrint = () => {
+    const root = printRootRef.current;
+
+    if (!root || loadedAgents.length === 0) {
+      toast.error("There are no agent IDs ready to print.");
+      return;
+    }
+
+    const logos = Array.from(
+      root.querySelectorAll<HTMLImageElement>(
+        ".agent-id-front header img[alt='Kalexi Brokerage Ltd']",
+      ),
+    );
+
+    if (
+      logos.length !== loadedAgents.length * 2 ||
+      logos.some((logo) => !logo.complete || logo.naturalWidth === 0)
+    ) {
+      toast.error(
+        "The actual Kalexi logo is not ready. Wait for it to load before printing.",
+      );
+      return;
+    }
+
+    if (readyKeys.size < expectedReady) {
+      toast.error("Wait for all QR codes and barcodes to finish loading.");
+      return;
+    }
+
+    window.print();
+  };
+
+  const busy =
+    recordsQuery.isLoading ||
+    photosQuery.isLoading ||
+    loadedAgents.length === 0 ||
+    readyKeys.size < expectedReady;
+
+  return (
+    <section className="mb-6 rounded-xl border bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold">Bulk Agent ID Printing</h2>
+          <p className="text-sm text-muted-foreground">
+            Select official agents. Fronts print first, followed by matching backs.
+          </p>
+        </div>
+
+        <Button
+          type="button"
+          disabled={selectedIds.length === 0 || busy || recordsQuery.isError}
+          onClick={handlePrint}
+        >
+          Print selected IDs ({selectedIds.length})
+        </Button>
+      </div>
+
+      <div className="mt-4 flex items-center gap-2 border-b pb-3">
+        <input
+          id="bulk-agent-select-all"
+          type="checkbox"
+          checked={allSelected}
+          onChange={(event) => {
+            setSelectedIds(event.target.checked ? allIds : []);
+          }}
+        />
+        <label
+          htmlFor="bulk-agent-select-all"
+          className="cursor-pointer text-sm font-medium"
+        >
+          Select all official agents
+        </label>
+      </div>
+
+      {agentsQuery.isLoading && (
+        <p className="py-4 text-sm text-muted-foreground">
+          Loading official agents...
+        </p>
+      )}
+
+      {agentsQuery.isError && (
+        <p className="py-4 text-sm text-red-600">
+          Could not load agents: {agentsQuery.error.message}
+        </p>
+      )}
+
+      <div className="mt-3 grid max-h-64 grid-cols-1 gap-2 overflow-y-auto md:grid-cols-2">
+        {(agentsQuery.data ?? []).map((agent) => (
+          <label
+            key={agent.id}
+            className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 hover:bg-muted/40"
+          >
+            <input
+              type="checkbox"
+              checked={selectedIds.includes(agent.id)}
+              onChange={(event) =>
+                toggleAgent(agent.id, event.target.checked)
+              }
+            />
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-medium">
+                {agent.full_name}
+              </span>
+              <span className="block text-xs text-muted-foreground">
+                {agent.agent_code} · {agent.status}
+              </span>
+            </span>
+          </label>
+        ))}
+      </div>
+
+      {recordsQuery.isError && (
+        <p className="mt-3 text-sm text-red-600">
+          {recordsQuery.error.message}
+        </p>
+      )}
+
+      {selectedIds.length > 0 && (
+        <p className="mt-3 text-xs text-muted-foreground">
+          {recordsQuery.isLoading
+            ? "Preparing agent ID cards..."
+            : `Cards ready: ${Math.floor(readyKeys.size / 2)} of ${loadedAgents.length} agents`}
+        </p>
+      )}
+
+      <div
+        ref={printRootRef}
+        className="bulk-print-root fixed -left-[20000px] top-0 opacity-0 pointer-events-none"
+        aria-hidden="true"
+      >
+        {batches.map((batch, pageIndex) => (
+          <section
+            key={`front-${pageIndex}`}
+            className="bulk-print-page"
+            data-side="front"
+          >
+            {batch.map((agent) => (
+              <AgentIdCard
+                key={`front-${agent.id}`}
+                agent={agent}
+                photoUrl={
+                  agent.photo_path
+                    ? photosQuery.data?.[agent.photo_path] ?? null
+                    : null
+                }
+                bulkPrint
+                onDownloadReady={(download) =>
+                  markReady(`front-${agent.id}`, download)
+                }
+              />
+            ))}
+          </section>
+        ))}
+
+        {batches.map((batch, pageIndex) => (
+          <section
+            key={`back-${pageIndex}`}
+            className="bulk-print-page"
+            data-side="back"
+          >
+            {batch.map((agent) => (
+              <AgentIdCard
+                key={`back-${agent.id}`}
+                agent={agent}
+                photoUrl={
+                  agent.photo_path
+                    ? photosQuery.data?.[agent.photo_path] ?? null
+                    : null
+                }
+                bulkPrint
+                onDownloadReady={(download) =>
+                  markReady(`back-${agent.id}`, download)
+                }
+              />
+            ))}
+          </section>
+        ))}
+
+        <style>{`
+@page {
+  size: A4 portrait !important;
+  margin: 5mm !important;
+}
+
+@media print {
+
+  html,
+  body {
+    width: 210mm !important;
+    min-width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .bulk-print-root,
+  .bulk-print-root * {
+    visibility: visible !important;
+  }
+
+  .bulk-print-root {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    left: auto !important;
+    top: auto !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /*
+    ONE COLUMN.
+    THREE CARDS MAXIMUM PER A4 SHEET.
+    EACH CARD IS PLACED BELOW THE PREVIOUS CARD.
+  */
+
+  .bulk-print-root > .bulk-print-page {
+    display: grid !important;
+
+    grid-template-columns: 53.98mm !important;
+
+    grid-template-rows:
+      repeat(3, 85.6mm) !important;
+
+    grid-auto-flow: row !important;
+    grid-auto-rows: 85.6mm !important;
+
+    column-gap: 0 !important;
+    row-gap: 3mm !important;
+
+    width: 53.98mm !important;
+    height: 262.8mm !important;
+
+    min-height: 262.8mm !important;
+    max-height: 262.8mm !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+
+  /*
+    DO NOT CREATE AN EXTRA BLANK PAGE.
+  */
+
+  .bulk-print-root > .bulk-print-page:last-of-type {
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+
+  /*
+    REMOVE THE OUTER CARD WRAPPER.
+    This allows individual front/back cards
+    to become the items in the one-column grid.
+  */
+
+  .bulk-print-page .agent-id-set {
+    display: contents !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  /*
+    PORTRAIT ID CARD DIMENSIONS.
+  */
+
+  .bulk-print-page .agent-id {
+    display: flex !important;
+    flex-direction: column !important;
+
+    box-sizing: border-box !important;
+
+    width: 53.98mm !important;
+    min-width: 53.98mm !important;
+    max-width: 53.98mm !important;
+
+    height: 85.6mm !important;
+    min-height: 85.6mm !important;
+    max-height: 85.6mm !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border-radius: 0 !important;
+    box-shadow: none !important;
+
+    overflow: hidden !important;
+
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /*
+    FRONT SHEETS:
+    SHOW FRONTS AND HIDE BACKS.
+  */
+
+  .bulk-print-page[data-side="front"] .agent-id-front {
+    display: flex !important;
+  }
+
+  .bulk-print-page[data-side="front"] .agent-id-back {
+    display: none !important;
+  }
+
+  /*
+    BACK SHEETS:
+    SHOW BACKS AND HIDE FRONTS.
+  */
+
+  .bulk-print-page[data-side="back"] .agent-id-front {
+    display: none !important;
+  }
+
+  .bulk-print-page[data-side="back"] .agent-id-back {
+    display: flex !important;
+  }
+
+  /*
+    HIDE INTERFACE ELEMENTS.
+  */
+
+  .bulk-print-page .no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /*
+    PRESERVE REAL LOGOS, PHOTOS, QR AND BARCODES.
+  */
+
+  .bulk-print-page img,
+  .bulk-print-page svg {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+}
+`}</style>
+      </div>
+    </section>
+  );
+}
+

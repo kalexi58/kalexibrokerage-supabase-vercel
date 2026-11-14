@@ -1,0 +1,3 @@
+export function approximateReward(tokens: number) { return Math.max(0, tokens) * 100000 / 100; }
+export function validAgent(status: string, expiry: string, now = new Date()) { return status === "active" && new Date(expiry).getTime() > now.getTime(); }
+export function agentPermissions(status: string, expiry: string) { return validAgent(status, expiry) ? ["Refer clients", "Share official referral link"] : []; }

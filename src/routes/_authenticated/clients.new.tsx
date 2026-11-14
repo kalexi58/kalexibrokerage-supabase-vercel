@@ -68,6 +68,7 @@ function RegisterClient() {
     referral_code: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [photo, setPhoto] = useState<File | null>(null);
 
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -88,6 +89,7 @@ function RegisterClient() {
 
   const create = useMutation({
     mutationFn: async () => {
+      if (errors["photo"]) throw new Error("Please correct the highlighted fields.");
       const parsed = schema.safeParse(form);
       if (!parsed.success) {
         const map: Record<string, string> = {};
@@ -103,6 +105,15 @@ function RegisterClient() {
         if (!ref) throw new Error("That referral code does not belong to an active agent.");
         agentId = ref.agentId;
       }
+      let photoPath: string | null = null;
+      if (photo) {
+        const extension = photo.type === "image/jpeg" ? "jpg" : photo.type.split("/")[1];
+        photoPath = `${session!.userId}/${crypto.randomUUID()}.${extension}`;
+        const { error: uploadError } = await supabase.storage
+          .from("client-photos")
+          .upload(photoPath, photo, { contentType: photo.type, upsert: false });
+        if (uploadError) throw uploadError;
+      }
       const { data, error } = await supabase
         .from("clients")
         .insert({
@@ -114,13 +125,25 @@ function RegisterClient() {
           sector: v.sector,
           requirement: v.requirement,
           branch: v.branch || null,
+          photo_path: photoPath,
           registered_by: session!.userId,
           agent_id: agentId,
           referral_code: agentId ? form.referral_code.trim().toUpperCase() : null,
         })
         .select("id, client_ref")
         .single();
-      if (error) throw error;
+      if (error) {
+        if (photoPath) {
+          const { error: cleanupError } = await supabase.storage
+            .from("client-photos")
+            .remove([photoPath]);
+          if (cleanupError) {
+            console.error("[clients] Could not remove an unlinked profile photo.", cleanupError);
+            throw new Error(`${error.message} The uploaded photo could not be cleaned up.`);
+          }
+        }
+        throw error;
+      }
       await logAudit({
         actorId: session!.userId,
         actorEmail: session!.profile?.email ?? null,
@@ -185,6 +208,39 @@ function RegisterClient() {
                 onChange={(e) => set("company_name")(e.target.value)}
                 maxLength={160}
               />
+            </Field>
+            <Field label="Client profile photo (optional)" error={errors["photo"]}>
+              <Input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0] ?? null;
+                  if (file && !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+                    setErrors((previous) => ({
+                      ...previous,
+                      photo: "Choose a JPEG, PNG, or WebP image.",
+                    }));
+                    event.currentTarget.value = "";
+                    setPhoto(null);
+                    return;
+                  }
+                  if (file && file.size > 5 * 1024 * 1024) {
+                    setErrors((previous) => ({
+                      ...previous,
+                      photo: "The image must be 5 MB or smaller.",
+                    }));
+                    event.currentTarget.value = "";
+                    setPhoto(null);
+                    return;
+                  }
+                  setErrors((previous) => ({ ...previous, photo: "" }));
+                  setPhoto(file);
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Private staff-only image, up to 5 MB. No confidential details are embedded in client
+                QR codes.
+              </p>
             </Field>
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Client type" error={errors["client_type"]}>

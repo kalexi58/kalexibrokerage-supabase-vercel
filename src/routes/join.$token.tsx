@@ -1,8 +1,9 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+﻿import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAgentUploadFormat, type AgentUploadKind } from "@/lib/agent-upload";
 import { createAgentUpload, getAgentCampaign, matchAgentRegistry, submitAgentApplication } from "@/lib/agents.functions";
 import { KalexiMark } from "@/components/KalexiMark";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ function JoinPage() {
       if (r) {
         setMatch(r);
         setF((prev) => ({ ...prev, fullName: prev.fullName || r.fullName, phone: prev.phone || r.phone || "", village: prev.village || r.village || "", district: prev.district || r.district || "" }));
-        toast.success("We found your field registration — your details are linked. Please complete the rest.");
+        toast.success("We found your field registration - your details are linked. Please complete the rest.");
       }
     } catch { /* ignore */ }
   }
@@ -61,10 +62,21 @@ function JoinPage() {
     return null;
   }
 
-  async function upload(file: File) {
-    if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} is larger than 10MB.`);
-    const slot = await createAgentUpload({ data: { token, fileName: file.name } });
-    const { error } = await supabase.storage.from(slot.bucket).uploadToSignedUrl(slot.path, slot.uploadToken, file);
+  async function upload(file: File, kind: AgentUploadKind) {
+    if (file.size > 50 * 1024 * 1024) throw new Error(`${file.name} exceeds the 50 MB limit.`);
+    const format = resolveAgentUploadFormat(file.name, file.type, kind);
+    const slot = await createAgentUpload({
+      data: {
+        token,
+        fileName: file.name,
+        fileType: format.contentType,
+        fileSize: file.size,
+        kind,
+      },
+    });
+    const { error } = await supabase.storage
+      .from(slot.bucket)
+      .uploadToSignedUrl(slot.path, slot.uploadToken, file, { contentType: slot.contentType });
     if (error) throw new Error(`Upload failed for ${file.name}.`);
     return slot.path;
   }
@@ -77,9 +89,9 @@ function JoinPage() {
     }
     setBusy(true);
     try {
-      const photoPath = await upload(photo);
-      const idFrontPath = await upload(idFront);
-      const idBackPath = files.idBack ? await upload(files.idBack) : null;
+      const photoPath = await upload(photo, "photo");
+      const idFrontPath = await upload(idFront, "idFront");
+      const idBackPath = files.idBack ? await upload(files.idBack, "idBack") : null;
       const r = await submitAgentApplication({
         data: {
           token, fullName, phone, email, dateOfBirth: f.dateOfBirth, gender: f.gender,
@@ -88,7 +100,7 @@ function JoinPage() {
           paymentMethod: f.paymentMethod as "mobile_money" | "bank", paymentProvider: f.paymentProvider,
           paymentAccountName, paymentAccountNumber,
           password, registryId: match?.id ?? null, village: f.village,
-          declarations: decl as never,
+          declarations: { ...decl, commissionPolicyVersion: "DAP-COMMISSION-2PCT-v1", commissionRate: 2 } as never,
         },
       });
       setDone(r.reference);
@@ -115,14 +127,14 @@ function JoinPage() {
     </main>
   );
 
-  if (campaign.isLoading) return shell(<p className="text-sm text-muted-foreground">Loading…</p>);
+  if (campaign.isLoading) return shell(<p className="text-sm text-muted-foreground">Loading...</p>);
   if (!campaign.data || !campaign.data.open)
     return shell(<p className="text-sm">This registration link is not available or has closed. Please contact Kalexi Brokerage.</p>);
   if (done)
     return shell(
       <div className="space-y-2">
         <h1 className="font-display text-xl font-semibold">Application received</h1>
-        <p className="text-sm text-muted-foreground">Your reference is <b className="text-foreground">{done}</b>. Our team will review your details. You can already sign in with your email and password to see your dashboard.</p>
+        <p className="text-sm text-muted-foreground">Your reference is <b className="text-foreground">{done}</b>. Our team will review your details. You can sign in with your registered email address or phone number and password.</p>
         <a href="/" className="inline-block rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground">Sign in now</a>
       </div>,
     );
@@ -132,7 +144,28 @@ function JoinPage() {
   );
   const fileInp = (k: FK, label: string) => (
     <div className="space-y-1.5"><Label>{label}</Label>
-      <Input type="file" accept="image/*,application/pdf" onChange={(e) => setFiles({ ...files, [k]: e.target.files?.[0] ?? null })} />
+      <Input
+  type="file"
+  accept={k === "photo" ? "image/jpeg,image/png,image/webp,.jpg,.jpeg,.jfif,.png,.webp" : "image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.jfif,.png,.webp,.pdf"}
+  onChange={(e) => {
+    const file = e.target.files?.[0] ?? null;
+    if (file) {
+      try {
+        resolveAgentUploadFormat(file.name, file.type, k);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "This file format is not supported.");
+        e.target.value = "";
+        return;
+      }
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error("Each file must be 50 MB or smaller.");
+        e.target.value = "";
+        return;
+      }
+    }
+    setFiles((prev) => ({ ...prev, [k]: file }));
+  }}
+/>
       {files[k] ? <p className="text-xs text-muted-foreground">{files[k]?.name}</p> : null}
     </div>
   );
@@ -155,7 +188,7 @@ function JoinPage() {
         <div className="grid gap-4 md:grid-cols-2">
           {match ? (
             <div className="rounded-lg border border-primary/40 bg-primary/10 p-3 text-sm md:col-span-2">
-              Linked to field registration <b>{match.regId}</b> — {match.fullName}{match.village ? `, ${match.village}` : ""}. Continue with the remaining details.
+              Linked to field registration <b>{match.regId}</b> - {match.fullName}{match.village ? `, ${match.village}` : ""}. Continue with the remaining details.
             </div>
           ) : null}
           {inp("regId", "Field registration ID (if you have one)")}
@@ -194,7 +227,7 @@ function JoinPage() {
         <div className="space-y-3 text-sm">
           {([
             ["accurate", "I confirm the information I have given is true and accurate."],
-            ["terms", "I accept the Kalexi Digital Agent Programme terms, including commission of 0.9% on eligible completed transactions."],
+            ["terms", "I accept the Kalexi Digital Agent Programme commission policy, version DAP-COMMISSION-2PCT-v1. My commission is 2% of the brokerage fee actually collected by Kalexi Brokerage Ltd for eligible transactions attributed to me, subject to verification and the applicable agreement."],
             ["conduct", "I will act honestly and never misrepresent Kalexi Brokerage Ltd."],
             ["consent", "I consent to Kalexi verifying my identity and processing my data."],
           ] as const).map(([k, t]) => (
@@ -207,10 +240,10 @@ function JoinPage() {
       )}
       {step === 4 && (
         <dl className="grid gap-2 text-sm md:grid-cols-2">
-          {[["Name", f.fullName], ["Phone", f.phone], ["Email", f.email], ["District", f.district], ["ID", `${f.idType} · ${f.idNumber}`],
-            ["Payment", `${f.paymentMethod === "bank" ? "Bank" : "Mobile money"} · ${f.paymentAccountNumber}`],
+          {[["Name", f.fullName], ["Phone", f.phone], ["Email", f.email], ["District", f.district], ["ID", `${f.idType} | ${f.idNumber}`],
+            ["Payment", `${f.paymentMethod === "bank" ? "Bank" : "Mobile money"} | ${f.paymentAccountNumber}`],
             ["Files", [files.photo, files.idFront, files.idBack].filter(Boolean).length + " attached"]].map(([k, v]) => (
-            <div key={k}><dt className="text-xs text-muted-foreground">{k}</dt><dd>{v || "—"}</dd></div>
+            <div key={k}><dt className="text-xs text-muted-foreground">{k}</dt><dd>{v || "-"}</dd></div>
           ))}
         </dl>
       )}
@@ -220,9 +253,11 @@ function JoinPage() {
         {step < 4 ? (
           <Button onClick={() => { const e = validStep(); if (e) toast.error(e); else setStep(step + 1); }}>Continue</Button>
         ) : (
-          <Button disabled={busy} onClick={submit}>{busy ? "Submitting…" : "Submit application"}</Button>
+          <Button disabled={busy} onClick={submit}>{busy ? "Submitting..." : "Submit application"}</Button>
         )}
       </div>
     </div>,
   );
 }
+
+

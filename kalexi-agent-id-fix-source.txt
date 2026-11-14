@@ -1,0 +1,544 @@
+﻿KALEXI AGENT ID SOURCE FILES
+
+===== FILE: .\src\components\AgentIdCard.tsx =====
+import { useEffect, useRef, useState } from "react";
+import JsBarcode from "jsbarcode";
+import QRCode from "qrcode";
+import { useQuery } from "@tanstack/react-query";
+import { DEFAULT_AGENT_ID_THEME } from "@/lib/agent-id-theme";
+import { getAgentIdTheme } from "@/lib/agents.functions";
+import { useSession } from "@/hooks/useSession";
+import { KalexiMark } from "@/components/KalexiMark";
+
+export interface CardAgent {
+  full_name: string;
+  agent_code: string;
+  district: string | null;
+  village?: string | null;
+  phone: string;
+  referral_code: string;
+  verification_token: string;
+  issued_at: string;
+  expires_at: string;
+  status: string;
+  designation?: string;
+  company_phone?: string | null;
+}
+
+const fmt = (date: string) =>
+  new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+export function AgentIdCard({
+  agent: a,
+  photoUrl,
+  signatureUrl,
+}: {
+  agent: CardAgent;
+  photoUrl?: string | null;
+  signatureUrl?: string | null;
+}) {
+  const [qr, setQr] = useState("");
+  const [qrError, setQrError] = useState(false);
+  const barcodeRef = useRef<SVGSVGElement>(null);
+  const session = useSession();
+  const themeQuery = useQuery({
+    queryKey: ["agent-id-theme", session.data?.userId],
+    enabled: !!session.data?.userId,
+    queryFn: () => getAgentIdTheme(),
+  });
+  const theme = themeQuery.data?.theme ?? DEFAULT_AGENT_ID_THEME;
+  const authorizedSignatureUrl = themeQuery.data?.authorizedSignatureUrl ?? signatureUrl;
+
+  useEffect(() => {
+    let cancelled = false;
+    setQr("");
+    setQrError(false);
+    void QRCode.toDataURL(
+      `${window.location.origin}/agent/verify/${encodeURIComponent(a.verification_token)}`,
+      { errorCorrectionLevel: "H", margin: 1, width: 260 },
+    )
+      .then((url) => {
+        if (!cancelled) setQr(url);
+      })
+      .catch((error: unknown) => {
+        console.error("[Agent ID] Could not generate verification QR code.", error);
+        if (!cancelled) setQrError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [a.verification_token]);
+
+  useEffect(() => {
+    if (!barcodeRef.current) return;
+    try {
+      JsBarcode(barcodeRef.current, a.agent_code, {
+        format: "CODE128",
+        displayValue: true,
+        font: "monospace",
+        fontSize: 10,
+        height: 28,
+        margin: 0,
+        width: 1.4,
+      });
+    } catch (error) {
+      console.error("[Agent ID] Could not generate agent ID barcode.", error);
+    }
+  }, [a.agent_code]);
+
+  return (
+    <div
+      className="agent-id-set flex flex-wrap gap-6"
+      style={{ gridTemplateColumns: `repeat(2, ${theme.widthMm}mm)` }}
+    >
+      <style>{`
+/* KALEXI_AGENT_ID_TWO_PAGE_PRINT */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .agent-id-set {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    gap: 0 !important;
+  }
+
+  .agent-id-set > .agent-id {
+    display: flex !important;
+    position: relative !important;
+    float: none !important;
+    clear: both !important;
+    margin: 0 auto !important;
+    box-shadow: none !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  .agent-id-set > .agent-id-front {
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+
+  .agent-id-set > .agent-id-back {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+`}</style>
+<article
+        className="agent-id agent-id-front border shadow-[var(--shadow-panel)]"
+        style={{
+          backgroundColor: theme.background,
+          color: theme.text,
+          width: `min(100%, ${theme.widthMm}mm)`,
+          height: `${theme.heightMm}mm`,
+          aspectRatio: "auto",
+          borderRadius: `${theme.radiusMm}mm`,
+          fontFamily: theme.fontFamily,
+        }}
+      >
+        <header
+          className="flex items-center gap-2.5 px-3 py-2"
+          style={{ backgroundColor: theme.accent, color: theme.accentText }}
+        >
+          <KalexiMark className="h-8 w-8 shrink-0" />
+          <div className="min-w-0">
+            <p className="truncate font-display text-[11px] font-semibold">Kalexi Brokerage Ltd</p>
+            <p className="truncate text-[8px] font-semibold uppercase tracking-wide opacity-85">
+              Digital Agent Program (DAP)
+            </p>
+          </div>
+          <span className="ml-auto shrink-0 rounded-full border border-current/30 px-2 py-1 text-[7px] font-bold uppercase">
+            {a.status}
+          </span>
+        </header>
+
+        <div className="flex min-h-0 flex-1 gap-3 px-3 py-2.5">
+          <div className="w-[64px] shrink-0">
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt={a.full_name}
+                className="h-[79px] w-[64px] rounded object-cover"
+              />
+            ) : (
+              <div
+                className="flex h-[79px] w-[64px] items-center justify-center rounded text-2xl font-semibold"
+                style={{ backgroundColor: theme.accent, color: theme.accentText }}
+              >
+                {a.full_name.slice(0, 1).toUpperCase()}
+              </div>
+            )}
+            {authorizedSignatureUrl ? (
+              <img
+                src={authorizedSignatureUrl}
+                alt="Authorised signature"
+                className="mt-1 h-5 w-full object-contain"
+              />
+            ) : (
+              <div className="mt-1 h-5 border-b" style={{ borderColor: theme.accent }} />
+            )}
+            <p className="mt-0.5 text-center text-[6px] opacity-75">Authorised signature</p>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-display text-[13px] font-bold leading-tight">
+              {a.full_name}
+            </p>
+            <p className="mt-0.5 truncate text-[8px] font-semibold" style={{ color: theme.accent }}>
+              {a.designation ?? "Digital Agent"}
+            </p>
+            <dl className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1.5 text-[8px] leading-tight">
+              {[
+                ["Agent ID", a.agent_code],
+                ["Region", a.district ?? "â€”"],
+                ["Issued", fmt(a.issued_at)],
+                ["Expires", fmt(a.expires_at)],
+              ].map(([label, value]) => (
+                <div key={label} className="min-w-0">
+                  <dt className="text-[6px] uppercase opacity-70">{label}</dt>
+                  <dd className="truncate font-semibold">{value}</dd>
+                </div>
+              ))}
+              {theme.customFields.slice(0, 2).map((field) => (
+                <div key={field.label} className="min-w-0">
+                  <dt className="truncate text-[6px] uppercase opacity-70">{field.label}</dt>
+                  <dd className="truncate font-semibold">{field.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+
+        <footer
+          className="flex items-center justify-between border-t px-3 py-1.5 text-[7px] font-semibold uppercase tracking-wide"
+          style={{ borderColor: `${theme.accent}66`, color: theme.accent }}
+        >
+          <span>Official agent identification</span>
+          <span>Property of Kalexi</span>
+        </footer>
+      </article>
+
+      <article
+        className="agent-id agent-id-back border shadow-[var(--shadow-panel)]"
+        style={{
+          backgroundColor: theme.background,
+          color: theme.text,
+          width: `min(100%, ${theme.widthMm}mm)`,
+          height: `${theme.heightMm}mm`,
+          aspectRatio: "auto",
+          borderRadius: `${theme.radiusMm}mm`,
+          fontFamily: theme.fontFamily,
+        }}
+      >
+        <header
+          className="px-3 py-2 text-[9px] font-bold uppercase tracking-wide"
+          style={{ backgroundColor: theme.accent, color: theme.accentText }}
+        >
+          Agent verification &amp; authorisation
+        </header>
+        <div className="flex min-h-0 flex-1 gap-2.5 px-3 py-2">
+          <div className="w-[74px] shrink-0 text-center">
+            {qr ? (
+              <img src={qr} alt="Scan to verify agent status" className="h-[72px] w-[72px]" />
+            ) : (
+              <div
+                aria-label={qrError ? "QR code unavailable" : "Generating QR code"}
+                className="flex h-[72px] w-[72px] items-center justify-center text-[7px]"
+                style={{ backgroundColor: `${theme.accent}18` }}
+              >
+                {qrError ? "QR unavailable" : "Generatingâ€¦"}
+              </div>
+            )}
+            <p className="mt-0.5 text-[7px]">Scan to verify</p>
+          </div>
+          <div className="min-w-0 flex-1 text-[6px] leading-tight">
+            <p className="font-semibold">Referral: {a.referral_code}</p>
+            {theme.customFields.slice(2).map((field) => (
+              <p key={field.label} className="mt-0.5 break-words">
+                <span className="font-semibold">{field.label}:</span> {field.value}
+              </p>
+            ))}
+            <p className="mt-0.5 break-words">info@kalexibrokerage.com</p>
+            <p>www.kalexibrokerage.com</p>
+            <p>{a.company_phone || "Contact: official company email"}</p>
+            <p
+              className="mt-1.5 border-t pt-1.5 font-semibold"
+              style={{ borderColor: `${theme.accent}66` }}
+            >
+              {theme.authorizationMessage}
+            </p>
+            <p className="mt-0.5">
+              The holder may not collect money, sign contracts or make commitments. Pay only to
+              official company accounts.
+            </p>
+            <p className="mt-0.5">{theme.ifFoundMessage}</p>
+            {theme.showCorporateSeal ? (
+              <div className="mt-1 flex justify-end">
+                <div
+                  aria-label={`Corporate seal: ${theme.corporateSealText}`}
+                  className="grid h-8 w-8 place-content-center rounded-full border-2 text-center text-[5px] font-bold uppercase"
+                  style={{ borderColor: theme.accent, color: theme.accent }}
+                >
+                  <span>Seal</span>
+                  <span className="line-clamp-2 max-w-6 break-words">{theme.corporateSealText}</span>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+        <div
+          className="flex items-center justify-between border-t px-3 py-1"
+          style={{ borderColor: `${theme.accent}66` }}
+        >
+          <svg
+            ref={barcodeRef}
+            role="img"
+            aria-label={`Code 128 barcode for agent ${a.agent_code}`}
+            className="h-[30px] max-w-[145px]"
+          />
+          <p className="max-w-[110px] text-right text-[6px] opacity-75">
+            Company property Â· Valid only while active and before expiry.
+          </p>
+        </div>
+      </article>
+
+      {themeQuery.isError ? (
+        <p className="no-print basis-full text-xs text-destructive">
+          Could not load the shared ID theme. Showing the default colors.
+        </p>
+      ) : null}
+      <p className="no-print basis-full text-xs text-muted-foreground">
+        ID-1 card size: 85.60 Ã— 53.98 mm. Print at 100% / actual size for physical dimensions.
+      </p>
+    </div>
+  );
+}
+
+
+
+===== FILE: .\src\routes\_authenticated\agents.$agentId.tsx =====
+import { createFileRoute, useParams } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { AgentIdCard } from "@/components/AgentIdCard";
+import { AgentIdentityEditor } from "@/components/AgentIdentityEditor";
+import { Input } from "@/components/ui/input";
+import { NoAccess, StatusPill } from "@/components/records";
+import { Button } from "@/components/ui/button";
+import { ErrorState, PageLoadingState } from "@/components/LoadingStates";
+import { useAccess } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import {
+  createAgentLogin,
+  getAgentRecord,
+  setAgentStatus,
+  signAgentFiles,
+} from "@/lib/agents.functions";
+
+export const Route = createFileRoute("/_authenticated/agents/$agentId")({
+  head: () => ({ meta: [{ title: "Agent ID Card — Kalexi" }, { name: "description", content: "Official Kalexi digital agent ID card." }] }),
+  component: AgentCard,
+});
+
+function AgentCard() {
+  const { agentId } = useParams({ from: "/_authenticated/agents/$agentId" });
+  const qc = useQueryClient();
+  const access = useAccess();
+  const canView = allows(access, "agents.view") || allows(access, "agents.manage");
+  const canManage = allows(access, "agents.manage");
+  const q = useQuery({
+    queryKey: ["agent", agentId],
+    queryFn: () => getAgentRecord({ data: { id: agentId } }),
+    enabled: canView,
+    retry: false,
+  });
+  const a = q.data;
+  const [email, setEmail] = useState("");
+  const [pw, setPw] = useState("");
+  useEffect(() => { if (a?.email) setEmail(a.email); }, [a?.email]);
+  const photo = useQuery({
+    queryKey: ["agent-photo", a?.photo_path],
+    enabled: canView && !!a?.photo_path,
+    queryFn: () => signAgentFiles({ data: { paths: [a!.photo_path!] } }),
+  });
+  if (!access) return <AppShell><PageLoadingState message="Verifying agent-management access…" /></AppShell>;
+  if (!canView) return <AppShell><NoAccess module="Digital Agents" /></AppShell>;
+  if (q.isLoading) return <AppShell><PageLoadingState message="Loading agent ID card…" /></AppShell>;
+  if (q.isError) {
+    return (
+      <AppShell>
+        <ErrorState
+          title={q.error instanceof Error ? q.error.message : "Agent ID card could not be loaded."}
+          onRetry={() => void q.refetch()}
+        />
+      </AppShell>
+    );
+  }
+  if (!a) return <AppShell><p className="text-sm text-muted-foreground">Agent record not found.</p></AppShell>;
+  const photoUrl = a.photo_path ? photo.data?.[a.photo_path] : undefined;
+
+  async function issueLogin() {
+    if (pw.length < 8) { toast.error("Password must be at least 8 characters."); return; }
+    try { await createAgentLogin({ data: { agentId: a!.id, email, password: pw } }); toast.success(`Sign-in ready. Share: ${email} / ${pw}`); setPw(""); qc.invalidateQueries({ queryKey: ["agent", agentId] }); }
+    catch (e) { toast.error((e as Error).message); }
+  }
+
+  async function status(s: "active" | "suspended" | "revoked") {
+    try { await setAgentStatus({ data: { id: a!.id, status: s } }); toast.success(`Agent ${s}`); qc.invalidateQueries({ queryKey: ["agent", agentId] }); }
+    catch (e) { toast.error((e as Error).message); }
+  }
+
+  return (
+    <AppShell>
+      <PageHeader title={a.full_name} description={`${a.agent_code} · referral ${a.referral_code}`}
+        actions={<div className="no-print flex gap-2"><StatusPill value={a.status} />
+          <Button size="sm" variant="outline" onClick={() => window.print()}>Print card</Button>
+          {canManage ? <>
+            {a.status === "active"
+              ? <Button size="sm" variant="outline" onClick={() => status("suspended")}>Suspend</Button>
+              : <Button size="sm" variant="outline" onClick={() => status("active")}>Reactivate</Button>}
+            <Button size="sm" variant="destructive" onClick={() => status("revoked")}>Revoke</Button>
+          </> : null}
+        </div>} />
+      <AgentIdCard agent={a} photoUrl={photoUrl ?? null} />
+      {canManage ? <div className="no-print mt-6 max-w-xl rounded-xl border bg-card p-5">
+        <h2 className="font-display font-semibold">Agent sign-in details</h2>
+        <p className="mb-3 text-sm text-muted-foreground">{a.user_id ? "This agent can sign in. Update the email or set a new password below." : "Create the email and password the agent will use to open their dashboard."}</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input type="text" placeholder="Password (min 8 characters)" value={pw} onChange={(e) => setPw(e.target.value)} />
+        </div>
+        <Button className="mt-3" onClick={issueLogin}>{a.user_id ? "Update sign-in" : "Create sign-in"}</Button>
+      </div> : null}
+      {canManage ? <AgentIdentityEditor key={a.updated_at} agent={a} /> : null}
+    </AppShell>
+  );
+}
+
+
+===== FILE: .\package.json =====
+{
+  "name": "kalexi-brokerage",
+  "version": "1.1.3",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-aspect-ratio": "^1.1.8",
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-context-menu": "^2.2.16",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-hover-card": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-menubar": "^1.1.16",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-progress": "^1.1.8",
+    "@radix-ui/react-radio-group": "^1.3.8",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slider": "^1.3.6",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-toggle-group": "^1.1.11",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@supabase/supabase-js": "^2.112.2",
+    "@tailwindcss/vite": "^4.2.1",
+    "@tanstack/react-query": "^5.101.1",
+    "@tanstack/react-router": "1.170.41",
+    "@tanstack/react-start": "1.168.60",
+    "@tanstack/router-plugin": "1.168.42",
+    "@types/jsbarcode": "^3.11.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "date-fns": "^4.1.0",
+    "docxtemplater": "^3.71.1",
+    "embla-carousel-react": "^8.6.0",
+    "input-otp": "^1.4.2",
+    "jsbarcode": "^3.12.3",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.575.0",
+    "pizzip": "^3.3.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-day-picker": "^9.14.0",
+    "react-dom": "^19.2.0",
+    "react-hook-form": "^7.71.2",
+    "react-resizable-panels": "^4.6.5",
+    "recharts": "^2.15.4",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.1",
+    "tw-animate-css": "^1.3.4",
+    "vaul": "^1.1.2",
+    "vite-tsconfig-paths": "^6.0.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "@types/node": "^22.16.5",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "drizzle-kit": "0.x",
+    "drizzle-orm": "0.x",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^15.15.0",
+    "nitro": "3.0.260603-beta",
+    "postgres": "^3.4.9",
+    "prettier": "^3.7.3",
+    "supabase": "^2.122.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^8.2.0",
+    "vitest": "^5.0.4"
+  }
+}
+

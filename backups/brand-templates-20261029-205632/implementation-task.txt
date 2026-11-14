@@ -1,0 +1,56 @@
+﻿Implement both features in the existing Kalexi Brokerage Operating System. Inspect the actual project architecture, routes, components, Supabase schema, migrations, authentication, permissions and global styles first. Edit the real application; do not return a plan or mock-up.
+
+FEATURE 1: CENTRAL BRAND CONTROL CENTER
+
+Create or upgrade the authenticated administrator-only Brand Control Center.
+
+Allow authorized administrators to configure and persist:
+- Company display name, legal name, short name, tagline, description, vision, mission, values and about text.
+- Contact email, phone, website, office address and footer copyright.
+- Primary, secondary and accent colours; background, surfaces, text, muted text, borders and success/warning/error colours.
+- Light/dark appearance, light/dark logos, app icon, favicon and optional background image.
+- Supported heading/body fonts, button style, border radius, card style, sidebar/header/navigation appearance and interface density.
+
+Provide validation, colour pickers and hex inputs, asset uploads, preview, Save, Cancel, Reset to saved settings, Restore Defaults with confirmation, Publish, loading/error/success messages, and updated-at/by information. Unsaved drafts must not change the published application.
+
+Use one typed brand configuration, a reusable React context/provider and useBrand() hook or architectural equivalent, and semantic global CSS variables. Apply brand settings consistently to navigation, authentication screens, dashboards, research, risk intelligence, verification, due diligence, forms, reports, dialogs, loading/error states, print/PDF outputs and browser metadata wherever those features exist.
+
+Use safe defaults if settings cannot load. Replace hard-coded brand values only where they represent brand identity. Preserve legitimate module names, case identifiers, legal terminology and transaction data.
+
+FEATURE 2: COMPANY DOCUMENT TEMPLATE CENTER
+
+Create a Document Template Center accessible according to the existing role and permission model.
+
+Authorized users must be able to:
+- Import document templates from supported files, including DOCX and PDF, and other formats only where the existing application can safely support them.
+- Upload, preview, classify, version, activate, archive and download templates.
+- Give every template a name, description, category, owner, version, effective date and status.
+- Assign templates to the whole company or select specific departments that may use them.
+- Select multiple departments for one template and manage assignments later.
+- Define template usage permissions separately from template-management permissions.
+- See which template is currently active for a document category and department.
+- Choose an approved template when creating a supported document.
+- Keep the source template unchanged and preserve the original file for download.
+- Maintain version history and audit records for imports, edits, assignments, activation and archival.
+- Warn users when a template is archived, outdated or not authorized for their department.
+
+Department assignment must be enforced by backend permissions, not merely by hiding templates in the UI. Use the existing department and role schema. Do not invent departments or assume all users are administrators.
+
+DOCUMENT CONSISTENCY
+Where document generation already exists, use the selected approved template and central brand settings to maintain consistent logos, company details, headers, footers, fonts, colours, document titles, version information and page layout. Respect each imported template's intended formatting; do not destroy its layout by blindly applying global styles. Preserve document-specific legal content and approved wording.
+
+For PDFs, support preview/download and text extraction where feasible. Do not claim an imported PDF is fully editable unless actual editing is implemented. For DOCX files, preserve formatting as far as the existing libraries support. If a format cannot be reliably converted, retain it as a downloadable source template and report the limitation.
+
+DATABASE AND SECURITY
+Inspect existing Supabase tables, storage buckets, migrations, policies and permissions before changing anything. Reuse suitable existing structures. Avoid duplicate settings/template tables. If new structures are necessary, create versioned SQL migrations with appropriate RLS, authorized writes, department-scoped access, safe file storage policies and audit trails. Store file paths and metadata in database records, not raw file binaries. Never expose service-role keys in browser code. Do not disable existing security controls.
+
+IMPLEMENTATION REQUIREMENTS
+- Integrate with the current route and navigation structure.
+- Use existing installed dependencies wherever possible; do not install Copilot or any other tool.
+- Do not scaffold a replacement app or remove existing functionality.
+- Do not use mock persistence.
+- Avoid unrelated refactoring.
+- Back up files before editing.
+- Report any migration or storage setup that still requires deployment.
+- Run npm.cmd run build after changes and fix errors caused by the implementation.
+- Do not deploy to production or execute destructive database commands.

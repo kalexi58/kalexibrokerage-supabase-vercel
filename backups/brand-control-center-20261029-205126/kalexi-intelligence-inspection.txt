@@ -1,0 +1,3913 @@
+﻿KALEXI BROKERAGE - RISK & INTELLIGENCE INSPECTION
+
+===== 1. PROJECT LOCATION =====
+C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)
+
+===== 2. PACKAGE CONFIGURATION =====
+{
+  "name": "kalexi-brokerage",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-aspect-ratio": "^1.1.8",
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-context-menu": "^2.2.16",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-hover-card": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-menubar": "^1.1.16",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-progress": "^1.1.8",
+    "@radix-ui/react-radio-group": "^1.3.8",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slider": "^1.3.6",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-toggle-group": "^1.1.11",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@supabase/supabase-js": "^2.112.2",
+    "@tailwindcss/vite": "^4.2.1",
+    "@tanstack/react-query": "^5.101.1",
+    "@tanstack/react-router": "1.170.41",
+    "@tanstack/react-start": "1.168.60",
+    "@tanstack/router-plugin": "1.168.42",
+    "@types/jsbarcode": "^3.11.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "date-fns": "^4.1.0",
+    "embla-carousel-react": "^8.6.0",
+    "input-otp": "^1.4.2",
+    "jsbarcode": "^3.12.3",
+    "lucide-react": "^0.575.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-day-picker": "^9.14.0",
+    "react-dom": "^19.2.0",
+    "react-hook-form": "^7.71.2",
+    "react-resizable-panels": "^4.6.5",
+    "recharts": "^2.15.4",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.1",
+    "tw-animate-css": "^1.3.4",
+    "vaul": "^1.1.2",
+    "vite-tsconfig-paths": "^6.0.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "@types/node": "^22.16.5",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "drizzle-kit": "0.x",
+    "drizzle-orm": "0.x",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^15.15.0",
+    "nitro": "3.0.260603-beta",
+    "postgres": "^3.4.9",
+    "prettier": "^3.7.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^8.2.0",
+    "vitest": "^5.0.4"
+  }
+}
+
+===== 3. RELEVANT SOURCE FILES =====
+
+
+========== FILE: \src\components\GlobalSearch.tsx ==========
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { Input } from "@/components/ui/input";
+
+interface Hit {
+  to: string;
+  ref: string;
+  title: string;
+  kind: string;
+}
+
+export function GlobalSearch() {
+  const { data: session } = useSession();
+  const access = session?.access;
+  const [term, setTerm] = useState("");
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const q = term.trim();
+
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
+  const scopes = useMemo(
+    () => ({
+      clients: allows(access, "clients.view"),
+      opportunities: allows(access, "opportunities.view"),
+      deals: allows(access, "deals.view"),
+    }),
+    [access],
+  );
+
+  const { data: hits = [] } = useQuery<Hit[]>({
+    queryKey: ["global-search", q, scopes],
+    enabled: q.length >= 2,
+    queryFn: async () => {
+      const like = `%${q}%`;
+      const results: Hit[] = [];
+
+      if (scopes.clients) {
+        const { data } = await supabase
+          .from("clients")
+          .select("id, client_ref, full_name, company_name")
+          .or(`full_name.ilike.${like},client_ref.ilike.${like},company_name.ilike.${like},phone.ilike.${like}`)
+          .limit(5);
+        for (const c of data ?? [])
+          results.push({
+            to: `/clients/${c.id}`,
+            ref: c.client_ref,
+            title: c.company_name || c.full_name,
+            kind: "Client",
+          });
+      }
+
+      if (scopes.opportunities) {
+        const { data } = await supabase
+          .from("opportunities")
+          .select("id, opportunity_ref, title")
+          .or(`title.ilike.${like},opportunity_ref.ilike.${like}`)
+          .limit(5);
+        for (const o of data ?? [])
+          results.push({
+            to: `/opportunities/${o.id}`,
+            ref: o.opportunity_ref,
+            title: o.title,
+            kind: "Opportunity",
+          });
+      }
+
+      if (scopes.deals) {
+        const { data } = await supabase
+          .from("deals")
+          .select("id, deal_ref, title")
+          .or(`title.ilike.${like},deal_ref.ilike.${like}`)
+          .limit(5);
+        for (const d of data ?? [])
+          results.push({ to: `/deals/${d.id}`, ref: d.deal_ref, title: d.title, kind: "Deal" });
+      }
+
+      return results;
+    },
+  });
+
+  return (
+    <div ref={boxRef} className="relative">
+      <Input
+        value={term}
+        onChange={(e) => {
+          setTerm(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        placeholder="Search recordsâ€¦"
+        className="h-9 border-sidebar-border bg-sidebar-accent/40 text-sm text-sidebar-foreground placeholder:text-sidebar-foreground/40"
+      />
+      {open && q.length >= 2 ? (
+        <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg">
+          {hits.length === 0 ? (
+            <p className="px-3 py-2 text-xs text-muted-foreground">No matching records</p>
+          ) : (
+            hits.map((h) => (
+              <Link
+                key={`${h.kind}-${h.to}`}
+                to={h.to}
+                onClick={() => {
+                  setOpen(false);
+                  setTerm("");
+                }}
+                className="block px-3 py-2 text-sm hover:bg-muted"
+              >
+                <span className="text-xs text-muted-foreground">{h.kind} Â· {h.ref}</span>
+                <br />
+                {h.title}
+              </Link>
+            ))
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+
+========== FILE: \src\routes\_authenticated\intelligence.tsx ==========
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+import {
+  Activity,
+  AlertTriangle,
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  BriefcaseBusiness,
+  Building2,
+  CalendarDays,
+  CheckCircle2,
+  CircleDollarSign,
+  ClipboardList,
+  Download,
+  FileText,
+  RefreshCw,
+  ShieldCheck,
+  Users,
+  Wallet,
+} from "lucide-react";
+
+export const Route = createFileRoute("/_authenticated/intelligence")({
+  component: IntelligenceDashboard,
+});
+
+type Report = {
+  id: string;
+  report_date: string;
+  generated_at: string;
+  report_type: string;
+  status: string;
+  summary: Record<string, any> | null;
+  findings: any;
+};
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+const db =
+  supabaseUrl && supabaseKey
+    ? createClient(supabaseUrl, supabaseKey)
+    : null;
+
+function numberValue(value: unknown): number {
+  const result = Number(value ?? 0);
+  return Number.isFinite(result) ? result : 0;
+}
+
+function money(value: unknown, currency = "UGX"): string {
+  return new Intl.NumberFormat("en-UG", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+    notation: "compact",
+  }).format(numberValue(value));
+}
+
+function count(value: unknown): string {
+  return new Intl.NumberFormat("en-UG", {
+    maximumFractionDigits: 0,
+  }).format(numberValue(value));
+}
+
+function titleCase(value: string): string {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function asArray(value: any): any[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function IntelligenceDashboard() {
+  const [reports, setReports] = useState<Report[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const loadReports = useCallback(async (manual = false) => {
+    if (!db) {
+      setError(
+        "Supabase environment variables are missing. Configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your local environment and Vercel."
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (manual) setRefreshing(true);
+    else setLoading(true);
+
+    setError("");
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await db.auth.getSession();
+
+      if (sessionError) throw sessionError;
+
+      if (!sessionData.session) {
+        setError(
+          "Your session is not available. Sign in to Kalexi Brokerage and reopen Intelligence."
+        );
+        setReports([]);
+        return;
+      }
+
+      const { data, error: rpcError } = await db.rpc(
+        "get_intelligence_reports",
+        { p_limit: 50 }
+      );
+
+      if (rpcError) throw rpcError;
+
+      setReports((data ?? []) as Report[]);
+      setLastUpdated(new Date());
+    } catch (e: any) {
+      setError(
+        e?.message ||
+          "Could not load intelligence reports. Check the database connection and report permissions."
+      );
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadReports();
+  }, [loadReports]);
+
+  const latestReport = reports[0] ?? null;
+  const summary = latestReport?.summary ?? {};
+
+  const pipeline = asArray(summary.deal_pipeline);
+  const demand = asArray(summary.demand);
+  const findings = asArray(latestReport?.findings);
+
+  const totalPipelineValue = pipeline.reduce(
+    (sum, item) => sum + numberValue(item.total_deal_value),
+    0
+  );
+
+  const totalOpenRequirements = demand.reduce(
+    (sum, item) =>
+      sum + numberValue(item.open_requirements ?? item.requirement_count),
+    0
+  );
+
+  const totalDemandBudget = demand.reduce(
+    (sum, item) =>
+      sum + numberValue(
+        item.maximum_budget_total ?? item.total_maximum_budget
+      ),
+    0
+  );
+
+  const criticalFindings = findings.filter(
+    (item) =>
+      String(item.severity ?? "").toLowerCase() === "high" ||
+      String(item.severity ?? "").toLowerCase() === "critical"
+  ).length;
+
+  const metrics = [
+    {
+      label: "Total clients",
+      value: count(summary.clients_total),
+      icon: Users,
+      note: "Recorded client accounts",
+    },
+    {
+      label: "Active deals",
+      value: count(summary.active_deals),
+      icon: BriefcaseBusiness,
+      note: "Deals currently in progress",
+    },
+    {
+      label: "Open requirements",
+      value: count(summary.open_requirements ?? totalOpenRequirements),
+      icon: ClipboardList,
+      note: "Unfulfilled client demand",
+    },
+    {
+      label: "Pipeline value",
+      value: money(totalPipelineValue),
+      icon: CircleDollarSign,
+      note: "Value recorded in deal pipeline",
+    },
+    {
+      label: "KYC pending",
+      value: count(summary.clients_pending_kyc),
+      icon: ShieldCheck,
+      note: "Clients needing compliance review",
+    },
+    {
+      label: "High-risk findings",
+      value: count(criticalFindings),
+      icon: AlertTriangle,
+      note: "High or critical report findings",
+    },
+  ];
+
+  const maxPipeline = Math.max(
+    1,
+    ...pipeline.map((item) => numberValue(item.total_deal_value))
+  );
+
+  const reportRows = useMemo(() => reports, [reports]);
+
+  function exportReport() {
+    const payload = {
+      exported_at: new Date().toISOString(),
+      latest_report: latestReport,
+      report_history: reports,
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `kalexi-intelligence-${new Date()
+      .toISOString()
+      .slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <main className="min-h-screen space-y-6 bg-slate-50 p-4 text-slate-900 sm:p-6 lg:p-8">
+      <header className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+          <div data-kalexi-intelligence-back className="flex justify-start">
+            <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+              Back to Dashboard
+            </Link>
+          </div>
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-700">
+            <Activity size={17} />
+            KALEXI BROKERAGE OPERATING SYSTEM
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Intelligence & Analytics
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-slate-600">
+            Business performance, deal pipeline, market demand, compliance
+            risks and intelligence reporting in one place.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void loadReports(true)}
+            disabled={loading || refreshing}
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:bg-slate-100 disabled:opacity-50"
+          >
+            <RefreshCw
+              size={16}
+              className={refreshing ? "animate-spin" : ""}
+            />
+            Refresh
+          </button>
+          <button
+            type="button"
+            onClick={exportReport}
+            disabled={!reports.length}
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
+          >
+            <Download size={16} />
+            Export JSON
+          </button>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-100"
+          >
+            <FileText size={16} />
+            Print report
+          </button>
+        </div>
+      </header>
+
+      {error && (
+        <section
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 shrink-0" size={19} />
+            <div>
+              <p className="font-semibold">Intelligence data unavailable</p>
+              <p className="mt-1 break-words">{error}</p>
+              <p className="mt-2">
+                Check the Supabase connection, sign-in session, and the
+                get_intelligence_reports database function.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="flex flex-col justify-between gap-2 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-3">
+          <div className="rounded-xl bg-blue-50 p-3 text-blue-700">
+            <BarChart3 size={22} />
+          </div>
+          <div>
+            <p className="font-semibold">Business intelligence overview</p>
+            <p className="text-sm text-slate-500">
+              {latestReport
+                ? `Latest report: ${latestReport.report_type.replace(/_/g, " ")}`
+                : "Waiting for the first intelligence report"}
+            </p>
+          </div>
+        </div>
+        <div className="text-sm text-slate-500">
+          <span className="inline-flex items-center gap-2">
+            <span
+              className={`h-2 w-2 rounded-full ${
+                latestReport ? "bg-emerald-500" : "bg-amber-500"
+              }`}
+            />
+            {latestReport ? "Report loaded" : "No report loaded"}
+          </span>
+          <p className="mt-1">
+            Updated{" "}
+            {lastUpdated
+              ? lastUpdated.toLocaleString()
+              : "not yet"}
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold">Key business metrics</h2>
+          <span className="text-xs text-slate-500">
+            Source: latest saved report
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-32 animate-pulse rounded-2xl bg-slate-200"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {metrics.map((metric) => {
+              const Icon = metric.icon;
+              return (
+                <article
+                  key={metric.label}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-slate-500">
+                        {metric.label}
+                      </p>
+                      <p className="mt-3 break-words text-2xl font-bold tracking-tight">
+                        {metric.value}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-blue-50 p-3 text-blue-700">
+                      <Icon size={21} />
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-slate-500">
+                    {metric.note}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-2">
+        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="rounded-xl bg-indigo-50 p-3 text-indigo-700">
+              <Building2 size={21} />
+            </div>
+            <div>
+              <h2 className="font-bold">Deal pipeline</h2>
+              <p className="text-sm text-slate-500">
+                Recorded deal value by category
+              </p>
+            </div>
+          </div>
+
+          {pipeline.length ? (
+            <div className="space-y-5">
+              {pipeline.map((item, index) => {
+                const value = numberValue(item.total_deal_value);
+                const percent = Math.max(
+                  3,
+                  Math.min(100, (value / maxPipeline) * 100)
+                );
+                return (
+                  <div key={`${item.category ?? "deal"}-${index}`}>
+                    <div className="mb-2 flex items-start justify-between gap-3 text-sm">
+                      <div>
+                        <p className="font-semibold">
+                          {item.category ?? "Uncategorised"}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {count(item.deal_count)} deals
+                          {item.status ? ` · ${item.status}` : ""}
+                        </p>
+                      </div>
+                      <p className="shrink-0 font-semibold">
+                        {money(value, item.currency || "UGX")}
+                      </p>
+                    </div>
+                    <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-blue-600 transition-all"
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="border-t border-slate-100 pt-4">
+                <p className="text-sm text-slate-500">
+                  Total recorded pipeline
+                </p>
+                <p className="mt-1 text-xl font-bold">
+                  {money(totalPipelineValue)}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <EmptyState text="No deal pipeline breakdown was found in the latest report." />
+          )}
+        </article>
+
+        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="rounded-xl bg-emerald-50 p-3 text-emerald-700">
+              <ClipboardList size={21} />
+            </div>
+            <div>
+              <h2 className="font-bold">Client demand</h2>
+              <p className="text-sm text-slate-500">
+                Open requirements and recorded budget ceilings
+              </p>
+            </div>
+          </div>
+
+          {demand.length ? (
+            <div className="space-y-4">
+              {demand.map((item, index) => (
+                <div
+                  key={`${item.category ?? "demand"}-${item.location ?? ""}-${index}`}
+                  className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">
+                        {item.category ?? "Uncategorised demand"}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {item.location || "Location not specified"}
+                      </p>
+                    </div>
+                    <span className="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-slate-700">
+                      {count(item.open_requirements ?? item.requirement_count)}{" "}
+                      open
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-600">
+                    Maximum recorded budget
+                  </p>
+                  <p className="font-bold">
+                    {money(
+                      item.maximum_budget_total ??
+                        item.total_maximum_budget
+                    )}
+                  </p>
+                </div>
+              ))}
+              <p className="text-sm text-slate-500">
+                Combined recorded budget ceilings:{" "}
+                <span className="font-semibold text-slate-900">
+                  {money(totalDemandBudget)}
+                </span>
+              </p>
+            </div>
+          ) : (
+            <EmptyState text="No demand breakdown was found in the latest report." />
+          )}
+        </article>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-3">
+        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="rounded-xl bg-amber-50 p-3 text-amber-700">
+              <AlertTriangle size={21} />
+            </div>
+            <div>
+              <h2 className="font-bold">Risk and data quality</h2>
+              <p className="text-sm text-slate-500">
+                Findings recorded in the latest intelligence report
+              </p>
+            </div>
+          </div>
+
+          {findings.length ? (
+            <div className="space-y-3">
+              {findings.map((finding, index) => {
+                const severity = String(
+                  finding.severity ?? "info"
+                ).toLowerCase();
+                const high =
+                  severity === "high" || severity === "critical";
+                const medium = severity === "medium";
+                return (
+                  <div
+                    key={`${finding.issue ?? finding.title ?? "finding"}-${index}`}
+                    className="flex items-start gap-3 rounded-xl border border-slate-100 p-4"
+                  >
+                    <div
+                      className={`mt-0.5 rounded-lg p-2 ${
+                        high
+                          ? "bg-red-50 text-red-700"
+                          : medium
+                            ? "bg-amber-50 text-amber-700"
+                            : "bg-blue-50 text-blue-700"
+                      }`}
+                    >
+                      {high ? (
+                        <AlertTriangle size={18} />
+                      ) : (
+                        <ShieldCheck size={18} />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold">
+                          {titleCase(
+                            String(
+                              finding.issue ??
+                                finding.title ??
+                                finding.type ??
+                                "Report finding"
+                            )
+                          )}
+                        </p>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                            high
+                              ? "bg-red-50 text-red-700"
+                              : medium
+                                ? "bg-amber-50 text-amber-700"
+                                : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {titleCase(severity)}
+                        </span>
+                      </div>
+                      {finding.description && (
+                        <p className="mt-1 text-sm text-slate-600">
+                          {finding.description}
+                        </p>
+                      )}
+                      <p className="mt-1 text-xs text-slate-500">
+                        Affected records:{" "}
+                        {count(finding.affected_records)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyState text="No findings are recorded in the latest report, or the report has no findings field." />
+          )}
+        </article>
+
+        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="rounded-xl bg-violet-50 p-3 text-violet-700">
+              <Activity size={21} />
+            </div>
+            <div>
+              <h2 className="font-bold">Forecasting status</h2>
+              <p className="text-sm text-slate-500">Model readiness</p>
+            </div>
+          </div>
+
+          {summary.forecasting_enabled === true ? (
+            <div className="rounded-xl bg-emerald-50 p-4 text-emerald-800">
+              <CheckCircle2 size={22} />
+              <p className="mt-2 font-semibold">Forecasting enabled</p>
+              <p className="mt-1 text-sm">
+                Forecast results should be validated against actual outcomes.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-xl bg-amber-50 p-4 text-amber-900">
+              <CalendarDays size={22} />
+              <p className="mt-2 font-semibold">
+                Historical data still required
+              </p>
+              <p className="mt-1 text-sm">
+                The baseline collector records metrics, but forecasts are not
+                enabled. Build a reliable history before treating predictions
+                as business facts.
+              </p>
+            </div>
+          )}
+
+          <div className="mt-5 space-y-3 text-sm">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-slate-500">Saved reports</span>
+              <span className="font-semibold">{count(reports.length)}</span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-slate-500">Latest report date</span>
+              <span className="font-semibold">
+                {latestReport?.report_date ?? "Not available"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-slate-500">Report status</span>
+              <span className="font-semibold">
+                {latestReport?.status ?? "No report"}
+              </span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col justify-between gap-2 border-b border-slate-100 p-5 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="font-bold">Intelligence report history</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Latest saved reports returned by the secure database function
+            </p>
+          </div>
+          <span className="text-sm text-slate-500">
+            {count(reports.length)} reports
+          </span>
+        </div>
+
+        {reportRows.length ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[650px] text-left text-sm">
+              <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-5 py-3 font-semibold">Report</th>
+                  <th className="px-5 py-3 font-semibold">Report date</th>
+                  <th className="px-5 py-3 font-semibold">Generated</th>
+                  <th className="px-5 py-3 font-semibold">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reportRows.map((report) => (
+                  <tr key={report.id} className="border-t border-slate-100">
+                    <td className="px-5 py-4 font-medium">
+                      {titleCase(report.report_type || "Report")}
+                    </td>
+                    <td className="px-5 py-4 text-slate-600">
+                      {report.report_date || "Not recorded"}
+                    </td>
+                    <td className="px-5 py-4 text-slate-600">
+                      {report.generated_at
+                        ? new Date(report.generated_at).toLocaleString()
+                        : "Not recorded"}
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                        {report.status || "Unknown"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="p-6">
+            <EmptyState text="No saved intelligence reports are available for this account yet." />
+          </div>
+        )}
+      </section>
+
+      <footer className="flex flex-col gap-2 border-t border-slate-200 pt-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <span>Kalexi Brokerage · Internal business intelligence</span>
+        <span>
+          Metrics reflect saved reports and may not be real-time transaction
+          totals.
+        </span>
+      </footer>
+    </main>
+  );
+}
+
+function EmptyState({ text }: { text: string }) {
+  return (
+    <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center">
+      <BarChart3 className="mx-auto text-slate-400" size={25} />
+      <p className="mt-2 text-sm text-slate-500">{text}</p>
+    </div>
+  );
+}
+
+
+
+========== FILE: \src\routes\_authenticated\research.$caseId.index.tsx ==========
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { MediaGallery } from "@/components/MediaGallery";
+import { useSession, logAudit } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { NoAccess, Panel, Field, StatusPill } from "@/components/records";
+import { formatDateTime, titleCase } from "@/lib/records";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+export const Route = createFileRoute("/_authenticated/research/$caseId/")({
+  head: () => ({
+    meta: [
+      { title: "Research Case â€” Kalexi Brokerage" },
+      { name: "description", content: "Background research case file with sources and findings." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: ResearchDetail,
+});
+
+interface Source {
+  title: string;
+  url: string;
+  note: string;
+}
+
+const STATUSES = ["open", "in_progress", "completed", "closed"];
+
+function ResearchDetail() {
+  const { caseId } = useParams({ from: "/_authenticated/research/$caseId/" });
+  const { data: session } = useSession();
+  const access = session?.access;
+  const qc = useQueryClient();
+  const [findings, setFindings] = useState("");
+  const [notes, setNotes] = useState("");
+  const [src, setSrc] = useState<Source>({ title: "", url: "", note: "" });
+
+  const record = useQuery({
+    queryKey: ["research-case", caseId],
+    enabled: allows(access, "research.view"),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("research_cases")
+        .select("*")
+        .eq("id", caseId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (record.data) {
+      setFindings(record.data.findings ?? "");
+      setNotes(record.data.notes ?? "");
+    }
+  }, [record.data]);
+
+  const canEdit = allows(access, "research.edit");
+  const sources = (record.data?.sources ?? []) as unknown as Source[];
+
+  const save = useMutation({
+    mutationFn: async (patch: Record<string, unknown>) => {
+      const { error } = await supabase
+        .from("research_cases")
+        .update(patch as never)
+        .eq("id", caseId);
+      if (error) throw error;
+      if (session) {
+        await logAudit({
+          actorId: session.userId,
+          actorEmail: session.email,
+          action: "research_case.updated",
+          entityType: "research_cases",
+          entityId: caseId,
+          newValue: patch,
+        });
+      }
+    },
+    onSuccess: () => {
+      toast.success("Research case updated.");
+      qc.invalidateQueries({ queryKey: ["research-case", caseId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (!allows(access, "research.view")) {
+    return (
+      <AppShell>
+        <PageHeader title="Research case" />
+        <NoAccess module="Research" />
+      </AppShell>
+    );
+  }
+
+  if (record.isLoading) {
+    return (
+      <AppShell>
+        <p className="text-sm text-muted-foreground">Loading research caseâ€¦</p>
+      </AppShell>
+    );
+  }
+
+  const r = record.data;
+  if (!r) {
+    return (
+      <AppShell>
+        <PageHeader title="Case not found" description="This research case is not available." />
+        <Button asChild variant="outline">
+          <Link to="/research">Back to research</Link>
+        </Button>
+      </AppShell>
+    );
+  }
+
+  return (
+    <AppShell>
+      <PageHeader
+        title={r.subject}
+        description={`${r.case_ref} Â· ${titleCase(r.status)}`}
+        actions={
+          <Button asChild variant="outline">
+            <Link to="/research">Back to research</Link>
+          </Button>
+        }
+      />
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
+        <div className="space-y-6">
+          <Panel title="Case detail">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Reference">
+                <span className="ref-mono">{r.case_ref}</span>
+              </Field>
+              <Field label="Status">
+                <StatusPill value={r.status} />
+              </Field>
+              <Field label="Related party">{r.related_party ?? "â€”"}</Field>
+              <Field label="Opened">{formatDateTime(r.created_at)}</Field>
+              <Field label="Keywords">{(r.keywords ?? []).join(", ") || "â€”"}</Field>
+              <Field label="Research question">{r.research_question ?? "â€”"}</Field>
+            </div>
+          </Panel>
+
+          <Panel title="Findings">
+            <Textarea
+              rows={6}
+              value={findings}
+              disabled={!canEdit}
+              onChange={(e) => setFindings(e.target.value)}
+            />
+            <Textarea
+              rows={4}
+              className="mt-3"
+              placeholder="Internal notes"
+              value={notes}
+              disabled={!canEdit}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+            {canEdit ? (
+              <Button className="mt-3" size="sm" onClick={() => save.mutate({ findings, notes })}>
+                Save findings
+              </Button>
+            ) : null}
+          </Panel>
+
+          <Panel title="Sources">
+            <ul className="space-y-2 text-sm">
+              {sources.length === 0 ? (
+                <li className="text-muted-foreground">No sources recorded.</li>
+              ) : (
+                sources.map((s, i) => (
+                  <li key={`${s.url}-${i}`} className="rounded-md border p-3">
+                    <p className="font-medium">{s.title || s.url}</p>
+                    {s.url ? (
+                      <a
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary underline"
+                      >
+                        {s.url}
+                      </a>
+                    ) : null}
+                    {s.note ? (
+                      <p className="mt-1 text-xs text-muted-foreground">{s.note}</p>
+                    ) : null}
+                    {canEdit ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="mt-1 h-6 px-1 text-[11px] text-destructive"
+                        onClick={() =>
+                          save.mutate({ sources: sources.filter((_, idx) => idx !== i) })
+                        }
+                      >
+                        Remove
+                      </Button>
+                    ) : null}
+                  </li>
+                ))
+              )}
+            </ul>
+            {canEdit ? (
+              <div className="mt-3 grid gap-2 rounded-md border bg-muted/30 p-3 sm:grid-cols-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Title</Label>
+                  <Input
+                    value={src.title}
+                    onChange={(e) => setSrc({ ...src, title: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">URL</Label>
+                  <Input value={src.url} onChange={(e) => setSrc({ ...src, url: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Note</Label>
+                  <Input
+                    value={src.note}
+                    onChange={(e) => setSrc({ ...src, note: e.target.value })}
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  className="sm:col-span-3"
+                  disabled={!src.title.trim() && !src.url.trim()}
+                  onClick={() => {
+                    save.mutate({ sources: [...sources, src] });
+                    setSrc({ title: "", url: "", note: "" });
+                  }}
+                >
+                  Add source
+                </Button>
+              </div>
+            ) : null}
+          </Panel>
+
+          <MediaGallery parentType="research_cases" parentId={caseId} title="Case media" />
+        </div>
+
+        <div className="space-y-4">
+          <Panel title="Case status">
+            <Select
+              value={r.status}
+              disabled={!canEdit}
+              onValueChange={(v) => save.mutate({ status: v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {titleCase(s)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Panel>
+        </div>
+      </div>
+    </AppShell>
+  );
+}
+
+
+========== FILE: \src\routes\_authenticated\research.index.tsx ==========
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { useSession, logAudit } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { EmptyState, NoAccess, StatusPill } from "@/components/records";
+import { titleCase } from "@/lib/records";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+export const Route = createFileRoute("/_authenticated/research/")({
+  head: () => ({
+    meta: [
+      { title: "Research â€” Kalexi Brokerage" },
+      { name: "description", content: "Research case register for market and subject intelligence." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: ResearchPage,
+});
+
+const STATUSES = ["open", "in_progress", "completed", "archived"];
+
+function ResearchPage() {
+  const { data: session } = useSession();
+  const access = session?.access;
+  const qc = useQueryClient();
+  const [term, setTerm] = useState("");
+  const [status, setStatus] = useState("all");
+  const [open, setOpen] = useState(false);
+
+  const cases = useQuery({
+    queryKey: ["research-cases", term, status],
+    enabled: allows(access, "research.view"),
+    queryFn: async () => {
+      let query = supabase
+        .from("research_cases")
+        .select("*")
+        .is("archived_at", null)
+        .order("created_at", { ascending: false })
+        .limit(300);
+      if (status !== "all") query = query.eq("status", status);
+      const q = term.trim();
+      if (q) query = query.or(`case_ref.ilike.%${q}%,subject.ilike.%${q}%`);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  if (!allows(access, "research.view")) {
+    return (
+      <AppShell>
+        <PageHeader title="Research" />
+        <NoAccess module="Research" />
+      </AppShell>
+    );
+  }
+
+  const rows = cases.data ?? [];
+
+  return (
+    <AppShell>
+      <PageHeader
+        title="Research"
+        description="Market, ownership and subject research case files."
+        actions={
+          allows(access, "research.create") ? (
+            <Button onClick={() => setOpen(true)}>New research case</Button>
+          ) : null
+        }
+      />
+
+      <div className="mb-4 flex flex-wrap gap-3">
+        <Input
+          className="max-w-xs"
+          placeholder="Search reference or subject"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="w-44"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            {STATUSES.map((s) => (<SelectItem key={s} value={s}>{titleCase(s)}</SelectItem>))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Card className="overflow-x-auto shadow-[var(--shadow-panel)]">
+        {cases.isLoading ? (
+          <p className="px-6 py-12 text-center text-sm text-muted-foreground">Loadingâ€¦</p>
+        ) : rows.length === 0 ? (
+          <EmptyState title="No research cases" hint="Open a new research case to begin." />
+        ) : (
+          <table className="w-full min-w-[760px] text-sm">
+            <thead className="bg-muted/60 text-left">
+              <tr>
+                <th className="px-4 py-2.5 font-medium">Ref</th>
+                <th className="px-4 py-2.5 font-medium">Subject</th>
+                <th className="px-4 py-2.5 font-medium">Related party</th>
+                <th className="px-4 py-2.5 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id} className="border-t hover:bg-muted/40">
+                  <td className="px-4 py-2.5">
+                    <Link
+                      to="/research/$caseId"
+                      params={{ caseId: r.id }}
+                      className="ref-mono text-xs font-medium underline-offset-2 hover:underline"
+                    >
+                      {r.case_ref}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-2.5">{r.subject}</td>
+                  <td className="px-4 py-2.5">{r.related_party ?? "â€”"}</td>
+                  <td className="px-4 py-2.5"><StatusPill value={r.status} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Card>
+
+      <NewCaseDialog
+        open={open}
+        onOpenChange={setOpen}
+        onDone={() => {
+          setOpen(false);
+          qc.invalidateQueries({ queryKey: ["research-cases"] });
+        }}
+      />
+    </AppShell>
+  );
+}
+
+function NewCaseDialog({
+  open,
+  onOpenChange,
+  onDone,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onDone: () => void;
+}) {
+  const { data: session } = useSession();
+  const [subject, setSubject] = useState("");
+  const [question, setQuestion] = useState("");
+  const [relatedParty, setRelatedParty] = useState("");
+  const [keywords, setKeywords] = useState("");
+
+  const create = useMutation({
+    mutationFn: async () => {
+      if (!subject.trim()) throw new Error("Subject is required.");
+      const kw = keywords
+        .split(",")
+        .map((k) => k.trim())
+        .filter(Boolean);
+      const { data, error } = await supabase
+        .from("research_cases")
+        .insert({
+          subject: subject.trim(),
+          research_question: question.trim() || null,
+          related_party: relatedParty.trim() || null,
+          keywords: kw,
+          status: "open",
+          created_by: session?.userId ?? null,
+        })
+        .select("id, case_ref")
+        .single();
+      if (error) throw error;
+      if (session) {
+        await logAudit({
+          actorId: session.userId,
+          actorEmail: session.email,
+          action: "research_case.created",
+          entityType: "research_cases",
+          entityId: data.id,
+          newValue: { case_ref: data.case_ref },
+        });
+      }
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Research case opened.");
+      setSubject("");
+      setQuestion("");
+      setRelatedParty("");
+      setKeywords("");
+      onDone();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>New research case</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Subject</Label>
+            <Input value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={160} />
+          </div>
+          <div className="space-y-2">
+            <Label>Research question</Label>
+            <Textarea rows={3} value={question} onChange={(e) => setQuestion(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Related party</Label>
+            <Input value={relatedParty} onChange={(e) => setRelatedParty(e.target.value)} maxLength={160} />
+          </div>
+          <div className="space-y-2">
+            <Label>Keywords (comma-separated)</Label>
+            <Input value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="e.g. land, title, ownership" />
+          </div>
+          <Button className="w-full" disabled={create.isPending} onClick={() => create.mutate()}>
+            {create.isPending ? "Openingâ€¦" : "Open case"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+========== FILE: \src\routes\_authenticated\risk.$caseId.index.tsx ==========
+import { createFileRoute, useParams } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { useSession, logAudit } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { EmptyState, Field, NoAccess, Panel, StatusPill } from "@/components/records";
+import { archiveRecord, formatDateTime, titleCase } from "@/lib/records";
+import { MediaGallery } from "@/components/MediaGallery";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+export const Route = createFileRoute("/_authenticated/risk/$caseId/")({
+  head: () => ({
+    meta: [
+      { title: "Risk Case File â€” Kalexi Brokerage" },
+      { name: "description", content: "Full risk or investigation case file." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: RiskDetailPage,
+});
+
+const SEVERITIES = ["low", "medium", "high", "critical"];
+const STATUSES = ["open", "in_progress", "closed", "escalated"];
+
+function RiskDetailPage() {
+  const { caseId } = useParams({ from: "/_authenticated/risk/$caseId/" });
+  const { data: session } = useSession();
+  const access = session?.access;
+  const qc = useQueryClient();
+  const [finding, setFinding] = useState<string | null>(null);
+  const [resolution, setResolution] = useState<string | null>(null);
+
+  const record = useQuery({
+    queryKey: ["risk-case", caseId],
+    enabled: allows(access, "risk.view"),
+    queryFn: async () => {
+      const { data, error } = await supabase.from("risk_cases").select("*").eq("id", caseId).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const update = useMutation({
+    mutationFn: async (patch: Record<string, unknown>) => {
+      const { error } = await supabase.from("risk_cases").update(patch as never).eq("id", caseId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Case updated.");
+      qc.invalidateQueries({ queryKey: ["risk-case", caseId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const closeCase = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("risk_cases")
+        .update({ status: "closed", closed_at: new Date().toISOString() })
+        .eq("id", caseId);
+      if (error) throw error;
+      if (session) {
+        await logAudit({
+          actorId: session.userId,
+          actorEmail: session.email,
+          action: "risk_case.closed",
+          entityType: "risk_cases",
+          entityId: caseId,
+        });
+      }
+    },
+    onSuccess: () => {
+      toast.success("Case closed.");
+      qc.invalidateQueries({ queryKey: ["risk-case", caseId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (!allows(access, "risk.view")) {
+    return (
+      <AppShell>
+        <PageHeader title="Risk case file" />
+        <NoAccess module="Risk & Investigation" />
+      </AppShell>
+    );
+  }
+
+  if (record.isLoading) {
+    return (
+      <AppShell>
+        <PageHeader title="Risk case file" />
+        <p className="text-sm text-muted-foreground">Loading caseâ€¦</p>
+      </AppShell>
+    );
+  }
+
+  const r = record.data;
+  if (!r) {
+    return (
+      <AppShell>
+        <PageHeader title="Risk case file" />
+        <EmptyState title="Case not found" hint="It may have been archived." />
+      </AppShell>
+    );
+  }
+
+  const canEdit = allows(access, "risk.edit");
+
+  return (
+    <AppShell>
+      <PageHeader
+        title={r.subject_name}
+        description={`${r.case_ref ?? "â€”"} Â· ${titleCase(r.case_kind)}`}
+        actions={
+          <div className="flex gap-2">
+            {allows(access, "risk.close") && r.status !== "closed" ? (
+              <Button variant="outline" disabled={closeCase.isPending} onClick={() => closeCase.mutate()}>
+                Close case
+              </Button>
+            ) : null}
+            {allows(access, "risk.archive") && !r.archived_at ? (
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  const reason = window.prompt("Reason for archiving this case?");
+                  if (!reason || !session) return;
+                  try {
+                    await archiveRecord({
+                      table: "risk_cases",
+                      id: caseId,
+                      entityRef: r.case_ref,
+                      title: r.subject_name,
+                      previousStatus: r.status,
+                      reason,
+                      actorId: session.userId,
+                      actorEmail: session.email,
+                    });
+                    toast.success("Case archived.");
+                    qc.invalidateQueries({ queryKey: ["risk-case", caseId] });
+                  } catch (e) {
+                    toast.error((e as Error).message);
+                  }
+                }}
+              >
+                Archive
+              </Button>
+            ) : null}
+          </div>
+        }
+      />
+
+      <div className="grid gap-5 lg:grid-cols-3">
+        <div className="space-y-5 lg:col-span-2">
+          <Panel title="Description">
+            <p className="whitespace-pre-wrap text-sm text-muted-foreground">{r.description}</p>
+            {r.allegation ? (
+              <>
+                <p className="mt-3 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Allegation</p>
+                <p className="text-sm text-muted-foreground">{r.allegation}</p>
+              </>
+            ) : null}
+          </Panel>
+
+          <Panel title="Verified finding">
+            <Textarea
+              rows={4}
+              disabled={!canEdit}
+              value={finding ?? r.verified_finding ?? ""}
+              onChange={(e) => setFinding(e.target.value)}
+              placeholder="Record the verified findingâ€¦"
+            />
+            {canEdit ? (
+              <Button className="mt-3" size="sm" onClick={() => update.mutate({ verified_finding: finding })}>
+                Save finding
+              </Button>
+            ) : null}
+          </Panel>
+
+          <Panel title="Resolution">
+            <Textarea
+              rows={4}
+              disabled={!canEdit}
+              value={resolution ?? r.resolution ?? ""}
+              onChange={(e) => setResolution(e.target.value)}
+              placeholder="Record the resolutionâ€¦"
+            />
+            {canEdit ? (
+              <Button className="mt-3" size="sm" onClick={() => update.mutate({ resolution })}>
+                Save resolution
+              </Button>
+            ) : null}
+          </Panel>
+
+          <MediaGallery parentType="risk_cases" parentId={caseId} />
+        </div>
+
+        <div className="space-y-5">
+          <Panel
+            title="Case summary"
+            actions={
+              canEdit ? (
+                <Select value={r.severity} onValueChange={(v) => update.mutate({ severity: v })}>
+                  <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {SEVERITIES.map((s) => (<SelectItem key={s} value={s}>{titleCase(s)}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              ) : null
+            }
+          >
+            <div className="space-y-3">
+              <Field label="Reference"><span className="ref-mono">{r.case_ref ?? "â€”"}</span></Field>
+              <Field label="Kind">{titleCase(r.case_kind)}</Field>
+              <Field label="Severity"><StatusPill value={r.severity} /></Field>
+              <Field label="Status">
+                {canEdit ? (
+                  <Select value={r.status} onValueChange={(v) => update.mutate({ status: v })}>
+                    <SelectTrigger className="h-8 w-36 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STATUSES.map((s) => (<SelectItem key={s} value={s}>{titleCase(s)}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <StatusPill value={r.status} />
+                )}
+              </Field>
+              <Field label="Company">{r.subject_company ?? "â€”"}</Field>
+              <Field label="Phone">{r.subject_phone ?? "â€”"}</Field>
+              <Field label="Email">{r.subject_email ?? "â€”"}</Field>
+              <Field label="Identifier">{r.subject_identifier ?? "â€”"}</Field>
+              <Field label="Source">{r.source ?? "â€”"}</Field>
+              <Field label="Closed">{formatDateTime(r.closed_at)}</Field>
+              <Field label="Opened">{formatDateTime(r.created_at)}</Field>
+            </div>
+          </Panel>
+        </div>
+      </div>
+    </AppShell>
+  );
+}
+
+
+========== FILE: \src\routes\_authenticated\risk.index.tsx ==========
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { useSession, logAudit } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { EmptyState, NoAccess, StatusPill } from "@/components/records";
+import { titleCase } from "@/lib/records";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+export const Route = createFileRoute("/_authenticated/risk/")({
+  head: () => ({
+    meta: [
+      { title: "Risk & Investigations â€” Kalexi Brokerage" },
+      { name: "description", content: "Risk flags and investigation case register." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: RiskPage,
+});
+
+const KINDS = ["risk", "investigation"];
+const SEVERITIES = ["low", "medium", "high", "critical"];
+const STATUSES = ["open", "in_progress", "closed", "escalated"];
+
+function RiskPage() {
+  const { data: session } = useSession();
+  const access = session?.access;
+  const qc = useQueryClient();
+  const [term, setTerm] = useState("");
+  const [kind, setKind] = useState("all");
+  const [severity, setSeverity] = useState("all");
+  const [status, setStatus] = useState("all");
+  const [open, setOpen] = useState(false);
+
+  const cases = useQuery({
+    queryKey: ["risk-cases", term, kind, severity, status],
+    enabled: allows(access, "risk.view"),
+    queryFn: async () => {
+      let query = supabase
+        .from("risk_cases")
+        .select("*")
+        .is("archived_at", null)
+        .order("created_at", { ascending: false })
+        .limit(300);
+      if (kind !== "all") query = query.eq("case_kind", kind);
+      if (severity !== "all") query = query.eq("severity", severity);
+      if (status !== "all") query = query.eq("status", status);
+      const q = term.trim();
+      if (q) query = query.or(`case_ref.ilike.%${q}%,subject_name.ilike.%${q}%,subject_company.ilike.%${q}%`);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  if (!allows(access, "risk.view")) {
+    return (
+      <AppShell>
+        <PageHeader title="Risk & Investigations" />
+        <NoAccess module="Risk & Investigation" />
+      </AppShell>
+    );
+  }
+
+  const rows = cases.data ?? [];
+
+  return (
+    <AppShell>
+      <PageHeader
+        title="Risk & Investigations"
+        description="Risk flags and internal investigations across clients and deals."
+        actions={
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/risk/search">Internal search</Link>
+            </Button>
+            {allows(access, "risk.create") ? (
+              <Button onClick={() => setOpen(true)}>New case</Button>
+            ) : null}
+          </div>
+        }
+      />
+
+      <div className="mb-4 flex flex-wrap gap-3">
+        <Input
+          className="max-w-xs"
+          placeholder="Search reference, name or company"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
+        <Select value={kind} onValueChange={setKind}>
+          <SelectTrigger className="w-40"><SelectValue placeholder="Case kind" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All kinds</SelectItem>
+            {KINDS.map((k) => (<SelectItem key={k} value={k}>{titleCase(k)}</SelectItem>))}
+          </SelectContent>
+        </Select>
+        <Select value={severity} onValueChange={setSeverity}>
+          <SelectTrigger className="w-40"><SelectValue placeholder="Severity" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All severities</SelectItem>
+            {SEVERITIES.map((s) => (<SelectItem key={s} value={s}>{titleCase(s)}</SelectItem>))}
+          </SelectContent>
+        </Select>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="w-40"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            {STATUSES.map((s) => (<SelectItem key={s} value={s}>{titleCase(s)}</SelectItem>))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Card className="overflow-x-auto shadow-[var(--shadow-panel)]">
+        {cases.isLoading ? (
+          <p className="px-6 py-12 text-center text-sm text-muted-foreground">Loadingâ€¦</p>
+        ) : rows.length === 0 ? (
+          <EmptyState title="No risk or investigation cases" hint="Open a new case to begin." />
+        ) : (
+          <table className="w-full min-w-[860px] text-sm">
+            <thead className="bg-muted/60 text-left">
+              <tr>
+                <th className="px-4 py-2.5 font-medium">Ref</th>
+                <th className="px-4 py-2.5 font-medium">Subject</th>
+                <th className="px-4 py-2.5 font-medium">Kind</th>
+                <th className="px-4 py-2.5 font-medium">Severity</th>
+                <th className="px-4 py-2.5 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id} className="border-t hover:bg-muted/40">
+                  <td className="px-4 py-2.5">
+                    <Link
+                      to="/risk/$caseId"
+                      params={{ caseId: r.id }}
+                      className="ref-mono text-xs font-medium underline-offset-2 hover:underline"
+                    >
+                      {r.case_ref ?? "â€”"}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    {r.subject_name}
+                    {r.subject_company ? <span className="text-muted-foreground"> Â· {r.subject_company}</span> : null}
+                  </td>
+                  <td className="px-4 py-2.5">{titleCase(r.case_kind)}</td>
+                  <td className="px-4 py-2.5"><StatusPill value={r.severity} /></td>
+                  <td className="px-4 py-2.5"><StatusPill value={r.status} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Card>
+
+      <NewCaseDialog
+        open={open}
+        onOpenChange={setOpen}
+        onDone={() => {
+          setOpen(false);
+          qc.invalidateQueries({ queryKey: ["risk-cases"] });
+        }}
+      />
+    </AppShell>
+  );
+}
+
+function NewCaseDialog({
+  open,
+  onOpenChange,
+  onDone,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onDone: () => void;
+}) {
+  const { data: session } = useSession();
+  const [caseKind, setCaseKind] = useState("risk");
+  const [subjectName, setSubjectName] = useState("");
+  const [subjectCompany, setSubjectCompany] = useState("");
+  const [severity, setSeverity] = useState("medium");
+  const [description, setDescription] = useState("");
+
+  const create = useMutation({
+    mutationFn: async () => {
+      if (!subjectName.trim()) throw new Error("Subject name is required.");
+      if (!description.trim()) throw new Error("Description is required.");
+      const { data, error } = await supabase
+        .from("risk_cases")
+        .insert({
+          case_kind: caseKind,
+          subject_name: subjectName.trim(),
+          subject_company: subjectCompany.trim() || null,
+          severity,
+          description: description.trim(),
+          status: "open",
+          created_by: session?.userId ?? null,
+        })
+        .select("id, case_ref")
+        .single();
+      if (error) throw error;
+      if (session) {
+        await logAudit({
+          actorId: session.userId,
+          actorEmail: session.email,
+          action: "risk_case.created",
+          entityType: "risk_cases",
+          entityId: data.id,
+          newValue: { case_ref: data.case_ref },
+        });
+      }
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Case opened.");
+      setSubjectName("");
+      setSubjectCompany("");
+      setDescription("");
+      onDone();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>New risk / investigation case</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Case kind</Label>
+            <Select value={caseKind} onValueChange={setCaseKind}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {KINDS.map((k) => (<SelectItem key={k} value={k}>{titleCase(k)}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Subject name</Label>
+            <Input value={subjectName} onChange={(e) => setSubjectName(e.target.value)} maxLength={160} />
+          </div>
+          <div className="space-y-2">
+            <Label>Subject company</Label>
+            <Input value={subjectCompany} onChange={(e) => setSubjectCompany(e.target.value)} maxLength={160} />
+          </div>
+          <div className="space-y-2">
+            <Label>Severity</Label>
+            <Select value={severity} onValueChange={setSeverity}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {SEVERITIES.map((s) => (<SelectItem key={s} value={s}>{titleCase(s)}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
+          </div>
+          <Button className="w-full" disabled={create.isPending} onClick={() => create.mutate()}>
+            {create.isPending ? "Openingâ€¦" : "Open case"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+========== FILE: \src\routes\_authenticated\risk.search.tsx ==========
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { useSession } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { EmptyState, NoAccess, StatusPill } from "@/components/records";
+import { titleCase } from "@/lib/records";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Panel } from "@/components/records";
+
+export const Route = createFileRoute("/_authenticated/risk/search")({
+  head: () => ({
+    meta: [
+      { title: "Internal Intelligence Search â€” Kalexi Brokerage" },
+      { name: "description", content: "Cross-reference risk cases, clients and opportunities." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: RiskSearchPage,
+});
+
+function RiskSearchPage() {
+  const { data: session } = useSession();
+  const access = session?.access;
+  const [term, setTerm] = useState("");
+  const [query, setQuery] = useState("");
+
+  const results = useQuery({
+    queryKey: ["risk-search", query],
+    enabled: allows(access, "risk.view") && query.trim().length > 1,
+    queryFn: async () => {
+      const q = `%${query.trim()}%`;
+      const [risk, clients, opportunities] = await Promise.all([
+        supabase
+          .from("risk_cases")
+          .select("id, case_ref, case_kind, subject_name, subject_company, subject_phone, subject_email, subject_identifier, severity, status")
+          .is("archived_at", null)
+          .or(
+            `subject_name.ilike.${q},subject_company.ilike.${q},subject_phone.ilike.${q},subject_email.ilike.${q},subject_identifier.ilike.${q}`,
+          )
+          .limit(50),
+        supabase
+          .from("clients")
+          .select("id, client_ref, full_name, phone, email")
+          .is("archived_at", null)
+          .or(`full_name.ilike.${q},phone.ilike.${q},email.ilike.${q},client_ref.ilike.${q}`)
+          .limit(50),
+        supabase
+          .from("opportunities")
+          .select("id, opportunity_ref, title, owner_name, owner_contact")
+          .is("archived_at", null)
+          .or(`owner_name.ilike.${q},owner_contact.ilike.${q},title.ilike.${q}`)
+          .limit(50),
+      ]);
+      return {
+        risk: risk.data ?? [],
+        clients: clients.data ?? [],
+        opportunities: opportunities.data ?? [],
+      };
+    },
+  });
+
+  if (!allows(access, "risk.view")) {
+    return (
+      <AppShell>
+        <PageHeader title="Internal intelligence search" />
+        <NoAccess module="Risk & Investigation" />
+      </AppShell>
+    );
+  }
+
+  const data = results.data;
+  const totalHits = data ? data.risk.length + data.clients.length + data.opportunities.length : 0;
+
+  return (
+    <AppShell>
+      <PageHeader
+        title="Internal intelligence search"
+        description="Search names, phones, emails and identifiers across risk cases, clients and opportunities."
+      />
+
+      <div className="mb-5 flex gap-2">
+        <Input
+          className="max-w-md"
+          placeholder="Name, phone, email or identifier"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && setQuery(term)}
+        />
+        <Button onClick={() => setQuery(term)}>Search</Button>
+      </div>
+
+      {!query.trim() ? (
+        <EmptyState title="Enter a search term" hint="Search across risk cases, clients and opportunities." />
+      ) : results.isLoading ? (
+        <p className="text-sm text-muted-foreground">Searchingâ€¦</p>
+      ) : totalHits === 0 ? (
+        <EmptyState title="No adverse record found" hint="No matches across risk cases, clients or opportunities." />
+      ) : (
+        <div className="space-y-5">
+          <Panel title={`Risk & investigation cases (${data?.risk.length ?? 0})`}>
+            {(data?.risk ?? []).length === 0 ? (
+              <p className="text-sm text-muted-foreground">No matches.</p>
+            ) : (
+              <div className="space-y-2">
+                {(data?.risk ?? []).map((r) => (
+                  <div key={r.id} className="flex items-center justify-between rounded-md border p-3">
+                    <div>
+                      <Link to="/risk/$caseId" params={{ caseId: r.id }} className="text-sm font-medium underline-offset-2 hover:underline">
+                        {r.subject_name}
+                      </Link>
+                      <p className="text-xs text-muted-foreground">
+                        {r.case_ref} Â· {titleCase(r.case_kind)} Â· {r.subject_company ?? "â€”"}
+                      </p>
+                    </div>
+                    <StatusPill value={r.severity} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </Panel>
+
+          <Panel title={`Clients (${data?.clients.length ?? 0})`}>
+            {(data?.clients ?? []).length === 0 ? (
+              <p className="text-sm text-muted-foreground">No matches.</p>
+            ) : (
+              <div className="space-y-2">
+                {(data?.clients ?? []).map((c) => (
+                  <div key={c.id} className="flex items-center justify-between rounded-md border p-3">
+                    <div>
+                      <Link to="/clients/$clientId" params={{ clientId: c.id }} className="text-sm font-medium underline-offset-2 hover:underline">
+                        {c.full_name}
+                      </Link>
+                      <p className="text-xs text-muted-foreground">{c.client_ref} Â· {c.phone ?? "â€”"}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Panel>
+
+          <Panel title={`Opportunities (${data?.opportunities.length ?? 0})`}>
+            {(data?.opportunities ?? []).length === 0 ? (
+              <p className="text-sm text-muted-foreground">No matches.</p>
+            ) : (
+              <div className="space-y-2">
+                {(data?.opportunities ?? []).map((o) => (
+                  <div key={o.id} className="flex items-center justify-between rounded-md border p-3">
+                    <div>
+                      <Link to="/opportunities/$opportunityId" params={{ opportunityId: o.id }} className="text-sm font-medium underline-offset-2 hover:underline">
+                        {o.title}
+                      </Link>
+                      <p className="text-xs text-muted-foreground">{o.opportunity_ref} Â· {o.owner_name ?? "â€”"}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Panel>
+        </div>
+      )}
+    </AppShell>
+  );
+}
+
+
+========== FILE: \supabase\migrations\20260810000000_create_storage_buckets.sql ==========
+-- Ensure these storage buckets exist explicitly, including when already provisioned.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('kalexi-vault', 'kalexi-vault', false),
+       ('kalexi-avatars', 'kalexi-avatars', false)
+ON CONFLICT (id) DO NOTHING;
+
+
+========== FILE: \supabase\migrations\20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql ==========
+-- ROLES
+CREATE TYPE public.app_role AS ENUM (
+  'super_admin','receptionist','onboarding_officer','deals_manager',
+  'verification_officer','risk_officer','finance_officer','management','auditor'
+);
+
+CREATE TYPE public.account_status AS ENUM ('active','disabled','pending');
+
+-- PROFILES
+CREATE TABLE public.profiles (
+  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email text NOT NULL UNIQUE,
+  full_name text NOT NULL DEFAULT '',
+  phone text,
+  department text,
+  job_title text,
+  photo_url text,
+  status public.account_status NOT NULL DEFAULT 'active',
+  must_change_password boolean NOT NULL DEFAULT false,
+  last_login_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT, UPDATE ON public.profiles TO authenticated;
+GRANT ALL ON public.profiles TO service_role;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- USER ROLES
+CREATE TABLE public.user_roles (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role public.app_role NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (user_id, role)
+);
+GRANT SELECT ON public.user_roles TO authenticated;
+GRANT ALL ON public.user_roles TO service_role;
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+
+CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role public.app_role)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = _user_id AND role = _role);
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_active_staff(_user_id uuid)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = _user_id AND status = 'active');
+$$;
+
+-- PROFILE POLICIES
+CREATE POLICY "Staff can view profiles" ON public.profiles FOR SELECT TO authenticated
+  USING (public.is_active_staff(auth.uid()) OR id = auth.uid());
+CREATE POLICY "Super admin can insert profiles" ON public.profiles FOR INSERT TO authenticated
+  WITH CHECK (public.has_role(auth.uid(),'super_admin'));
+CREATE POLICY "Update own profile" ON public.profiles FOR UPDATE TO authenticated
+  USING (id = auth.uid()) WITH CHECK (id = auth.uid());
+CREATE POLICY "Super admin can update profiles" ON public.profiles FOR UPDATE TO authenticated
+  USING (public.has_role(auth.uid(),'super_admin')) WITH CHECK (public.has_role(auth.uid(),'super_admin'));
+
+-- ROLE POLICIES
+CREATE POLICY "Staff can view roles" ON public.user_roles FOR SELECT TO authenticated
+  USING (public.is_active_staff(auth.uid()) OR user_id = auth.uid());
+
+-- CLIENTS
+CREATE SEQUENCE public.client_ref_seq START 1;
+
+CREATE TABLE public.clients (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_ref text NOT NULL UNIQUE DEFAULT ('KBL-CLI-' || lpad(nextval('public.client_ref_seq')::text, 6, '0')),
+  full_name text NOT NULL,
+  phone text NOT NULL,
+  email text,
+  company_name text,
+  client_type text NOT NULL,
+  sector text NOT NULL,
+  requirement text NOT NULL,
+  branch text,
+  status text NOT NULL DEFAULT 'registered',
+  verification_ref text NOT NULL DEFAULT encode(gen_random_bytes(8),'hex'),
+  registered_by uuid REFERENCES auth.users(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT, UPDATE ON public.clients TO authenticated;
+GRANT ALL ON public.clients TO service_role;
+ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Active staff can view clients" ON public.clients FOR SELECT TO authenticated
+  USING (public.is_active_staff(auth.uid()));
+CREATE POLICY "Active staff can register clients" ON public.clients FOR INSERT TO authenticated
+  WITH CHECK (public.is_active_staff(auth.uid()) AND registered_by = auth.uid());
+CREATE POLICY "Authorised staff can update clients" ON public.clients FOR UPDATE TO authenticated
+  USING (
+    public.is_active_staff(auth.uid()) AND NOT (
+      public.has_role(auth.uid(),'receptionist')
+      AND NOT public.has_role(auth.uid(),'super_admin')
+    )
+  )
+  WITH CHECK (public.is_active_staff(auth.uid()));
+
+CREATE INDEX clients_search_idx ON public.clients USING gin (
+  to_tsvector('english', coalesce(full_name,'') || ' ' || coalesce(company_name,'') || ' ' || coalesce(phone,'') || ' ' || coalesce(requirement,''))
+);
+
+-- AUDIT LOG
+CREATE TABLE public.audit_logs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  actor_id uuid REFERENCES auth.users(id),
+  actor_email text,
+  action text NOT NULL,
+  entity_type text,
+  entity_id text,
+  previous_value jsonb,
+  new_value jsonb,
+  metadata jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT ON public.audit_logs TO authenticated;
+GRANT ALL ON public.audit_logs TO service_role;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Oversight roles can read audit log" ON public.audit_logs FOR SELECT TO authenticated
+  USING (
+    public.has_role(auth.uid(),'super_admin')
+    OR public.has_role(auth.uid(),'auditor')
+    OR public.has_role(auth.uid(),'management')
+  );
+CREATE POLICY "Active staff can append audit entries" ON public.audit_logs FOR INSERT TO authenticated
+  WITH CHECK (public.is_active_staff(auth.uid()) AND actor_id = auth.uid());
+
+-- updated_at trigger
+CREATE OR REPLACE FUNCTION public.touch_updated_at()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END; $$;
+
+CREATE TRIGGER profiles_touch BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+CREATE TRIGGER clients_touch BEFORE UPDATE ON public.clients
+  FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+
+-- New user bootstrap
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, department, job_title)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email,'@',1)),
+    NEW.raw_user_meta_data->>'department',
+    NEW.raw_user_meta_data->>'job_title'
+  )
+  ON CONFLICT (id) DO NOTHING;
+
+  IF lower(NEW.email) = 'kalemireabdul09@gmail.com' THEN
+    UPDATE public.profiles
+      SET full_name = 'Kalemire Abdulrahuman', job_title = 'Super Admin', department = 'Executive'
+      WHERE id = NEW.id;
+    INSERT INTO public.user_roles (user_id, role) VALUES (NEW.id, 'super_admin')
+      ON CONFLICT DO NOTHING;
+  END IF;
+  RETURN NEW;
+END; $$;
+
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Safe login identity lookup (no sensitive data)
+CREATE OR REPLACE FUNCTION public.login_identity(_email text)
+RETURNS TABLE (full_name text, job_title text, department text, photo_url text)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT p.full_name, p.job_title, p.department, p.photo_url
+  FROM public.profiles p
+  WHERE lower(p.email) = lower(trim(_email)) AND p.status = 'active'
+  LIMIT 1;
+$$;
+REVOKE ALL ON FUNCTION public.login_identity(text) FROM public;
+GRANT EXECUTE ON FUNCTION public.login_identity(text) TO anon, authenticated;
+
+
+========== FILE: \supabase\migrations\20260810183607_27fb022b-9190-4fef-95ab-401dd97e086e.sql ==========
+REVOKE ALL ON FUNCTION public.has_role(uuid, public.app_role) FROM anon, authenticated, public;
+REVOKE ALL ON FUNCTION public.is_active_staff(uuid) FROM anon, authenticated, public;
+REVOKE ALL ON FUNCTION public.touch_updated_at() FROM anon, authenticated, public;
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM anon, authenticated, public;
+REVOKE ALL ON FUNCTION public.login_identity(text) FROM anon, authenticated, public;
+GRANT EXECUTE ON FUNCTION public.login_identity(text) TO service_role;
+
+
+========== FILE: \supabase\migrations\20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql ==========
+
+-- ============ ROLES & PERMISSIONS ============
+CREATE TABLE public.roles (
+  key text PRIMARY KEY,
+  label text NOT NULL,
+  description text,
+  is_system boolean NOT NULL DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT ON public.roles TO authenticated;
+GRANT ALL ON public.roles TO service_role;
+ALTER TABLE public.roles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Staff can view roles catalogue" ON public.roles FOR SELECT TO authenticated USING (is_active_staff(auth.uid()));
+
+CREATE TABLE public.role_permissions (
+  role_key text NOT NULL REFERENCES public.roles(key) ON DELETE CASCADE,
+  permission text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (role_key, permission)
+);
+GRANT SELECT ON public.role_permissions TO authenticated;
+GRANT ALL ON public.role_permissions TO service_role;
+ALTER TABLE public.role_permissions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Staff can view role permissions" ON public.role_permissions FOR SELECT TO authenticated USING (is_active_staff(auth.uid()));
+
+CREATE TABLE public.user_role_assignments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role_key text NOT NULL REFERENCES public.roles(key) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (user_id, role_key)
+);
+GRANT SELECT ON public.user_role_assignments TO authenticated;
+GRANT ALL ON public.user_role_assignments TO service_role;
+ALTER TABLE public.user_role_assignments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Staff can view role assignments" ON public.user_role_assignments FOR SELECT TO authenticated USING (is_active_staff(auth.uid()) OR user_id = auth.uid());
+
+CREATE OR REPLACE FUNCTION public.has_permission(_user_id uuid, _perm text)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = _user_id AND p.status = 'active')
+    AND (
+      EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = _user_id AND ur.role = 'super_admin')
+      OR EXISTS (
+        SELECT 1 FROM public.role_permissions rp
+        WHERE rp.permission = _perm
+          AND (
+            rp.role_key IN (SELECT ur.role::text FROM public.user_roles ur WHERE ur.user_id = _user_id)
+            OR rp.role_key IN (SELECT a.role_key FROM public.user_role_assignments a WHERE a.user_id = _user_id)
+          )
+      )
+    );
+$$;
+
+CREATE OR REPLACE FUNCTION public.my_permissions()
+RETURNS TABLE(permission text) LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT DISTINCT rp.permission FROM public.role_permissions rp
+  WHERE rp.role_key IN (SELECT ur.role::text FROM public.user_roles ur WHERE ur.user_id = auth.uid())
+     OR rp.role_key IN (SELECT a.role_key FROM public.user_role_assignments a WHERE a.user_id = auth.uid());
+$$;
+
+INSERT INTO public.roles(key,label,description,is_system) VALUES
+ ('super_admin','Super Admin','Unrestricted administrative authority',true),
+ ('receptionist','Receptionist','Front desk client registration',true),
+ ('onboarding_officer','Client Onboarding Officer','Completes client profiles and KYC intake',true),
+ ('deals_manager','Deals Manager','Owns opportunities, matching and deals',true),
+ ('verification_officer','Verification Officer','Verification and due diligence',true),
+ ('risk_officer','Risk Officer','Risk cases and investigations',true),
+ ('finance_officer','Finance Officer','Transactions, receipts and commission',true),
+ ('management','Management','Company-wide oversight',true),
+ ('auditor','Auditor','Read-only assurance access',true);
+
+INSERT INTO public.role_permissions(role_key, permission)
+SELECT 'receptionist', p FROM unnest(ARRAY['clients.view','clients.create']) p
+UNION ALL SELECT 'onboarding_officer', p FROM unnest(ARRAY['clients.view','clients.create','clients.edit','requirements.view','requirements.create','requirements.edit','documents.view','documents.create','documents.download','forms.view','forms.create']) p
+UNION ALL SELECT 'deals_manager', p FROM unnest(ARRAY['clients.view','requirements.view','opportunities.view','opportunities.create','opportunities.edit','opportunities.archive','opportunities.export','deals.view','deals.create','deals.edit','deals.close','deals.archive','deals.export','documents.view','documents.create','documents.download','tasks.view','tasks.create','tasks.edit']) p
+UNION ALL SELECT 'verification_officer', p FROM unnest(ARRAY['clients.view','opportunities.view','verification.view','verification.create','verification.edit','verification.close','documents.view','documents.create','documents.download']) p
+UNION ALL SELECT 'risk_officer', p FROM unnest(ARRAY['clients.view','risk.view','risk.create','risk.edit','risk.close','risk.export','research.view','research.create','research.edit','documents.view','documents.download']) p
+UNION ALL SELECT 'finance_officer', p FROM unnest(ARRAY['clients.view','deals.view','finance.view','finance.create','finance.edit','finance.export','documents.view','documents.download']) p
+UNION ALL SELECT 'management', p FROM unnest(ARRAY['clients.view','clients.export','requirements.view','opportunities.view','opportunities.export','deals.view','deals.export','verification.view','risk.view','research.view','documents.view','documents.download','finance.view','finance.export','tasks.view','objectives.view','objectives.create','objectives.edit','objectives.archive','objectives.export','archive.view','archive.restore','audit.view','forms.view']) p
+UNION ALL SELECT 'auditor', p FROM unnest(ARRAY['clients.view','requirements.view','opportunities.view','deals.view','verification.view','risk.view','research.view','documents.view','finance.view','objectives.view','archive.view','audit.view','forms.view','tasks.view']) p;
+
+-- ============ SEQUENCES ============
+CREATE SEQUENCE public.opp_ref_seq;  CREATE SEQUENCE public.req_ref_seq;
+CREATE SEQUENCE public.deal_ref_seq; CREATE SEQUENCE public.risk_ref_seq;
+CREATE SEQUENCE public.inv_ref_seq;  CREATE SEQUENCE public.res_ref_seq;
+CREATE SEQUENCE public.doc_ref_seq;  CREATE SEQUENCE public.txn_ref_seq;
+CREATE SEQUENCE public.rcp_ref_seq;  CREATE SEQUENCE public.obj_ref_seq;
+CREATE SEQUENCE public.inq_ref_seq;  CREATE SEQUENCE public.ver_ref_seq;
+CREATE SEQUENCE public.cmp_ref_seq;  CREATE SEQUENCE public.frm_ref_seq;
+CREATE SEQUENCE public.prj_ref_seq;  CREATE SEQUENCE public.med_ref_seq;
+
+-- ============ CLIENT DOMAIN ============
+ALTER TABLE public.clients
+  ADD COLUMN IF NOT EXISTS address text,
+  ADD COLUMN IF NOT EXISTS id_type text,
+  ADD COLUMN IF NOT EXISTS id_number text,
+  ADD COLUMN IF NOT EXISTS legal_name text,
+  ADD COLUMN IF NOT EXISTS kyc_status text NOT NULL DEFAULT 'pending',
+  ADD COLUMN IF NOT EXISTS kyc_details jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS archived_at timestamptz,
+  ADD COLUMN IF NOT EXISTS archived_by uuid,
+  ADD COLUMN IF NOT EXISTS archive_reason text;
+
+CREATE TABLE public.companies (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_ref text NOT NULL DEFAULT ('KBL-CMP-'||lpad(nextval('cmp_ref_seq')::text,6,'0')),
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  name text NOT NULL,
+  registration_number text,
+  country text,
+  address text,
+  directors jsonb NOT NULL DEFAULT '[]'::jsonb,
+  representatives jsonb NOT NULL DEFAULT '[]'::jsonb,
+  beneficial_owners jsonb NOT NULL DEFAULT '[]'::jsonb,
+  notes text,
+  status text NOT NULL DEFAULT 'active',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.contacts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id uuid REFERENCES public.clients(id) ON DELETE CASCADE,
+  company_id uuid REFERENCES public.companies(id) ON DELETE CASCADE,
+  full_name text NOT NULL, role text, phone text, email text, notes text,
+  status text NOT NULL DEFAULT 'active',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.communications (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id uuid REFERENCES public.clients(id) ON DELETE CASCADE,
+  deal_id uuid,
+  channel text NOT NULL DEFAULT 'note',
+  subject text, body text NOT NULL,
+  occurred_at timestamptz NOT NULL DEFAULT now(),
+  status text NOT NULL DEFAULT 'logged',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.client_requirements (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  requirement_ref text NOT NULL DEFAULT ('KBL-REQ-'||lpad(nextval('req_ref_seq')::text,6,'0')),
+  client_id uuid NOT NULL REFERENCES public.clients(id) ON DELETE CASCADE,
+  sector text NOT NULL,
+  title text NOT NULL,
+  description text,
+  budget_min numeric, budget_max numeric, currency text NOT NULL DEFAULT 'USD',
+  location text, quantity text, specifications text,
+  deadline date, priority text NOT NULL DEFAULT 'normal',
+  status text NOT NULL DEFAULT 'open',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ============ OPPORTUNITIES ============
+CREATE TABLE public.opportunities (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  opportunity_ref text NOT NULL DEFAULT ('KBL-OPP-'||lpad(nextval('opp_ref_seq')::text,6,'0')),
+  sector text NOT NULL,
+  opportunity_type text NOT NULL,
+  title text NOT NULL,
+  description text,
+  owner_name text, owner_contact text, source text,
+  location text,
+  price numeric, currency text NOT NULL DEFAULT 'USD',
+  quantity text, availability text, requirements text,
+  sector_details jsonb NOT NULL DEFAULT '{}'::jsonb,
+  verification_status text NOT NULL DEFAULT 'unverified',
+  assigned_to uuid,
+  status text NOT NULL DEFAULT 'new',
+  notes text,
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.opportunity_matches (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  requirement_id uuid NOT NULL REFERENCES public.client_requirements(id) ON DELETE CASCADE,
+  opportunity_id uuid NOT NULL REFERENCES public.opportunities(id) ON DELETE CASCADE,
+  score integer NOT NULL DEFAULT 0,
+  reasons jsonb NOT NULL DEFAULT '[]'::jsonb,
+  status text NOT NULL DEFAULT 'suggested',
+  reviewed_by uuid, reviewed_at timestamptz,
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (requirement_id, opportunity_id)
+);
+
+-- ============ DEALS ============
+CREATE TABLE public.deals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deal_ref text NOT NULL DEFAULT ('KBL-DEAL-'||lpad(nextval('deal_ref_seq')::text,6,'0')),
+  title text NOT NULL,
+  sector text NOT NULL,
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  opportunity_id uuid REFERENCES public.opportunities(id) ON DELETE SET NULL,
+  requirement_id uuid REFERENCES public.client_requirements(id) ON DELETE SET NULL,
+  stage text NOT NULL DEFAULT 'source',
+  status text NOT NULL DEFAULT 'active',
+  value numeric, currency text NOT NULL DEFAULT 'USD',
+  commission_rate numeric,
+  expected_close date, closed_at timestamptz, close_outcome text,
+  assigned_to uuid, notes text,
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.deal_parties (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deal_id uuid NOT NULL REFERENCES public.deals(id) ON DELETE CASCADE,
+  party_role text NOT NULL,
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  company_id uuid REFERENCES public.companies(id) ON DELETE SET NULL,
+  name text NOT NULL, contact text, notes text,
+  status text NOT NULL DEFAULT 'active',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.offers (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deal_id uuid NOT NULL REFERENCES public.deals(id) ON DELETE CASCADE,
+  offered_by text NOT NULL, amount numeric NOT NULL, currency text NOT NULL DEFAULT 'USD',
+  terms text, status text NOT NULL DEFAULT 'submitted',
+  offered_at timestamptz NOT NULL DEFAULT now(),
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.negotiations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deal_id uuid NOT NULL REFERENCES public.deals(id) ON DELETE CASCADE,
+  entry_type text NOT NULL DEFAULT 'note',
+  summary text NOT NULL, detail text,
+  occurred_at timestamptz NOT NULL DEFAULT now(),
+  status text NOT NULL DEFAULT 'logged',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.tasks (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL, detail text,
+  deal_id uuid REFERENCES public.deals(id) ON DELETE CASCADE,
+  client_id uuid REFERENCES public.clients(id) ON DELETE CASCADE,
+  assigned_to uuid, due_date date,
+  status text NOT NULL DEFAULT 'open',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ============ VERIFICATION / RISK / RESEARCH ============
+CREATE TABLE public.verifications (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  case_ref text NOT NULL DEFAULT ('KBL-VER-'||lpad(nextval('ver_ref_seq')::text,6,'0')),
+  case_kind text NOT NULL DEFAULT 'verification',
+  subject text NOT NULL, sector text,
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  deal_id uuid REFERENCES public.deals(id) ON DELETE SET NULL,
+  opportunity_id uuid REFERENCES public.opportunities(id) ON DELETE SET NULL,
+  summary text, findings text,
+  status text NOT NULL DEFAULT 'open',
+  officer_id uuid, decided_at timestamptz,
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.verification_items (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  verification_id uuid NOT NULL REFERENCES public.verifications(id) ON DELETE CASCADE,
+  label text NOT NULL, requirement_note text,
+  state text NOT NULL DEFAULT 'pending', comment text,
+  status text NOT NULL DEFAULT 'active',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.risk_cases (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  case_ref text NOT NULL,
+  case_kind text NOT NULL DEFAULT 'risk',
+  subject_name text NOT NULL, subject_company text,
+  subject_phone text, subject_email text, subject_identifier text,
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  deal_id uuid REFERENCES public.deals(id) ON DELETE SET NULL,
+  source text, description text NOT NULL,
+  allegation text, verified_finding text, resolution text,
+  severity text NOT NULL DEFAULT 'medium',
+  status text NOT NULL DEFAULT 'reported',
+  investigator_id uuid, closed_at timestamptz,
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.research_cases (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  case_ref text NOT NULL DEFAULT ('KBL-RES-'||lpad(nextval('res_ref_seq')::text,6,'0')),
+  subject text NOT NULL, research_question text,
+  keywords text[] NOT NULL DEFAULT '{}',
+  related_party text,
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  deal_id uuid REFERENCES public.deals(id) ON DELETE SET NULL,
+  sources jsonb NOT NULL DEFAULT '[]'::jsonb,
+  findings text, notes text,
+  researcher_id uuid,
+  status text NOT NULL DEFAULT 'open',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ============ DOCUMENTS & MEDIA ============
+CREATE TABLE public.documents (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  document_ref text NOT NULL DEFAULT ('KBL-DOC-'||lpad(nextval('doc_ref_seq')::text,6,'0')),
+  title text NOT NULL, document_type text NOT NULL DEFAULT 'other',
+  storage_path text NOT NULL, mime_type text, size_bytes bigint,
+  parent_type text NOT NULL, parent_id uuid NOT NULL,
+  verification_status text NOT NULL DEFAULT 'unverified',
+  confidential boolean NOT NULL DEFAULT false,
+  version integer NOT NULL DEFAULT 1,
+  status text NOT NULL DEFAULT 'active',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.document_versions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  document_id uuid NOT NULL REFERENCES public.documents(id) ON DELETE CASCADE,
+  version integer NOT NULL, storage_path text NOT NULL,
+  note text, status text NOT NULL DEFAULT 'active',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.media (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  media_ref text NOT NULL DEFAULT ('KBL-MED-'||lpad(nextval('med_ref_seq')::text,6,'0')),
+  caption text, media_type text NOT NULL DEFAULT 'image',
+  storage_path text NOT NULL, mime_type text,
+  parent_type text NOT NULL, parent_id uuid NOT NULL,
+  status text NOT NULL DEFAULT 'active',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ============ FORMS ============
+CREATE TABLE public.forms (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  form_ref text NOT NULL DEFAULT ('KBL-FRM-'||lpad(nextval('frm_ref_seq')::text,6,'0')),
+  title text NOT NULL, purpose text,
+  schema jsonb NOT NULL DEFAULT '[]'::jsonb,
+  target text NOT NULL DEFAULT 'client',
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  access_token text NOT NULL DEFAULT encode(extensions.gen_random_bytes(16),'hex'),
+  allow_multiple boolean NOT NULL DEFAULT false,
+  expires_at timestamptz,
+  status text NOT NULL DEFAULT 'created',
+  opened_at timestamptz, submitted_at timestamptz,
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.form_submissions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  form_id uuid NOT NULL REFERENCES public.forms(id) ON DELETE CASCADE,
+  answers jsonb NOT NULL DEFAULT '{}'::jsonb,
+  submitted_by_name text, submitted_internally boolean NOT NULL DEFAULT false,
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  review_note text,
+  status text NOT NULL DEFAULT 'submitted',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ============ FINANCE ============
+CREATE TABLE public.transactions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  transaction_ref text NOT NULL DEFAULT ('KBL-TXN-'||lpad(nextval('txn_ref_seq')::text,6,'0')),
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  deal_id uuid REFERENCES public.deals(id) ON DELETE SET NULL,
+  amount numeric NOT NULL, currency text NOT NULL DEFAULT 'USD',
+  payment_method text, payment_reference text, purpose text NOT NULL,
+  commission_amount numeric,
+  occurred_on date NOT NULL DEFAULT current_date,
+  status text NOT NULL DEFAULT 'recorded',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.receipts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  receipt_ref text NOT NULL DEFAULT ('KBL-RCP-'||lpad(nextval('rcp_ref_seq')::text,6,'0')),
+  transaction_id uuid NOT NULL REFERENCES public.transactions(id) ON DELETE CASCADE,
+  verification_ref text NOT NULL DEFAULT encode(extensions.gen_random_bytes(8),'hex'),
+  issued_to text NOT NULL, amount numeric NOT NULL, currency text NOT NULL DEFAULT 'USD',
+  narrative text,
+  status text NOT NULL DEFAULT 'issued',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.invoices (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  invoice_ref text NOT NULL DEFAULT ('KBL-INV-'||lpad(nextval('inq_ref_seq')::text,6,'0')),
+  client_id uuid REFERENCES public.clients(id) ON DELETE SET NULL,
+  deal_id uuid REFERENCES public.deals(id) ON DELETE SET NULL,
+  amount numeric NOT NULL, currency text NOT NULL DEFAULT 'USD',
+  due_date date, narrative text,
+  status text NOT NULL DEFAULT 'draft',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.commissions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  deal_id uuid NOT NULL REFERENCES public.deals(id) ON DELETE CASCADE,
+  transaction_id uuid REFERENCES public.transactions(id) ON DELETE SET NULL,
+  rate numeric, amount numeric NOT NULL, currency text NOT NULL DEFAULT 'USD',
+  beneficiary text, narrative text,
+  status text NOT NULL DEFAULT 'pending',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ============ OBJECTIVES & PROJECTS ============
+CREATE TABLE public.projects (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_ref text NOT NULL DEFAULT ('KBL-PRJ-'||lpad(nextval('prj_ref_seq')::text,6,'0')),
+  title text NOT NULL, description text, department text,
+  lead_id uuid, start_date date, target_date date,
+  status text NOT NULL DEFAULT 'planned',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.objectives (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  objective_ref text NOT NULL DEFAULT ('KBL-OBJ-'||lpad(nextval('obj_ref_seq')::text,6,'0')),
+  title text NOT NULL, description text,
+  department text, sector text,
+  responsible_id uuid,
+  start_date date, target_date date,
+  priority text NOT NULL DEFAULT 'normal',
+  key_results jsonb NOT NULL DEFAULT '[]'::jsonb,
+  budget numeric, currency text NOT NULL DEFAULT 'USD',
+  progress integer NOT NULL DEFAULT 0,
+  project_id uuid REFERENCES public.projects(id) ON DELETE SET NULL,
+  outcome text, completed_at timestamptz, notes text,
+  status text NOT NULL DEFAULT 'planned',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.objective_progress (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  objective_id uuid NOT NULL REFERENCES public.objectives(id) ON DELETE CASCADE,
+  progress integer NOT NULL DEFAULT 0,
+  note text NOT NULL,
+  recorded_at timestamptz NOT NULL DEFAULT now(),
+  status text NOT NULL DEFAULT 'logged',
+  archived_at timestamptz, archived_by uuid, archive_reason text,
+  created_by uuid, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ============ ARCHIVE REGISTER ============
+CREATE TABLE public.archive_records (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  entity_type text NOT NULL,
+  entity_id uuid NOT NULL,
+  entity_ref text,
+  title text,
+  original_created_at timestamptz,
+  original_created_by uuid,
+  previous_status text,
+  reason text,
+  archived_by uuid, archived_at timestamptz NOT NULL DEFAULT now(),
+  restored_by uuid, restored_at timestamptz, restore_reason text,
+  state text NOT NULL DEFAULT 'archived',
+  snapshot jsonb,
+  created_by uuid,
+  created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ============ NOTIFICATIONS ============
+CREATE TABLE public.notifications (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title text NOT NULL, body text, link text,
+  read_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, UPDATE ON public.notifications TO authenticated;
+GRANT ALL ON public.notifications TO service_role;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Own notifications" ON public.notifications FOR SELECT TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "Update own notifications" ON public.notifications FOR UPDATE TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- ============ GENERIC GRANTS / RLS / POLICIES / TRIGGERS ============
+DO $$
+DECLARE
+  m record;
+  pairs text[][] := ARRAY[
+    ['companies','clients'],['contacts','clients'],['communications','clients'],
+    ['client_requirements','requirements'],
+    ['opportunities','opportunities'],['opportunity_matches','opportunities'],
+    ['deals','deals'],['deal_parties','deals'],['offers','deals'],['negotiations','deals'],
+    ['tasks','tasks'],
+    ['verifications','verification'],['verification_items','verification'],
+    ['risk_cases','risk'],['research_cases','research'],
+    ['documents','documents'],['document_versions','documents'],['media','documents'],
+    ['forms','forms'],['form_submissions','forms'],
+    ['transactions','finance'],['receipts','finance'],['invoices','finance'],['commissions','finance'],
+    ['projects','objectives'],['objectives','objectives'],['objective_progress','objectives'],
+    ['archive_records','archive']
+  ];
+  t text; md text; i int;
+BEGIN
+  FOR i IN 1..array_length(pairs,1) LOOP
+    t := pairs[i][1]; md := pairs[i][2];
+    EXECUTE format('GRANT SELECT, INSERT, UPDATE ON public.%I TO authenticated', t);
+    EXECUTE format('GRANT ALL ON public.%I TO service_role', t);
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR SELECT TO authenticated USING (has_permission(auth.uid(), %L))', t||'_view', t, md||'.view');
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR INSERT TO authenticated WITH CHECK (has_permission(auth.uid(), %L) AND created_by = auth.uid())', t||'_create', t, md||'.create');
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated USING (has_permission(auth.uid(), %L)) WITH CHECK (has_permission(auth.uid(), %L))', t||'_edit', t, md||'.edit', md||'.edit');
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR DELETE TO authenticated USING (has_role(auth.uid(), ''super_admin''::app_role))', t||'_delete', t);
+    EXECUTE format('CREATE TRIGGER %I BEFORE UPDATE ON public.%I FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at()', t||'_touch', t);
+  END LOOP;
+END $$;
+
+-- archive_records has no created_by column; replace its insert policy
+DROP POLICY archive_records_create ON public.archive_records;
+CREATE POLICY archive_records_create ON public.archive_records FOR INSERT TO authenticated
+  WITH CHECK (is_active_staff(auth.uid()) AND archived_by = auth.uid());
+
+-- risk case reference generator (risk vs investigation prefixes)
+CREATE OR REPLACE FUNCTION public.set_risk_case_ref()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN
+  IF NEW.case_ref IS NULL OR NEW.case_ref = '' THEN
+    IF NEW.case_kind = 'investigation' THEN
+      NEW.case_ref := 'KBL-INV-'||lpad(nextval('inv_ref_seq')::text,6,'0');
+    ELSE
+      NEW.case_ref := 'KBL-RISK-'||lpad(nextval('risk_ref_seq')::text,6,'0');
+    END IF;
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER risk_cases_ref BEFORE INSERT ON public.risk_cases FOR EACH ROW EXECUTE FUNCTION public.set_risk_case_ref();
+ALTER TABLE public.risk_cases ALTER COLUMN case_ref DROP NOT NULL;
+
+-- helpful indexes
+CREATE INDEX idx_requirements_client ON public.client_requirements(client_id);
+CREATE INDEX idx_opportunities_sector_status ON public.opportunities(sector, status);
+CREATE INDEX idx_deals_client ON public.deals(client_id);
+CREATE INDEX idx_documents_parent ON public.documents(parent_type, parent_id);
+CREATE INDEX idx_media_parent ON public.media(parent_type, parent_id);
+CREATE INDEX idx_archive_entity ON public.archive_records(entity_type, entity_id);
+
+
+========== FILE: \supabase\migrations\20260811070025_56fabcfd-1eff-46ec-9183-fbbf25285203.sql ==========
+REVOKE ALL ON FUNCTION public.has_permission(uuid, text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.my_permissions() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.has_permission(uuid, text) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.my_permissions() TO authenticated, service_role;
+REVOKE ALL ON FUNCTION public.set_risk_case_ref() FROM PUBLIC, anon, authenticated;
+
+
+========== FILE: \supabase\migrations\20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql ==========
+CREATE POLICY "Vault read for document viewers" ON storage.objects FOR SELECT TO authenticated
+  USING (bucket_id = 'kalexi-vault' AND public.has_permission(auth.uid(), 'documents.view'));
+CREATE POLICY "Vault upload for document creators" ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'kalexi-vault' AND public.has_permission(auth.uid(), 'documents.create'));
+CREATE POLICY "Vault update for document editors" ON storage.objects FOR UPDATE TO authenticated
+  USING (bucket_id = 'kalexi-vault' AND public.has_permission(auth.uid(), 'documents.edit'))
+  WITH CHECK (bucket_id = 'kalexi-vault' AND public.has_permission(auth.uid(), 'documents.edit'));
+CREATE POLICY "Vault delete for super admin" ON storage.objects FOR DELETE TO authenticated
+  USING (bucket_id = 'kalexi-vault' AND public.has_role(auth.uid(), 'super_admin'::app_role));
+
+
+========== FILE: \supabase\migrations\20260814162920_0cb94f30-e546-4b87-b52a-0da3fc1f43e3.sql ==========
+GRANT EXECUTE ON FUNCTION public.is_active_staff(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.has_permission(uuid, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.my_permissions() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.login_identity(text) TO anon, authenticated;
+
+
+========== FILE: \supabase\migrations\20260816035733_d4bba811-549a-4efa-a1fb-e69056e0792b.sql ==========
+DO $$
+DECLARE p record;
+BEGIN
+  FOR p IN
+    SELECT pol.policyname, pol.tablename, pol.qual, pol.with_check
+    FROM pg_policies pol
+    JOIN information_schema.columns c
+      ON c.table_schema = 'public' AND c.table_name = pol.tablename AND c.column_name = 'created_by'
+    WHERE pol.schemaname = 'public'
+      AND pol.cmd = 'UPDATE'
+      AND pol.policyname LIKE '%\_edit'
+  LOOP
+    EXECUTE format('DROP POLICY %I ON public.%I', p.policyname, p.tablename);
+    EXECUTE format(
+      'CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated USING ((%s) OR created_by = auth.uid()) WITH CHECK ((%s) OR created_by = auth.uid())',
+      p.policyname, p.tablename, p.qual, coalesce(p.with_check, p.qual));
+  END LOOP;
+END $$;
+
+DROP POLICY IF EXISTS "Authorised staff can update clients" ON public.clients;
+CREATE POLICY "Authorised staff can update clients"
+ON public.clients FOR UPDATE TO authenticated
+USING (
+  is_active_staff(auth.uid())
+  AND (
+    registered_by = auth.uid()
+    OR has_role(auth.uid(), 'super_admin'::app_role)
+    OR NOT has_role(auth.uid(), 'receptionist'::app_role)
+  )
+)
+WITH CHECK (is_active_staff(auth.uid()));
+
+
+========== FILE: \supabase\migrations\20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql ==========
+CREATE POLICY "Avatar read for staff"
+ON storage.objects FOR SELECT TO authenticated
+USING (bucket_id = 'kalexi-avatars' AND is_active_staff(auth.uid()));
+
+CREATE POLICY "Avatar upload for admin or owner"
+ON storage.objects FOR INSERT TO authenticated
+WITH CHECK (
+  bucket_id = 'kalexi-avatars'
+  AND (has_role(auth.uid(), 'super_admin'::app_role) OR (storage.foldername(name))[1] = auth.uid()::text)
+);
+
+CREATE POLICY "Avatar update for admin or owner"
+ON storage.objects FOR UPDATE TO authenticated
+USING (
+  bucket_id = 'kalexi-avatars'
+  AND (has_role(auth.uid(), 'super_admin'::app_role) OR (storage.foldername(name))[1] = auth.uid()::text)
+)
+WITH CHECK (
+  bucket_id = 'kalexi-avatars'
+  AND (has_role(auth.uid(), 'super_admin'::app_role) OR (storage.foldername(name))[1] = auth.uid()::text)
+);
+
+CREATE POLICY "Avatar delete for admin or owner"
+ON storage.objects FOR DELETE TO authenticated
+USING (
+  bucket_id = 'kalexi-avatars'
+  AND (has_role(auth.uid(), 'super_admin'::app_role) OR (storage.foldername(name))[1] = auth.uid()::text)
+);
+
+
+========== FILE: \supabase\migrations\20261022190000_agent_phone_signin.sql ==========
+CREATE INDEX IF NOT EXISTS profiles_active_phone_digits_idx
+  ON public.profiles (regexp_replace(coalesce(phone, ''), '[^0-9]', '', 'g'))
+  WHERE status = 'active';
+
+CREATE OR REPLACE FUNCTION public.login_identity(_email text)
+RETURNS TABLE (full_name text, job_title text, department text, photo_url text)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT p.full_name, p.job_title, p.department, p.photo_url
+  FROM public.profiles p
+  WHERE p.status = 'active'
+    AND (
+      (position('@' IN trim(_email)) > 0 AND lower(p.email) = lower(trim(_email)))
+      OR (
+        position('@' IN trim(_email)) = 0
+        AND length(regexp_replace(coalesce(_email, ''), '[^0-9]', '', 'g')) BETWEEN 7 AND 20
+        AND regexp_replace(coalesce(p.phone, ''), '[^0-9]', '', 'g')
+          = regexp_replace(coalesce(_email, ''), '[^0-9]', '', 'g')
+        AND 1 = (
+          SELECT count(*)
+          FROM public.profiles matching
+          WHERE matching.status = 'active'
+            AND regexp_replace(coalesce(matching.phone, ''), '[^0-9]', '', 'g')
+              = regexp_replace(coalesce(_email, ''), '[^0-9]', '', 'g')
+        )
+      )
+    )
+  LIMIT 1;
+$$;
+
+CREATE OR REPLACE FUNCTION public.login_email_by_phone(_phone text)
+RETURNS TABLE (email text)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT p.email
+  FROM public.profiles p
+  WHERE p.status = 'active'
+    AND length(regexp_replace(coalesce(_phone, ''), '[^0-9]', '', 'g')) BETWEEN 7 AND 20
+    AND regexp_replace(coalesce(p.phone, ''), '[^0-9]', '', 'g')
+      = regexp_replace(coalesce(_phone, ''), '[^0-9]', '', 'g')
+    AND 1 = (
+      SELECT count(*)
+      FROM public.profiles matching
+      WHERE matching.status = 'active'
+        AND regexp_replace(coalesce(matching.phone, ''), '[^0-9]', '', 'g')
+          = regexp_replace(coalesce(_phone, ''), '[^0-9]', '', 'g')
+    )
+  LIMIT 1;
+$$;
+
+REVOKE ALL ON FUNCTION public.login_identity(text) FROM public;
+GRANT EXECUTE ON FUNCTION public.login_identity(text) TO anon, authenticated;
+REVOKE ALL ON FUNCTION public.login_email_by_phone(text) FROM public, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.login_email_by_phone(text) TO service_role;
+
+
+========== FILE: \supabase\migrations\20261022203000_system_maintenance.sql ==========
+CREATE TABLE IF NOT EXISTS public.system_maintenance (
+  id text PRIMARY KEY CHECK (id = 'global'),
+  maintenance_enabled boolean NOT NULL DEFAULT false,
+  maintenance_message text,
+  maintenance_start_time timestamptz,
+  estimated_completion_time timestamptz,
+  maintenance_updated_at timestamptz NOT NULL DEFAULT now(),
+  maintenance_updated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL
+);
+
+INSERT INTO public.system_maintenance (id)
+VALUES ('global')
+ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE public.system_maintenance ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE public.system_maintenance FROM anon, authenticated;
+GRANT ALL ON TABLE public.system_maintenance TO service_role;
+
+CREATE OR REPLACE FUNCTION public.maintenance_access_allowed()
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT
+    NOT COALESCE(
+      (SELECT maintenance_enabled
+       FROM public.system_maintenance
+       WHERE id = 'global'),
+      true
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM public.user_roles
+      WHERE user_id = auth.uid()
+        AND role = 'super_admin'::public.app_role
+    );
+$$;
+
+REVOKE ALL ON FUNCTION public.maintenance_access_allowed() FROM public;
+GRANT EXECUTE ON FUNCTION public.maintenance_access_allowed() TO anon, authenticated;
+
+DO $$
+DECLARE
+  target record;
+BEGIN
+  FOR target IN
+    SELECT n.nspname, c.relname
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relkind IN ('r', 'p')
+      AND c.relrowsecurity
+      AND c.relname <> 'system_maintenance'
+  LOOP
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_policies
+      WHERE schemaname = target.nspname
+        AND tablename = target.relname
+        AND policyname = 'maintenance_access_gate'
+    ) THEN
+      EXECUTE format(
+        'CREATE POLICY maintenance_access_gate ON %I.%I AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())',
+        target.nspname,
+        target.relname
+      );
+    END IF;
+  END LOOP;
+END $$;
+
+DO $$
+BEGIN
+  IF to_regclass('storage.objects') IS NOT NULL
+    AND NOT EXISTS (
+      SELECT 1 FROM pg_policies
+      WHERE schemaname = 'storage'
+        AND tablename = 'objects'
+        AND policyname = 'maintenance_access_gate'
+    )
+  THEN
+    EXECUTE
+      'CREATE POLICY maintenance_access_gate ON storage.objects AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())';
+  END IF;
+END $$;
+
+
+========== FILE: \supabase\migrations\20261024000000_agent_registration_schema.sql ==========
+CREATE SEQUENCE IF NOT EXISTS public.agent_application_ref_seq;
+CREATE SEQUENCE IF NOT EXISTS public.agent_code_seq;
+CREATE SEQUENCE IF NOT EXISTS public.agent_referral_seq;
+
+CREATE TABLE IF NOT EXISTS public.agent_campaigns (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  token text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(24), 'hex'),
+  active boolean NOT NULL DEFAULT true,
+  expires_at timestamptz,
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.agent_registry (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  reg_id text NOT NULL UNIQUE,
+  full_name text NOT NULL,
+  phone text,
+  village text,
+  district text,
+  registered_on date,
+  received_by text,
+  signature_path text,
+  linked_application_id uuid,
+  status text NOT NULL DEFAULT 'registered',
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.agent_applications (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_ref text NOT NULL UNIQUE DEFAULT (
+    'KBL-AG-APP-' || lpad(nextval('public.agent_application_ref_seq')::text, 6, '0')
+  ),
+  campaign_id uuid REFERENCES public.agent_campaigns(id) ON DELETE SET NULL,
+  full_name text NOT NULL,
+  phone text NOT NULL,
+  email text NOT NULL,
+  date_of_birth date,
+  gender text,
+  nationality text,
+  address text,
+  district text,
+  village text,
+  occupation text,
+  id_type text NOT NULL,
+  id_number text NOT NULL,
+  photo_path text,
+  id_front_path text,
+  id_back_path text,
+  payment_method text NOT NULL,
+  payment_provider text,
+  payment_account_name text,
+  payment_account_number text,
+  declarations jsonb NOT NULL DEFAULT '{}'::jsonb,
+  registry_id uuid REFERENCES public.agent_registry(id) ON DELETE SET NULL,
+  user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  status text NOT NULL DEFAULT 'pending',
+  review_note text,
+  reviewed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  reviewed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS agent_applications_active_id_number_idx
+  ON public.agent_applications (lower(id_number))
+  WHERE status IN ('pending', 'approved');
+
+CREATE TABLE IF NOT EXISTS public.agents (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_code text NOT NULL UNIQUE DEFAULT (
+    'KBL-AG-' || lpad(nextval('public.agent_code_seq')::text, 6, '0')
+  ),
+  application_id uuid UNIQUE REFERENCES public.agent_applications(id) ON DELETE SET NULL,
+  registry_id uuid REFERENCES public.agent_registry(id) ON DELETE SET NULL,
+  full_name text NOT NULL,
+  phone text NOT NULL,
+  email text NOT NULL,
+  company_phone text,
+  district text,
+  village text,
+  designation text NOT NULL DEFAULT 'Digital Agent',
+  commission_rate numeric NOT NULL DEFAULT 5,
+  referral_code text NOT NULL UNIQUE DEFAULT (
+    'KBLR' || lpad(nextval('public.agent_referral_seq')::text, 6, '0')
+  ),
+  verification_token text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(24), 'hex'),
+  photo_path text,
+  signature_path text,
+  issued_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz NOT NULL DEFAULT (now() + interval '1 year'),
+  status text NOT NULL DEFAULT 'active',
+  user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.agent_registry
+  ADD CONSTRAINT agent_registry_linked_application_id_fkey
+  FOREIGN KEY (linked_application_id)
+  REFERENCES public.agent_applications(id) ON DELETE SET NULL;
+
+CREATE TABLE IF NOT EXISTS public.agent_redemptions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_id uuid NOT NULL REFERENCES public.agents(id) ON DELETE CASCADE,
+  tokens_used integer NOT NULL,
+  amount numeric NOT NULL DEFAULT 0,
+  currency text NOT NULL DEFAULT 'UGX',
+  status text NOT NULL DEFAULT 'pending',
+  processed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  processed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.agent_notices (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  body text NOT NULL,
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.agent_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  sender_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  body text NOT NULL DEFAULT '',
+  attachments jsonb NOT NULL DEFAULT '[]'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.brand_templates (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  kind text NOT NULL DEFAULT 'letter',
+  heading text,
+  body text,
+  doc_date date,
+  signatory_name text,
+  signatory_title text,
+  signature_path text,
+  accent text NOT NULL DEFAULT 'gold',
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'super_admin'::public.app_role
+FROM auth.users
+WHERE lower(email) = 'kalemireabdul09@gmail.com'
+ON CONFLICT (user_id, role) DO NOTHING;
+
+ALTER TABLE public.clients
+  ADD COLUMN IF NOT EXISTS agent_id uuid REFERENCES public.agents(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS referral_code text;
+
+CREATE INDEX IF NOT EXISTS clients_agent_id_idx ON public.clients (agent_id);
+CREATE INDEX IF NOT EXISTS agent_applications_status_created_idx
+  ON public.agent_applications (status, created_at DESC);
+CREATE INDEX IF NOT EXISTS agent_messages_owner_created_idx
+  ON public.agent_messages (owner_user_id, created_at);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.agent_campaigns TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.agent_registry TO authenticated;
+GRANT SELECT, UPDATE ON public.agent_applications TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.agents TO authenticated;
+GRANT SELECT, UPDATE ON public.agent_redemptions TO authenticated;
+GRANT SELECT, INSERT ON public.agent_notices TO authenticated;
+GRANT SELECT, INSERT ON public.agent_messages TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.brand_templates TO authenticated;
+GRANT USAGE, SELECT ON SEQUENCE public.client_ref_seq TO authenticated;
+GRANT ALL ON public.agent_campaigns, public.agent_registry, public.agent_applications,
+  public.agents, public.agent_redemptions, public.agent_notices, public.agent_messages,
+  public.brand_templates TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.agent_application_ref_seq,
+  public.agent_code_seq, public.agent_referral_seq TO service_role;
+
+ALTER TABLE public.agent_campaigns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agent_registry ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agent_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agent_redemptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agent_notices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agent_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.brand_templates ENABLE ROW LEVEL SECURITY;
+
+DO $$
+DECLARE
+  v_table_name text;
+BEGIN
+  FOREACH v_table_name IN ARRAY ARRAY[
+    'agent_campaigns', 'agent_registry', 'agent_applications', 'agents',
+    'agent_redemptions', 'agent_notices', 'agent_messages', 'brand_templates'
+  ]
+  LOOP
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_policies
+      WHERE schemaname = 'public'
+        AND tablename = v_table_name
+        AND policyname = 'maintenance_access_gate'
+    ) THEN
+      EXECUTE format(
+        'CREATE POLICY maintenance_access_gate ON public.%I AS RESTRICTIVE FOR ALL TO anon, authenticated USING (public.maintenance_access_allowed()) WITH CHECK (public.maintenance_access_allowed())',
+        v_table_name
+      );
+    END IF;
+  END LOOP;
+END $$;
+
+CREATE POLICY agent_campaigns_view ON public.agent_campaigns
+  FOR SELECT TO authenticated USING (public.has_permission(auth.uid(), 'agents.view'));
+CREATE POLICY agent_campaigns_manage ON public.agent_campaigns
+  FOR ALL TO authenticated
+  USING (public.has_permission(auth.uid(), 'agents.manage'))
+  WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+
+CREATE POLICY agent_registry_view ON public.agent_registry
+  FOR SELECT TO authenticated USING (public.has_permission(auth.uid(), 'agents.view'));
+CREATE POLICY agent_registry_manage ON public.agent_registry
+  FOR ALL TO authenticated
+  USING (public.has_permission(auth.uid(), 'agents.manage'))
+  WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+
+CREATE POLICY agent_applications_view ON public.agent_applications
+  FOR SELECT TO authenticated USING (public.has_permission(auth.uid(), 'agents.view'));
+CREATE POLICY agent_applications_owner_view ON public.agent_applications
+  FOR SELECT TO authenticated USING (user_id = auth.uid());
+CREATE POLICY agent_applications_manage ON public.agent_applications
+  FOR UPDATE TO authenticated
+  USING (public.has_permission(auth.uid(), 'agents.manage'))
+  WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+
+CREATE POLICY agents_view ON public.agents
+  FOR SELECT TO authenticated USING (public.has_permission(auth.uid(), 'agents.view'));
+CREATE POLICY agents_owner_view ON public.agents
+  FOR SELECT TO authenticated USING (user_id = auth.uid());
+CREATE POLICY agents_manage ON public.agents
+  FOR ALL TO authenticated
+  USING (public.has_permission(auth.uid(), 'agents.manage'))
+  WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+
+CREATE POLICY agent_redemptions_view ON public.agent_redemptions
+  FOR SELECT TO authenticated USING (public.has_permission(auth.uid(), 'agents.view'));
+CREATE POLICY agent_redemptions_manage ON public.agent_redemptions
+  FOR UPDATE TO authenticated
+  USING (public.has_permission(auth.uid(), 'agents.manage'))
+  WITH CHECK (public.has_permission(auth.uid(), 'agents.manage'));
+
+CREATE POLICY agent_notices_view ON public.agent_notices
+  FOR SELECT TO authenticated USING (public.has_permission(auth.uid(), 'agents.view'));
+CREATE POLICY agent_notices_manage ON public.agent_notices
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    public.has_permission(auth.uid(), 'agents.manage')
+    AND (created_by IS NULL OR created_by = auth.uid())
+  );
+
+CREATE POLICY agent_messages_view ON public.agent_messages
+  FOR SELECT TO authenticated
+  USING (
+    owner_user_id = auth.uid()
+    OR public.has_permission(auth.uid(), 'agents.view')
+  );
+CREATE POLICY agent_messages_send ON public.agent_messages
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    sender_id = auth.uid()
+    AND (
+      owner_user_id = auth.uid()
+      OR public.has_permission(auth.uid(), 'agents.manage')
+    )
+  );
+
+CREATE POLICY brand_templates_staff_read ON public.brand_templates
+  FOR SELECT TO authenticated USING (public.is_active_staff(auth.uid()));
+CREATE POLICY brand_templates_staff_write ON public.brand_templates
+  FOR ALL TO authenticated
+  USING (public.is_active_staff(auth.uid()))
+  WITH CHECK (public.is_active_staff(auth.uid()));
+
+CREATE POLICY "Agent registry signature uploads" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'kalexi-vault'
+    AND (storage.foldername(name))[1] = 'agent-registry'
+    AND public.has_permission(auth.uid(), 'agents.manage')
+  );
+
+DO $$
+DECLARE
+  target record;
+BEGIN
+  FOR target IN
+    SELECT unnest(ARRAY[
+      'agent_campaigns', 'agent_registry', 'agent_applications', 'agents', 'brand_templates'
+    ]) AS table_name
+  LOOP
+    EXECUTE format(
+      'CREATE TRIGGER %I BEFORE UPDATE ON public.%I FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at()',
+      target.table_name || '_touch',
+      target.table_name
+    );
+  END LOOP;
+END $$;
+
+NOTIFY pgrst, 'reload schema';
+''
+
+
+========== FILE: \supabase\migrations\20261025000000_company_branding.sql ==========
+CREATE TABLE IF NOT EXISTS public.company_branding (
+  id text PRIMARY KEY DEFAULT 'default' CHECK (id = 'default'),
+  logo_path text,
+  primary_color text NOT NULL DEFAULT '#145453'
+    CHECK (primary_color ~ '^#[0-9A-Fa-f]{6}$'),
+  accent_color text NOT NULL DEFAULT '#d3ad52'
+    CHECK (accent_color ~ '^#[0-9A-Fa-f]{6}$'),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  updated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL
+);
+
+ALTER TABLE public.company_branding ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS company_branding_public_read ON public.company_branding;
+CREATE POLICY company_branding_public_read
+  ON public.company_branding
+  FOR SELECT TO anon, authenticated
+  USING (id = 'default');
+
+REVOKE ALL ON public.company_branding FROM anon, authenticated;
+GRANT SELECT ON public.company_branding TO anon, authenticated;
+
+INSERT INTO public.company_branding (id)
+VALUES ('default')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'company-branding',
+  'company-branding',
+  true,
+  5242880,
+  ARRAY['image/png', 'image/jpeg', 'image/webp']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = EXCLUDED.public,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS company_branding_public_logo_read ON storage.objects;
+CREATE POLICY company_branding_public_logo_read
+  ON storage.objects
+  FOR SELECT TO anon, authenticated
+  USING (bucket_id = 'company-branding');
+
+
+========== FILE: \supabase\migrations\20261028000000_company_calendar.sql ==========
+CREATE TABLE IF NOT EXISTS public.calendar_events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL CHECK (char_length(trim(title)) BETWEEN 1 AND 160),
+  description text,
+  starts_at timestamptz NOT NULL,
+  ends_at timestamptz,
+  event_type text NOT NULL DEFAULT 'meeting'
+    CHECK (event_type IN ('meeting', 'programme', 'deadline', 'training', 'announcement', 'other')),
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT calendar_events_valid_time CHECK (ends_at IS NULL OR ends_at > starts_at)
+);
+
+CREATE INDEX IF NOT EXISTS calendar_events_starts_at_idx
+  ON public.calendar_events (starts_at);
+
+ALTER TABLE public.calendar_events ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Authenticated users can view company calendar events"
+  ON public.calendar_events
+  FOR SELECT TO authenticated
+  USING (true);
+
+DROP POLICY IF EXISTS "Management can create company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Management can create company calendar events"
+  ON public.calendar_events
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    created_by = (SELECT auth.uid())
+    AND EXISTS (
+      SELECT 1
+      FROM public.user_roles ur
+      WHERE ur.user_id = (SELECT auth.uid())
+        AND ur.role::text IN ('super_admin', 'management')
+    )
+  );
+
+DROP POLICY IF EXISTS "Management can update company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Management can update company calendar events"
+  ON public.calendar_events
+  FOR UPDATE TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1
+      FROM public.user_roles ur
+      WHERE ur.user_id = (SELECT auth.uid())
+        AND ur.role::text IN ('super_admin', 'management')
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1
+      FROM public.user_roles ur
+      WHERE ur.user_id = (SELECT auth.uid())
+        AND ur.role::text IN ('super_admin', 'management')
+    )
+  );
+
+DROP POLICY IF EXISTS "Management can delete company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Management can delete company calendar events"
+  ON public.calendar_events
+  FOR DELETE TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1
+      FROM public.user_roles ur
+      WHERE ur.user_id = (SELECT auth.uid())
+        AND ur.role::text IN ('super_admin', 'management')
+    )
+  );
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.calendar_events TO authenticated;
+
+===== 4. ALL DATABASE CALLS AND INTELLIGENCE REFERENCES =====
+\src\components\AgentIdCard.tsx:47: .from("brand_templates")
+\src\components\AgentIdCardDesigner.tsx:40: .from("brand_templates")
+\src\components\AgentIdentityEditor.tsx:53: .from("brand_templates")
+\src\components\AgentIdentityEditor.tsx:83: .from("kalexi-vault")
+\src\components\AgentMessages.tsx:17: for (const f of files) { const s = await createMessageUpload({ data: { owner, name: f.name } }); const { error } = await supabase.storage.from("kalexi-vault").uploadToSignedUrl(s.path, s.token, f); if (error) throw error; attachments.push({ path: s.path, name: f.name, type: f.type }); }
+\src\components\BrandAppearanceSettings.tsx:66: .from("company-branding")
+\src\components\ClientEditor.tsx:29: const { error } = await supabase.from("clients").update(payload as never).eq("id", client.id);
+\src\components\DashboardCalendarSummary.tsx:31: .from("calendar_events")
+\src\components\GlobalSearch.tsx:50: .from("clients")
+\src\components\GlobalSearch.tsx:65: .from("opportunities")
+\src\components\GlobalSearch.tsx:80: .from("deals")
+\src\components\MediaGallery.tsx:72: .from("media")
+\src\components\MediaGallery.tsx:108: const { error: insErr } = await supabase.from("media").insert({
+\src\components\MediaGallery.tsx:143: .from("media")
+\src\hooks\useSession.ts:34: supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+\src\hooks\useSession.ts:35: supabase.from("user_roles").select("role").eq("user_id", user.id),
+\src\hooks\useSession.ts:36: supabase.rpc("my_permissions"),
+\src\hooks\useSession.ts:82: await supabase.from("audit_logs").insert({
+\src\integrations\supabase\auth-middleware.ts:4: import { createClient } from '@supabase/supabase-js'
+\src\integrations\supabase\auth-middleware.ts:74: const supabase = createClient<Database>(
+\src\integrations\supabase\client.server.ts:4: import { createClient } from '@supabase/supabase-js';
+\src\integrations\supabase\client.server.ts:46: return createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+\src\integrations\supabase\client.ts:1: import { createClient } from '@supabase/supabase-js';
+\src\integrations\supabase\client.ts:45: return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+\src\integrations\supabase\types.ts:4: // Allows to automatically instantiate createClient with right options
+\src\integrations\supabase\types.ts:5: // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+\src\integrations\supabase\types.ts:2297: risk_cases: {
+\src\integrations\supabase\types.ts:2381: foreignKeyName: "risk_cases_client_id_fkey";
+\src\integrations\supabase\types.ts:2388: foreignKeyName: "risk_cases_deal_id_fkey";
+\src\lib\admin.functions.ts:7: .from("user_roles")
+\src\lib\admin.functions.ts:24: await supabaseAdmin.from("audit_logs").insert({
+\src\lib\admin.functions.ts:57: .from("profiles")
+\src\lib\admin.functions.ts:71: .from("profiles")
+\src\lib\admin.functions.ts:110: await supabaseAdmin.from("role_permissions").delete().eq("role_key", data.roleKey);
+\src\lib\admin.functions.ts:113: .from("role_permissions")
+\src\lib\admin.functions.ts:130: const { data, error } = await supabaseAdmin.from("role_permissions").select("role_key, permission");
+\src\lib\agent-commission.functions.ts:11: const { data, error } = await supabase.rpc("has_permission", {
+\src\lib\agent-commission.functions.ts:40: .from("agents")
+\src\lib\agent-commission.functions.ts:60: .from("transactions")
+\src\lib\agent-commission.functions.ts:87: .from("clients")
+\src\lib\agent-commission.functions.ts:106: .from("agent_commission_ledger")
+\src\lib\agent-commission.functions.ts:137: const { error: auditError } = await db.from("audit_logs").insert({
+\src\lib\agent-commission.functions.ts:159: .from("agent_commission_ledger")
+\src\lib\agent-messages.functions.ts:8: const { data } = await context.supabase.rpc("has_permission", { _user_id: context.userId, _perm: write ? "agents.manage" : "agents.view" });
+\src\lib\agent-messages.functions.ts:11: const [a, b] = await Promise.all([context.supabase.from("agents").select("id").eq("user_id", uid).maybeSingle(), context.supabase.from("agent_applications").select("id").eq("user_id", uid).maybeSingle()]);
+\src\lib\agent-messages.functions.ts:19: const { data: rows, error } = await context.supabase.from("agent_messages").select("*").eq("owner_user_id", uid).order("created_at").limit(200);
+\src\lib\agent-messages.functions.ts:22: return Promise.all((rows ?? []).map(async r => ({ ...r, attachments: await Promise.all((r.attachments as { path: string; name: string; type: string }[]).map(async a => ({ ...a, url: (await supabaseAdmin.storage.from("kalexi-vault").createSignedUrl(a.path, 600)).data?.signedUrl ?? "" }))) })));
+\src\lib\agent-messages.functions.ts:30: const { data: slot, error } = await supabaseAdmin.storage.from("kalexi-vault").createSignedUploadUrl(path);
+\src\lib\agent-messages.functions.ts:39: const { error } = await context.supabase.from("agent_messages").insert({ owner_user_id: uid, sender_id: context.userId, body: data.body, attachments: data.attachments });
+\src\lib\agents.functions.ts:18: .from("agent_campaigns")
+\src\lib\agents.functions.ts:28: const { data } = await supabase.rpc("has_permission", { _user_id: userId, _perm: perm });
+\src\lib\agents.functions.ts:40: await db.from("audit_logs").insert({
+\src\lib\agents.functions.ts:133: .from("agent_applications")
+\src\lib\agents.functions.ts:152: .from("profiles")
+\src\lib\agents.functions.ts:160: .from("agent_applications")
+\src\lib\agents.functions.ts:194: .from("agent_registry")
+\src\lib\agents.functions.ts:216: .from("agent_applications")
+\src\lib\agents.functions.ts:225: .from("agent_applications")
+\src\lib\agents.functions.ts:236: .from("agents")
+\src\lib\agents.functions.ts:274: await (await admin()).from("agents").update({ status: data.status }).eq("id", data.id);
+\src\lib\agents.functions.ts:304: .from("agents")
+\src\lib\agents.functions.ts:349: .from("agent_registry")
+\src\lib\agents.functions.ts:384: .from("agents")
+\src\lib\agents.functions.ts:407: await db.from("agents").update({ user_id: uid, email: data.email }).eq("id", ag.id);
+\src\lib\agents.functions.ts:410: .from("profiles")
+\src\lib\agents.functions.ts:435: db.from("clients").select("id", { count: "exact", head: true }).eq("agent_id", agentId),
+\src\lib\agents.functions.ts:436: db.from("agent_redemptions").select("tokens_used, status").eq("agent_id", agentId),
+\src\lib\agents.functions.ts:455: .from("agents")
+\src\lib\agents.functions.ts:465: .from("agent_applications")
+\src\lib\agents.functions.ts:473: db.from("agents").select("id").eq("status", "active"),
+\src\lib\agents.functions.ts:475: .from("clients")
+\src\lib\agents.functions.ts:479: .from("agent_notices")
+\src\lib\agents.functions.ts:484: .from("agent_redemptions")
+\src\lib\agents.functions.ts:553: .from("agents")
+\src\lib\agents.functions.ts:563: .from("agent_redemptions")
+\src\lib\agents.functions.ts:581: db.from("agents").select("id, agent_code, full_name, status, user_id"),
+\src\lib\agents.functions.ts:582: db.from("clients").select("id, agent_id, created_at").not("agent_id", "is", null),
+\src\lib\agents.functions.ts:583: db.from("deals").select("id, client_id, status, stage, value, currency"),
+\src\lib\agents.functions.ts:584: db.from("transactions").select("client_id, amount, currency, status"),
+\src\lib\agents.functions.ts:585: db.from("agent_redemptions").select("amount, status, currency"),
+\src\lib\agents.functions.ts:586: db.from("clients").select("id", { count: "exact", head: true }),
+\src\lib\agents.functions.ts:692: .from("agents")
+\src\lib\agents.functions.ts:702: .from("profiles")
+\src\lib\agents.functions.ts:739: const { error } = await context.supabase.from("brand_templates").upsert(
+\src\lib\agents.functions.ts:770: .from("agent_redemptions")
+\src\lib\agents.functions.ts:777: .from("agent_redemptions")
+\src\lib\agents.functions.ts:806: .from("agents")
+\src\lib\agents.functions.ts:834: .from("agents")
+\src\lib\agents.functions.ts:841: .from("clients")
+\src\lib\agents.functions.ts:848: .from("clients")
+\src\lib\auth.functions.ts:43: const { createClient } = await import("@supabase/supabase-js");
+\src\lib\auth.functions.ts:51: const supabaseLookup = createClient(supabaseUrl, publishableKey);
+\src\lib\auth.functions.ts:65: .from("kalexi-avatars")
+\src\lib\auth.functions.ts:98: const { createClient } = await import("@supabase/supabase-js");
+\src\lib\auth.functions.ts:99: const authClient = createClient(supabaseUrl, publishableKey);
+\src\lib\auth.functions.ts:113: .from("user_roles")
+\src\lib\auth.functions.ts:130: await supabaseAdmin.from("audit_logs").insert({
+\src\lib\auth.functions.ts:176: .from("profiles")
+\src\lib\auth.functions.ts:188: .from("user_roles")
+\src\lib\auth.functions.ts:216: .from("profiles")
+\src\lib\auth.functions.ts:239: .from("profiles")
+\src\lib\auth.functions.ts:267: await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
+\src\lib\auth.functions.ts:269: .from("user_roles")
+\src\lib\auth.functions.ts:307: .from("profiles")
+\src\lib\auth.functions.ts:325: .from("profiles")
+\src\lib\auth.functions.ts:346: .from("clients")
+\src\lib\brand.functions.ts:15: .from("user_roles")
+\src\lib\brand.functions.ts:26: .from("company_branding")
+\src\lib\brand.functions.ts:35: ? supabaseAdmin.storage.from("company-branding").getPublicUrl(data.logo_path).data.publicUrl
+\src\lib\brand.functions.ts:55: .from("company-branding")
+\src\lib\brand.functions.ts:74: .from("company_branding")
+\src\lib\brand.functions.ts:83: .from("company_branding")
+\src\lib\brand.functions.ts:98: const { error: auditError } = await supabaseAdmin.from("audit_logs").insert({
+\src\lib\brand.functions.ts:114: ? supabaseAdmin.storage.from("company-branding").getPublicUrl(updated.logo_path).data
+\src\lib\brand.functions.ts:126: const { data: staff } = await context.supabase.rpc("is_active_staff", { _user_id: context.userId });
+\src\lib\brand.functions.ts:130: const { data: upload, error } = await supabaseAdmin.storage.from("kalexi-vault").createSignedUploadUrl(path);
+\src\lib\brand.functions.ts:139: const { data: row, error } = await context.supabase.from("brand_templates").select("signature_path").eq("id", data.id).single();
+\src\lib\brand.functions.ts:143: const { data: signed, error: signingError } = await supabaseAdmin.storage.from("kalexi-vault").createSignedUrl(row.signature_path, 900);
+\src\lib\maintenance.functions.ts:16: .from("user_roles")
+\src\lib\maintenance.functions.ts:30: .from("user_roles")
+\src\lib\maintenance.functions.ts:57: .from("audit_logs")
+\src\lib\maintenance.functions.ts:73: .from("profiles")
+\src\lib\maintenance.functions.ts:94: .from("system_maintenance")
+\src\lib\maintenance.functions.ts:157: .from("system_maintenance")
+\src\lib\maintenance.functions.ts:173: const { error: auditError } = await supabaseAdmin.from("audit_logs").insert({
+\src\lib\maintenance.ts:65: .from("system_maintenance")
+\src\lib\maintenance.ts:85: .from("user_roles")
+\src\lib\publicform.functions.ts:31: .from("forms")
+\src\lib\publicform.functions.ts:51: .from("forms")
+\src\lib\publicform.functions.ts:181: .from("forms")
+\src\lib\publicform.functions.ts:192: .from("form_submissions")
+\src\lib\publicform.functions.ts:205: .from("forms")
+\src\lib\publicform.functions.ts:221: await supabaseAdmin.from("documents").insert({
+\src\lib\publicform.functions.ts:231: await supabaseAdmin.from("media").insert({
+\src\lib\publicform.functions.ts:243: .from("forms")
+\src\lib\publicform.functions.ts:247: await supabaseAdmin.from("audit_logs").insert({
+\src\lib\records.ts:92: | "risk_cases"
+\src\lib\records.ts:131: const { error: archiveError } = await supabase.from("archive_records").insert({
+\src\lib\records.ts:177: .from("archive_records")
+\src\routes\_authenticated\account.tsx:68: .from("profiles")
+\src\routes\_authenticated\admin.audit.tsx:29: .from("audit_logs")
+\src\routes\_authenticated\admin.index.tsx:266: supabase.from("profiles").select("id", { count: "exact", head: true }),
+\src\routes\_authenticated\admin.index.tsx:267: supabase.from("clients").select("id", { count: "exact", head: true }),
+\src\routes\_authenticated\admin.index.tsx:268: supabase.from("deals").select("id", { count: "exact", head: true }),
+\src\routes\_authenticated\admin.index.tsx:269: supabase.from("opportunities").select("id", { count: "exact", head: true }),
+\src\routes\_authenticated\admin.users.tsx:67: .from("profiles")
+\src\routes\_authenticated\admin.users.tsx:70: supabase.from("user_roles").select("user_id, role"),
+\src\routes\_authenticated\agents.$agentId.tsx:22: const q = useQuery({ queryKey: ["agent", agentId], queryFn: async () => (await supabase.from("agents").select("*").eq("id", agentId).single()).data });
+\src\routes\_authenticated\agents.index.tsx:93: .from("agent_applications")
+\src\routes\_authenticated\agents.index.tsx:462: supabase.from("agents").select("*").order("created_at", { ascending: false }),
+\src\routes\_authenticated\agents.index.tsx:463: supabase.from("agent_registry").select("*").order("created_at", { ascending: false }),
+\src\routes\_authenticated\agents.index.tsx:555: .from("agents")
+\src\routes\_authenticated\agents.index.tsx:572: .from("agent_registry")
+\src\routes\_authenticated\agents.index.tsx:801: .from("agent_campaigns")
+\src\routes\_authenticated\agents.index.tsx:832: .from("agent_campaigns")
+\src\routes\_authenticated\agents.index.tsx:865: .from("agent_campaigns")
+\src\routes\_authenticated\agents.index.tsx:967: .from("agent_registry")
+\src\routes\_authenticated\agents.index.tsx:985: const { error } = await supabase.storage.from("kalexi-vault").upload(signature_path, sig);
+\src\routes\_authenticated\agents.index.tsx:988: const { error } = await supabase.from("agent_registry").insert({
+\src\routes\_authenticated\agents.index.tsx:1125: (await supabase.from("agent_notices").select("*").order("created_at", { ascending: false }))
+\src\routes\_authenticated\agents.index.tsx:1135: .from("agent_notices")
+\src\routes\_authenticated\agents.redemptions.tsx:25: const { data, error } = await supabase.from("agent_redemptions").select("*, agents(full_name, agent_code, phone, application_id)").order("created_at", { ascending: false });
+\src\routes\_authenticated\agents.redemptions.tsx:28: const payments = ids.length ? await supabase.from("agent_applications").select("id,payment_method,payment_provider,payment_account_name,payment_account_number").in("id", ids) : null;
+\src\routes\_authenticated\archive.index.tsx:70: const { data, error } = await supabase.from("archive_records").select("entity_type");
+\src\routes\_authenticated\archive.index.tsx:81: .from("archive_records")
+\src\routes\_authenticated\archive.index.tsx:106: .from("archive_records")
+\src\routes\_authenticated\brand.tsx:42: const q = useQuery({ queryKey: ["brand-templates"], enabled: staff, queryFn: async () => { const { data, error } = await supabase.from("brand_templates").select("*").order("updated_at", { ascending: false }); if (error) throw error; return data; } });
+\src\routes\_authenticated\brand.tsx:55: const { error } = await supabase.storage.from("kalexi-vault").uploadToSignedUrl(slot.path, slot.token, signature); if (error) throw error;
+\src\routes\_authenticated\brand.tsx:59: const result = id ? await supabase.from("brand_templates").update(payload).eq("id", id).select().single() : await supabase.from("brand_templates").insert({ ...payload, created_by: session.userId }).select().single();
+\src\routes\_authenticated\brand.tsx:66: async function remove() { if (!id || !window.confirm("Delete this saved template?")) return; setBusy(true); const { error } = await supabase.from("brand_templates").delete().eq("id", id); setBusy(false); if (error) { toast.error(error.message); return; } setDirty(false); setId(null); setDraft(fresh()); setSignature(null); qc.invalidateQueries({ queryKey: ["brand-templates"] }); toast.success("Template deleted"); }
+\src\routes\_authenticated\calendar.tsx:65: .from("calendar_events")
+\src\routes\_authenticated\calendar.tsx:149: const result = await (supabase as any).from("calendar_events").insert({
+\src\routes\_authenticated\clients.$clientId.acknowledgement.tsx:29: .from("clients")
+\src\routes\_authenticated\clients.$clientId.index.tsx:27: const { data, error } = await supabase.from("clients").select("*").eq("id", clientId).maybeSingle();
+\src\routes\_authenticated\clients.$clientId.index.tsx:38: .from("profiles")
+\src\routes\_authenticated\clients.index.tsx:33: .from("clients")
+\src\routes\_authenticated\clients.new.tsx:81: .from("clients")
+\src\routes\_authenticated\clients.new.tsx:107: .from("clients")
+\src\routes\_authenticated\dashboard.tsx:142: supabase.from("clients").select("id", { count: "exact", head: true }).is("archived_at", null),
+\src\routes\_authenticated\dashboard.tsx:145: .from("clients")
+\src\routes\_authenticated\dashboard.tsx:155: .from("deals")
+\src\routes\_authenticated\dashboard.tsx:164: .from("transactions")
+\src\routes\_authenticated\dashboard.tsx:175: .from("audit_logs")
+\src\routes\_authenticated\dashboard.tsx:309: .from("agents")
+\src\routes\_authenticated\dashboard.tsx:316: .from("clients")
+\src\routes\_authenticated\dashboard.tsx:325: .from("deals")
+\src\routes\_authenticated\deals.$dealId.index.tsx:58: .from("deals")
+\src\routes\_authenticated\deals.$dealId.index.tsx:72: .from("deal_parties")
+\src\routes\_authenticated\deals.$dealId.index.tsx:86: .from("offers")
+\src\routes\_authenticated\deals.$dealId.index.tsx:100: .from("negotiations")
+\src\routes\_authenticated\deals.$dealId.index.tsx:113: const { error } = await supabase.from("deals").update(patch as never).eq("id", dealId);
+\src\routes\_authenticated\deals.$dealId.index.tsx:346: const { error } = await supabase.from("offers").insert({
+\src\routes\_authenticated\deals.$dealId.index.tsx:427: const { error } = await supabase.from("negotiations").insert({
+\src\routes\_authenticated\deals.$dealId.index.tsx:491: const { error } = await supabase.from("deal_parties").insert({
+\src\routes\_authenticated\deals.index.tsx:68: .from("deals")
+\src\routes\_authenticated\deals.new.tsx:56: .from("clients")
+\src\routes\_authenticated\deals.new.tsx:69: .from("opportunities")
+\src\routes\_authenticated\deals.new.tsx:82: .from("client_requirements")
+\src\routes\_authenticated\deals.new.tsx:97: .from("deals")
+\src\routes\_authenticated\documents.index.tsx:84: .from("documents")
+\src\routes\_authenticated\documents.index.tsx:100: .from("kalexi-vault")
+\src\routes\_authenticated\documents.index.tsx:122: .from("documents")
+\src\routes\_authenticated\documents.index.tsx:314: .from("clients")
+\src\routes\_authenticated\documents.index.tsx:327: .from("deals")
+\src\routes\_authenticated\documents.index.tsx:343: .from("kalexi-vault")
+\src\routes\_authenticated\documents.index.tsx:348: .from("documents")
+\src\routes\_authenticated\documents.index.tsx:509: .from("kalexi-vault")
+\src\routes\_authenticated\documents.index.tsx:513: const { error: versionError } = await supabase.from("document_versions").insert({
+\src\routes\_authenticated\documents.index.tsx:524: .from("documents")
+\src\routes\_authenticated\finance.index.tsx:94: .from("clients")
+\src\routes\_authenticated\finance.index.tsx:106: .from("deals")
+\src\routes\_authenticated\finance.index.tsx:137: .from("transactions")
+\src\routes\_authenticated\finance.index.tsx:158: .from("invoices")
+\src\routes\_authenticated\finance.index.tsx:179: .from("commissions")
+\src\routes\_authenticated\finance.index.tsx:195: const { error } = await supabase.from("transactions").update({ status: value }).eq("id", id);
+\src\routes\_authenticated\finance.index.tsx:207: const { error } = await supabase.from("invoices").update({ status: value }).eq("id", id);
+\src\routes\_authenticated\finance.index.tsx:219: const { error } = await supabase.from("commissions").update({ status: value }).eq("id", id);
+\src\routes\_authenticated\finance.index.tsx:644: .from("transactions")
+\src\routes\_authenticated\finance.index.tsx:811: .from("invoices")
+\src\routes\_authenticated\finance.index.tsx:948: .from("transactions")
+\src\routes\_authenticated\finance.index.tsx:962: .from("commissions")
+\src\routes\_authenticated\finance.receipts.$receiptId.tsx:30: .from("receipts")
+\src\routes\_authenticated\finance.receipts.index.tsx:59: .from("receipts")
+\src\routes\_authenticated\finance.receipts.index.tsx:176: .from("transactions")
+\src\routes\_authenticated\finance.receipts.index.tsx:207: .from("receipts")
+\src\routes\_authenticated\finance.receipts.print.tsx:36: let query = supabase.from("receipts").select("id, receipt_ref, verification_ref, issued_to, amount, currency, narrative, created_at").is("archived_at", null).order("created_at", { ascending: true }).limit(1000);
+\src\routes\_authenticated\forms.$formId.index.tsx:57: .from("forms")
+\src\routes\_authenticated\forms.$formId.index.tsx:71: .from("form_submissions")
+\src\routes\_authenticated\forms.$formId.index.tsx:238: .from("form_submissions")
+\src\routes\_authenticated\forms.$formId.index.tsx:328: .from("documents")
+\src\routes\_authenticated\forms.$formId.index.tsx:334: .from("media")
+\src\routes\_authenticated\forms.$formId.index.tsx:365: const { data, error } = await supabase.storage.from("kalexi-vault").createSignedUrl(path, 600);
+\src\routes\_authenticated\forms.index.tsx:94: .from("forms")
+\src\routes\_authenticated\forms.index.tsx:300: const { error } = await supabase.from("forms").insert({
+\src\routes\_authenticated\intelligence.tsx:3: import { createClient } from "@supabase/supabase-js";
+\src\routes\_authenticated\intelligence.tsx:45: ? createClient(supabaseUrl, supabaseKey)
+\src\routes\_authenticated\intelligence.tsx:114: "get_intelligence_reports",
+\src\routes\_authenticated\intelligence.tsx:303: get_intelligence_reports database function.
+\src\routes\_authenticated\matches.index.tsx:71: .from("opportunity_matches")
+\src\routes\_authenticated\matches.index.tsx:89: .from("opportunity_matches")
+\src\routes\_authenticated\media.index.tsx:100: .from("media")
+\src\routes\_authenticated\objectives.index.tsx:87: .from("objectives")
+\src\routes\_authenticated\objectives.index.tsx:102: const { error } = await supabase.from("objectives").insert({
+\src\routes\_authenticated\objectives.index.tsx:147: .from("objectives")
+\src\routes\_authenticated\objectives.index.tsx:152: await supabase.from("objective_progress").insert({
+\src\routes\_authenticated\opportunities.$opportunityId.index.tsx:52: const { data, error } = await supabase.from("opportunities").select("*").eq("id", opportunityId).maybeSingle();
+\src\routes\_authenticated\opportunities.$opportunityId.index.tsx:62: .from("opportunity_matches")
+\src\routes\_authenticated\opportunities.$opportunityId.index.tsx:97: .from("opportunities")
+\src\routes\_authenticated\opportunities.$opportunityId.index.tsx:135: const { error } = await supabase.from("opportunities").update({ verification_status: status }).eq("id", opportunityId);
+\src\routes\_authenticated\opportunities.index.tsx:49: .from("opportunities")
+
+===== 5. MIGRATION FILE NAMES =====
+20260810000000_create_storage_buckets.sql
+20260810183553_0adf00fa-e8a8-42a4-856b-276772fac36f.sql
+20260810183607_27fb022b-9190-4fef-95ab-401dd97e086e.sql
+20260811070002_342b9224-48fc-4f99-85d6-5813b0f1b401.sql
+20260811070025_56fabcfd-1eff-46ec-9183-fbbf25285203.sql
+20260811070056_99e69905-f7a3-491a-9627-218a01cda62f.sql
+20260814162920_0cb94f30-e546-4b87-b52a-0da3fc1f43e3.sql
+20260816035733_d4bba811-549a-4efa-a1fb-e69056e0792b.sql
+20260816035808_0d6fcfb3-86bc-4df6-b72f-0092db514a93.sql
+20261022190000_agent_phone_signin.sql
+20261022203000_system_maintenance.sql
+20261024000000_agent_registration_schema.sql
+20261025000000_company_branding.sql
+20261028000000_company_calendar.sql
+
+===== INSPECTION COMPLETE =====

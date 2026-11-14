@@ -1,4 +1,4 @@
-import { i as __toESM, t as __commonJSMin } from "../../_runtime.mjs";
+import { o as __toESM, t as __commonJSMin } from "../../_runtime.mjs";
 import { l as require_react_dom, u as require_react } from "../@floating-ui/react-dom+[...].mjs";
 import { t as composeEventHandlers } from "../radix-ui__primitive.mjs";
 //#region node_modules/react/cjs/react-jsx-runtime.production.js
@@ -78,6 +78,7 @@ __name$8(useComposedRefs, "useComposedRefs");
 //#endregion
 //#region node_modules/@radix-ui/react-slot/dist/index.mjs
 var import_jsx_runtime = require_jsx_runtime();
+var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
 var __defProp$7 = Object.defineProperty;
 var __name$7 = (target, value) => __defProp$7(target, "name", {
 	value,
@@ -206,7 +207,6 @@ var createSlottableError = /* @__PURE__ */ __name$7((ownerName) => {
 var use = import_react[" use ".trim().toString()];
 //#endregion
 //#region node_modules/@radix-ui/react-primitive/dist/index.mjs
-var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
 var __defProp$6 = Object.defineProperty;
 var __name$6 = (target, value) => __defProp$6(target, "name", {
 	value,

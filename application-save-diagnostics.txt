@@ -1,0 +1,47 @@
+﻿src/routes/_authenticated/finance.approvals.index.tsx(103,50): error TS2448: Block-scoped variable 'journalIds' used before its declaration.
+src/routes/_authenticated/finance.approvals.index.tsx(103,50): error TS2454: Variable 'journalIds' is used before being assigned.
+src/routes/_authenticated/finance.approvals.index.tsx(104,25): error TS2448: Block-scoped variable 'journalIds' used before its declaration.
+src/routes/_authenticated/finance.approvals.index.tsx(104,25): error TS2454: Variable 'journalIds' is used before being assigned.
+src/routes/_authenticated/finance.approvals.index.tsx(120,25): error TS2448: Block-scoped variable 'journalIds' used before its declaration.
+src/routes/_authenticated/finance.approvals.index.tsx(120,25): error TS2454: Variable 'journalIds' is used before being assigned.
+src/routes/_authenticated/intelligence-monitor.tsx(18,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(relation: "agent_campaigns" | "profiles" | "agents" | "agent_applications" | "clients" | "deals" | "transactions" | "agent_commission_ledger" | "agent_commission_payouts" | "properties" | ... 50 more ... | "finance_settings"): PostgrestQueryBuilder<...>', gave the following error.
+    Argument of type '"intelligence_activity"' is not assignable to parameter of type '"agent_campaigns" | "profiles" | "agents" | "agent_applications" | "clients" | "deals" | "transactions" | "agent_commission_ledger" | "agent_commission_payouts" | "properties" | ... 50 more ... | "finance_settings"'.
+  Overload 2 of 2, '(relation: never): PostgrestQueryBuilder<{ PostgrestVersion: "14.15"; }, { Tables: { company_branding: { Row: { accent_color: string; id: string; logo_path: string | null; primary_color: string; updated_at: string; updated_by: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: []; }; ... 59 more ...; finance_settings: { ...; }; }; Views: {}; Functions: { ...; }; Enums: { ...; }; CompositeTypes: {}; }, never, never, never>', gave the following error.
+    Argument of type '"intelligence_activity"' is not assignable to parameter of type 'never'.
+src/routes/_authenticated/intelligence-monitor.tsx(134,53): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(relation: "agent_campaigns" | "profiles" | "agents" | "agent_applications" | "clients" | "deals" | "transactions" | "agent_commission_ledger" | "agent_commission_payouts" | "properties" | ... 50 more ... | "finance_settings"): PostgrestQueryBuilder<...>', gave the following error.
+    Argument of type '"intelligence_activity"' is not assignable to parameter of type '"agent_campaigns" | "profiles" | "agents" | "agent_applications" | "clients" | "deals" | "transactions" | "agent_commission_ledger" | "agent_commission_payouts" | "properties" | ... 50 more ... | "finance_settings"'.
+  Overload 2 of 2, '(relation: never): PostgrestQueryBuilder<{ PostgrestVersion: "14.15"; }, { Tables: { company_branding: { Row: { accent_color: string; id: string; logo_path: string | null; primary_color: string; updated_at: string; updated_by: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: []; }; ... 59 more ...; finance_settings: { ...; }; }; Views: {}; Functions: { ...; }; Enums: { ...; }; CompositeTypes: {}; }, never, never, never>', gave the following error.
+    Argument of type '"intelligence_activity"' is not assignable to parameter of type 'never'.
+src/routes/_authenticated/intelligence-monitor.tsx(135,7): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/intelligence-monitor.tsx(136,7): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/intelligence-monitor.tsx(137,7): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/intelligence-monitor.tsx(138,7): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/intelligence-monitor.tsx(139,7): error TS2322: Type 'number' is not assignable to type 'never'.
+src/routes/_authenticated/intelligence-monitor.tsx(140,7): error TS2322: Type 'number' is not assignable to type 'never'.
+src/routes/_authenticated/intelligence-monitor.tsx(141,7): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(81,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(relation: "agent_campaigns" | "profiles" | "agents" | "agent_applications" | "clients" | "deals" | "transactions" | "agent_commission_ledger" | "agent_commission_payouts" | "properties" | ... 50 more ... | "finance_settings"): PostgrestQueryBuilder<...>', gave the following error.
+    Argument of type '"research_intelligence_memory"' is not assignable to parameter of type '"agent_campaigns" | "profiles" | "agents" | "agent_applications" | "clients" | "deals" | "transactions" | "agent_commission_ledger" | "agent_commission_payouts" | "properties" | ... 50 more ... | "finance_settings"'.
+  Overload 2 of 2, '(relation: never): PostgrestQueryBuilder<{ PostgrestVersion: "14.15"; }, { Tables: { company_branding: { Row: { accent_color: string; id: string; logo_path: string | null; primary_color: string; updated_at: string; updated_by: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: []; }; ... 59 more ...; finance_settings: { ...; }; }; Views: {}; Functions: { ...; }; Enums: { ...; }; CompositeTypes: {}; }, never, never, never>', gave the following error.
+    Argument of type '"research_intelligence_memory"' is not assignable to parameter of type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(83,11): error TS2345: Argument of type '"case_id"' is not assignable to parameter of type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(93,17): error TS2352: Conversion of type '(SelectQueryError<"column 'id' does not exist on 'agent_campaigns'."> | SelectQueryError<"column 'id' does not exist on 'profiles'."> | ... 58 more ... | SelectQueryError<...>)[]' to type 'MemoryRecord[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'SelectQueryError<"column 'id' does not exist on 'agent_campaigns'."> | SelectQueryError<"column 'id' does not exist on 'profiles'."> | ... 58 more ... | SelectQueryError<...>' is not comparable to type 'MemoryRecord'.
+    Type '{ error: true; } & String' is missing the following properties from type 'MemoryRecord': id, case_id, memory_type, subject, and 6 more.
+src/routes/_authenticated/research/rio-times-ddr.tsx(123,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(relation: "agent_campaigns" | "profiles" | "agents" | "agent_applications" | "clients" | "deals" | "transactions" | "agent_commission_ledger" | "agent_commission_payouts" | "properties" | ... 50 more ... | "finance_settings"): PostgrestQueryBuilder<...>', gave the following error.
+    Argument of type '"research_intelligence_memory"' is not assignable to parameter of type '"agent_campaigns" | "profiles" | "agents" | "agent_applications" | "clients" | "deals" | "transactions" | "agent_commission_ledger" | "agent_commission_payouts" | "properties" | ... 50 more ... | "finance_settings"'.
+  Overload 2 of 2, '(relation: never): PostgrestQueryBuilder<{ PostgrestVersion: "14.15"; }, { Tables: { company_branding: { Row: { accent_color: string; id: string; logo_path: string | null; primary_color: string; updated_at: string; updated_by: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: []; }; ... 59 more ...; finance_settings: { ...; }; }; Views: {}; Functions: { ...; }; Enums: { ...; }; CompositeTypes: {}; }, never, never, never>', gave the following error.
+    Argument of type '"research_intelligence_memory"' is not assignable to parameter of type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(125,9): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(126,9): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(127,9): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(128,9): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(129,9): error TS2322: Type 'string | null' is not assignable to type 'never'.
+  Type 'null' is not assignable to type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(130,9): error TS2322: Type 'string | null' is not assignable to type 'never'.
+  Type 'null' is not assignable to type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(131,9): error TS2322: Type 'string' is not assignable to type 'never'.
+src/routes/_authenticated/research/rio-times-ddr.tsx(132,9): error TS2322: Type 'string' is not assignable to type 'never'.

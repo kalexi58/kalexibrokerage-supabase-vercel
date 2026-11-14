@@ -122,6 +122,58 @@
   --input: oklch(1 0 0 / 16%);
 }
 
+html[data-interface-density="compact"] .workspace-main {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.workspace-main {
+  scrollbar-gutter: stable;
+}
+
+@media (min-width: 768px) {
+  html[data-interface-density="compact"] .workspace-main {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+}
+
+html[data-interface-accent="ocean"] {
+  --primary: oklch(0.52 0.19 255);
+  --ring: oklch(0.62 0.16 255);
+}
+html[data-interface-accent="kalexi"] {
+  --primary: var(--company-primary, oklch(0.46 0.13 170));
+  --accent: var(--company-accent, oklch(0.742 0.126 88));
+}
+html.dark[data-interface-accent="kalexi"] {
+  --primary: var(--company-primary, oklch(0.742 0.126 88));
+}
+html.dark[data-interface-accent="ocean"] {
+  --primary: oklch(0.72 0.14 255);
+}
+html[data-interface-accent="forest"] {
+  --primary: oklch(0.48 0.13 150);
+  --ring: oklch(0.58 0.13 150);
+}
+html.dark[data-interface-accent="forest"] {
+  --primary: oklch(0.72 0.12 150);
+}
+html[data-interface-accent="violet"] {
+  --primary: oklch(0.52 0.19 295);
+  --ring: oklch(0.62 0.17 295);
+}
+html.dark[data-interface-accent="violet"] {
+  --primary: oklch(0.74 0.14 295);
+}
+html[data-interface-accent="gold"] {
+  --primary: oklch(0.68 0.13 80);
+  --ring: oklch(0.72 0.13 80);
+}
+html.dark[data-interface-accent="gold"] {
+  --primary: oklch(0.78 0.13 85);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);

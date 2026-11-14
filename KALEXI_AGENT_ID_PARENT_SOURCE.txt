@@ -1,0 +1,656 @@
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 194 ==========
+
+    if (!result) {
+      throw new Error("Could not rasterize the original Kalexi logo.");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("[Agent ID PDF] Actual SVG logo conversion failed.", error);
+    throw error;
+  }
+}
+
+export function AgentIdCard({
+  agent: a,
+  photoUrl,
+  signatureUrl,
+  onDownloadReady,
+}: {
+  agent: CardAgent;
+  photoUrl?: string | null;
+  signatureUrl?: string | null;
+  onDownloadReady?: (download: PdfDownload | null) => void;
+}) {
+  const [qr, setQr] = useState("");
+  const [qrError, setQrError] = useState(false);
+  const barcodeRef = useRef<SVGSVGElement>(null);
+  const logoContainerRef = useRef<HTMLDivElement>(null);
+
+  const session = useSession();
+  const themeQuery = useQuery({
+    queryKey: ["agent-id-theme", session.data?.userId],
+    enabled: !!session.data?.userId,
+    queryFn: () => getAgentIdTheme(),
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 198 ==========
+
+    return result;
+  } catch (error) {
+    console.error("[Agent ID PDF] Actual SVG logo conversion failed.", error);
+    throw error;
+  }
+}
+
+export function AgentIdCard({
+  agent: a,
+  photoUrl,
+  signatureUrl,
+  onDownloadReady,
+}: {
+  agent: CardAgent;
+  photoUrl?: string | null;
+  signatureUrl?: string | null;
+  onDownloadReady?: (download: PdfDownload | null) => void;
+}) {
+  const [qr, setQr] = useState("");
+  const [qrError, setQrError] = useState(false);
+  const barcodeRef = useRef<SVGSVGElement>(null);
+  const logoContainerRef = useRef<HTMLDivElement>(null);
+
+  const session = useSession();
+  const themeQuery = useQuery({
+    queryKey: ["agent-id-theme", session.data?.userId],
+    enabled: !!session.data?.userId,
+    queryFn: () => getAgentIdTheme(),
+  });
+
+  const theme = themeQuery.data?.theme ?? DEFAULT_AGENT_ID_THEME;
+  const authorizedSignatureUrl =
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 203 ==========
+  }
+}
+
+export function AgentIdCard({
+  agent: a,
+  photoUrl,
+  signatureUrl,
+  onDownloadReady,
+}: {
+  agent: CardAgent;
+  photoUrl?: string | null;
+  signatureUrl?: string | null;
+  onDownloadReady?: (download: PdfDownload | null) => void;
+}) {
+  const [qr, setQr] = useState("");
+  const [qrError, setQrError] = useState(false);
+  const barcodeRef = useRef<SVGSVGElement>(null);
+  const logoContainerRef = useRef<HTMLDivElement>(null);
+
+  const session = useSession();
+  const themeQuery = useQuery({
+    queryKey: ["agent-id-theme", session.data?.userId],
+    enabled: !!session.data?.userId,
+    queryFn: () => getAgentIdTheme(),
+  });
+
+  const theme = themeQuery.data?.theme ?? DEFAULT_AGENT_ID_THEME;
+  const authorizedSignatureUrl =
+    themeQuery.data?.authorizedSignatureUrl ?? signatureUrl;
+
+  useEffect(() => {
+    let cancelled = false;
+    setQr("");
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 537 ==========
+    pdf.save(`Kalexi-Agent-ID-${safeName || "Agent"}.pdf`);
+  }, [
+    a,
+    theme,
+    qr,
+    qrError,
+    photoUrl,
+    authorizedSignatureUrl,
+  ]);
+
+  useEffect(() => {
+    if (!qr || !barcodeRef.current) {
+      onDownloadReady?.(null);
+      return;
+    }
+
+    onDownloadReady?.(downloadPdf);
+    return () => onDownloadReady?.(null);
+  }, [qr, downloadPdf, onDownloadReady]);
+
+  return (
+    <>
+      <style>{`
+      @media print {
+        @page {
+          size: ${Number(theme.widthMm)}mm ${Number(theme.heightMm)}mm;
+          margin: 0;
+        }
+
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 541 ==========
+    qr,
+    qrError,
+    photoUrl,
+    authorizedSignatureUrl,
+  ]);
+
+  useEffect(() => {
+    if (!qr || !barcodeRef.current) {
+      onDownloadReady?.(null);
+      return;
+    }
+
+    onDownloadReady?.(downloadPdf);
+    return () => onDownloadReady?.(null);
+  }, [qr, downloadPdf, onDownloadReady]);
+
+  return (
+    <>
+      <style>{`
+      @media print {
+        @page {
+          size: ${Number(theme.widthMm)}mm ${Number(theme.heightMm)}mm;
+          margin: 0;
+        }
+
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+        }
+
+        body * {
+          visibility: hidden !important;
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 542 ==========
+    qrError,
+    photoUrl,
+    authorizedSignatureUrl,
+  ]);
+
+  useEffect(() => {
+    if (!qr || !barcodeRef.current) {
+      onDownloadReady?.(null);
+      return;
+    }
+
+    onDownloadReady?.(downloadPdf);
+    return () => onDownloadReady?.(null);
+  }, [qr, downloadPdf, onDownloadReady]);
+
+  return (
+    <>
+      <style>{`
+      @media print {
+        @page {
+          size: ${Number(theme.widthMm)}mm ${Number(theme.heightMm)}mm;
+          margin: 0;
+        }
+
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+        }
+
+        body * {
+          visibility: hidden !important;
+        }
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 543 ==========
+    photoUrl,
+    authorizedSignatureUrl,
+  ]);
+
+  useEffect(() => {
+    if (!qr || !barcodeRef.current) {
+      onDownloadReady?.(null);
+      return;
+    }
+
+    onDownloadReady?.(downloadPdf);
+    return () => onDownloadReady?.(null);
+  }, [qr, downloadPdf, onDownloadReady]);
+
+  return (
+    <>
+      <style>{`
+      @media print {
+        @page {
+          size: ${Number(theme.widthMm)}mm ${Number(theme.heightMm)}mm;
+          margin: 0;
+        }
+
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+        }
+
+        body * {
+          visibility: hidden !important;
+        }
+
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 564 ==========
+        }
+
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+        }
+
+        body * {
+          visibility: hidden !important;
+        }
+
+        .agent-id-set,
+        .agent-id-set * {
+          visibility: visible !important;
+        }
+
+        .agent-id-set {
+          display: block !important;
+          width: ${Number(theme.widthMm)}mm !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          gap: 0 !important;
+        }
+
+        .agent-id {
+          display: flex !important;
+          box-sizing: border-box !important;
+          width: ${Number(theme.widthMm)}mm !important;
+          min-width: ${Number(theme.widthMm)}mm !important;
+          max-width: ${Number(theme.widthMm)}mm !important;
+          height: ${Number(theme.heightMm)}mm !important;
+          min-height: ${Number(theme.heightMm)}mm !important;
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 565 ==========
+
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+        }
+
+        body * {
+          visibility: hidden !important;
+        }
+
+        .agent-id-set,
+        .agent-id-set * {
+          visibility: visible !important;
+        }
+
+        .agent-id-set {
+          display: block !important;
+          width: ${Number(theme.widthMm)}mm !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          gap: 0 !important;
+        }
+
+        .agent-id {
+          display: flex !important;
+          box-sizing: border-box !important;
+          width: ${Number(theme.widthMm)}mm !important;
+          min-width: ${Number(theme.widthMm)}mm !important;
+          max-width: ${Number(theme.widthMm)}mm !important;
+          height: ${Number(theme.heightMm)}mm !important;
+          min-height: ${Number(theme.heightMm)}mm !important;
+          max-height: ${Number(theme.heightMm)}mm !important;
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 569 ==========
+          background: white !important;
+        }
+
+        body * {
+          visibility: hidden !important;
+        }
+
+        .agent-id-set,
+        .agent-id-set * {
+          visibility: visible !important;
+        }
+
+        .agent-id-set {
+          display: block !important;
+          width: ${Number(theme.widthMm)}mm !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          gap: 0 !important;
+        }
+
+        .agent-id {
+          display: flex !important;
+          box-sizing: border-box !important;
+          width: ${Number(theme.widthMm)}mm !important;
+          min-width: ${Number(theme.widthMm)}mm !important;
+          max-width: ${Number(theme.widthMm)}mm !important;
+          height: ${Number(theme.heightMm)}mm !important;
+          min-height: ${Number(theme.heightMm)}mm !important;
+          max-height: ${Number(theme.heightMm)}mm !important;
+          margin: 0 !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+          overflow: hidden !important;
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCard.tsx : LINE 617 ==========
+          display: none !important;
+          visibility: hidden !important;
+        }
+
+        img, svg {
+          print-color-adjust: exact !important;
+          -webkit-print-color-adjust: exact !important;
+        }
+      }
+    `}</style>
+
+    <div
+      className="agent-id-set flex flex-wrap gap-6"
+      style={{ gridTemplateColumns: `repeat(2, ${theme.widthMm}mm)` }}
+    >
+      <article
+        className="agent-id agent-id-front flex flex-col overflow-hidden border shadow-[var(--shadow-panel)]"
+        style={{
+          backgroundColor: theme.background,
+          color: theme.text,
+          width: `min(100%, ${theme.widthMm}mm)`,
+          height: `${theme.heightMm}mm`,
+          borderRadius: `${theme.radiusMm}mm`,
+          fontFamily: theme.fontFamily,
+        }}
+      >
+        <header
+          className="flex items-center gap-2.5 px-3 py-2"
+          style={{ backgroundColor: theme.accent, color: theme.accentText }}
+        >
+                    <div ref={logoContainerRef} className="flex h-8 w-8 shrink-0 items-center justify-center">
+            <KalexiMark className="h-8 w-8" />
+          </div>
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\components\AgentIdCardDesigner.tsx : LINE 45 ==========
+];
+
+function isSignatureImageType(
+  contentType: string,
+): contentType is "image/jpeg" | "image/png" | "image/webp" {
+  return (
+    contentType === "image/jpeg" ||
+    contentType === "image/png" ||
+    contentType === "image/webp"
+  );
+}
+
+export function AgentIdCardDesigner({ canManage }: { canManage: boolean }) {
+  const qc = useQueryClient();
+  const session = useSession();
+  const [draft, setDraft] = useState<AgentIdTheme>(DEFAULT_AGENT_ID_THEME);
+  const [signatureFile, setSignatureFile] = useState<File | null>(null);
+  const [signaturePreviewUrl, setSignaturePreviewUrl] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const query = useQuery({
+    queryKey: ["agent-id-theme", session.data?.userId],
+    enabled: !!session.data?.userId,
+    queryFn: () => getAgentIdTheme(),
+  });
+
+  useEffect(() => {
+    if (query.data) setDraft(query.data.theme);
+  }, [query.data]);
+
+  useEffect(() => {
+    if (!signatureFile) {
+      setSignaturePreviewUrl(null);
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\routes\_authenticated\agent-portal.tsx : LINE 18 ==========
+import { CalendarDays, Clock, MapPin, ClipboardList } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
+import { getAgentDashboard, getUpcomingAgentEvents, redeemAgentTokens } from "@/lib/agents.functions";
+import {
+  getMyAgentCommissionSummary,
+  requestAgentCommissionPayout,
+} from "@/lib/agent-commission.functions";
+import { KalexiMark } from "@/components/KalexiMark";
+import { StatusPill } from "@/components/records";
+import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/AppShell";
+import { AgentIdCard } from "@/components/AgentIdCard";
+import { AgentMessages } from "@/components/AgentMessages";
+import { validAgent } from "@/lib/agent-rules";
+import { DEAL_STAGES, DEAL_STAGE_LABEL } from "@/lib/records";
+
+export const Route = createFileRoute("/_authenticated/agent-portal")({
+  head: () => ({ meta: [{ title: "My Agent Dashboard — Kalexi" }, { name: "description", content: "Your referrals, approximate rewards and private Kalexi conversations." }, { property: "og:title", content: "My Agent Dashboard — Kalexi" }, { property: "og:description", content: "Your Kalexi agent performance and rewards." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  component: AgentPortal,
+});
+
+const TIPS = [
+  "Share your link on WhatsApp status and in community groups.",
+  "Ask satisfied clients to refer friends — each referral counts for you.",
+  "Collect the client's exact need (location, budget, quantity) so Kalexi can match faster.",
+  "Never collect money from clients — all payments go to official Kalexi accounts.",
+];
+const TRACKED_DEAL_STAGES = DEAL_STAGES.filter((stage) => stage !== "archived");
+
+function AgentPortal() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\routes\_authenticated\agent-portal.tsx : LINE 604 ==========
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Staff-published events will appear here when scheduled.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {tab === "card" && (
+          <section className={box}>
+            <div className="no-print mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="font-display font-semibold">My official ID card</h2>
+              <Button size="sm" disabled={!active} onClick={() => window.print()}>Download / print</Button></div>
+            {active ? <AgentIdCard agent={me} photoUrl={me.photoUrl} signatureUrl={me.signatureUrl} /> : <p className="text-sm text-muted-foreground">Your card is unavailable while your account is {me.status} or expired.</p>}
+          </section>
+        )}
+
+        {tab === "messages" && (
+          <section className={box}>
+            <AgentMessages />
+            <h2 className="mb-3 font-display font-semibold">Messages from Kalexi</h2>
+            {d.notices.length ? d.notices.map((n) => (
+              <article key={n.id} className="border-b py-3 last:border-0"><p className="font-medium">{n.title}</p>
+                <p className="whitespace-pre-wrap text-sm text-muted-foreground">{n.body}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{new Date(n.created_at).toLocaleDateString()}</p></article>
+            )) : <p className="text-sm text-muted-foreground">No messages yet.</p>}
+          </section>
+        )}
+      </main>
+    </div>
+  );
+}
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\routes\_authenticated\agents.$agentId.tsx : LINE 6 ==========
+import { createFileRoute, useParams } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { AgentIdCard } from "@/components/AgentIdCard";
+import { AgentIdentityEditor } from "@/components/AgentIdentityEditor";
+import { Input } from "@/components/ui/input";
+import { NoAccess, StatusPill } from "@/components/records";
+import { Button } from "@/components/ui/button";
+import { ErrorState, PageLoadingState } from "@/components/LoadingStates";
+import { useAccess } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import {
+  createAgentLogin,
+  getAgentRecord,
+  setAgentStatus,
+  signAgentFiles,
+} from "@/lib/agents.functions";
+
+type PdfDownload = () => Promise<void>;
+
+export const Route = createFileRoute("/_authenticated/agents/$agentId")({
+  head: () => ({
+    meta: [
+      { title: "Agent ID Card — Kalexi" },
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\routes\_authenticated\agents.$agentId.tsx : LINE 182 ==========
+                    Reactivate
+                  </Button>
+                )}
+                <Button size="sm" variant="destructive" onClick={() => status("revoked")}>
+                  Revoke
+                </Button>
+              </>
+            ) : null}
+          </div>
+        }
+      />
+
+      <AgentIdCard
+        agent={a}
+        photoUrl={photoUrl ?? null}
+        onDownloadReady={handleDownloadReady}
+      />
+
+      {canManage ? (
+        <div className="no-print mt-6 max-w-xl rounded-xl border bg-card p-5">
+          <h2 className="font-display font-semibold">Agent sign-in details</h2>
+          <p className="mb-3 text-sm text-muted-foreground">
+            {a.user_id
+              ? "This agent can sign in. Update the email or set a new password below."
+              : "Create the email and password the agent will use to open their dashboard."}
+          </p>
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input type="text" placeholder="Password (min 8 characters)" value={pw} onChange={(e) => setPw(e.target.value)} />
+          </div>
+
+          <Button className="mt-3" onClick={issueLogin}>
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\routes\_authenticated\agents.$agentId.tsx : LINE 185 ==========
+                <Button size="sm" variant="destructive" onClick={() => status("revoked")}>
+                  Revoke
+                </Button>
+              </>
+            ) : null}
+          </div>
+        }
+      />
+
+      <AgentIdCard
+        agent={a}
+        photoUrl={photoUrl ?? null}
+        onDownloadReady={handleDownloadReady}
+      />
+
+      {canManage ? (
+        <div className="no-print mt-6 max-w-xl rounded-xl border bg-card p-5">
+          <h2 className="font-display font-semibold">Agent sign-in details</h2>
+          <p className="mb-3 text-sm text-muted-foreground">
+            {a.user_id
+              ? "This agent can sign in. Update the email or set a new password below."
+              : "Create the email and password the agent will use to open their dashboard."}
+          </p>
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input type="text" placeholder="Password (min 8 characters)" value={pw} onChange={(e) => setPw(e.target.value)} />
+          </div>
+
+          <Button className="mt-3" onClick={issueLogin}>
+            {a.user_id ? "Update sign-in" : "Create sign-in"}
+          </Button>
+        </div>
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\routes\_authenticated\agents.index.tsx : LINE 28 ==========
+} from "@/lib/agent-application-validation";
+import { useAccess } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import {
+  createAgentCampaign,
+  listAgentApplications,
+  listAgentCampaigns,
+  reviewAgentApplication,
+  setAgentCampaignStatus,
+  signAgentFiles,
+  updateAgentApplication,
+} from "@/lib/agents.functions";
+import { AgentIdCardDesigner } from "@/components/AgentIdCardDesigner";
+import {
+  DataTableSkeleton,
+  ErrorState,
+  OperationProgress,
+  PageLoadingState,
+} from "@/components/LoadingStates";
+
+export const Route = createFileRoute("/_authenticated/agents/")({
+  head: () => ({
+    meta: [
+      { title: "Digital Agents - Kalexi" },
+      { name: "description", content: "Digital Agent Programme administration." },
+    ],
+  }),
+  component: AgentsPage,
+});
+
+function AgentsPage() {
+  const access = useAccess();
+  const canView = allows(access, "agents.view");
+
+========== C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\src\routes\_authenticated\agents.index.tsx : LINE 91 ==========
+          .map(([k, l]) => (
+          <Button
+            key={k}
+            variant={tab === k ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTab(k)}
+          >
+            {l}
+          </Button>
+        ))}
+      </div>
+{tab === "designer" ? (
+        <AgentIdCardDesigner canManage={canManage} />
+      ) : tab === "apps" ? (
+        <Applications canManage={allows(access, "agents.manage")} />
+      ) : tab === "agents" ? (
+        <AgentList />
+      ) : tab === "registry" ? (
+        <Registry />
+      ) : tab === "notices" ? (
+        <Notices />
+      ) : (
+        <Links canManage={allows(access, "agents.manage")} />
+      )}
+    </AppShell>
+  );
+}
+
+type AgentApplicationRecord = Database["public"]["Tables"]["agent_applications"]["Row"];
+
+type AgentApplicationEdit = UpdateAgentApplicationFields;
+
+function applicationEditFromRecord(application: AgentApplicationRecord): AgentApplicationEdit {

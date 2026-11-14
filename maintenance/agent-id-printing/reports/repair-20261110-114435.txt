@@ -1,0 +1,22 @@
+﻿KALEXI BULK AGENT ID PRINT REPAIR
+Date: 11/10/2026 11:44:36
+
+Component:
+src/components/BulkAgentIdPrint.tsx
+
+Layout:
+A4 portrait
+One column
+Three portrait cards maximum per sheet
+Cards stacked vertically
+Front sheets printed first
+Back sheets printed second
+Same agent ordering on both sides
+
+Card dimensions:
+53.98mm x 85.6mm
+
+Original source backup:
+C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)\maintenance\agent-id-printing\backups\20261110-114435
+
+All source verification checks passed.

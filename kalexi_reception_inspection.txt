@@ -1,0 +1,4240 @@
+﻿KALEXI BROKERAGE - RECEPTION APPOINTMENT INSPECTION
+Project: C:\Users\kalexi group\Downloads\kalexibrokerage-supabase-vercel(v1.0.0 relase)
+Generated: 11/08/2026 09:48:26
+Files collected: 14
+
+
+==========================================================================================
+FILE: .\package.json
+==========================================================================================
+{
+  "name": "kalexi-brokerage",
+  "version": "1.1.3",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-aspect-ratio": "^1.1.8",
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-context-menu": "^2.2.16",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-hover-card": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-menubar": "^1.1.16",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-progress": "^1.1.8",
+    "@radix-ui/react-radio-group": "^1.3.8",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slider": "^1.3.6",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-toggle-group": "^1.1.11",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@supabase/supabase-js": "^2.112.2",
+    "@tailwindcss/vite": "^4.2.1",
+    "@tanstack/react-query": "^5.101.1",
+    "@tanstack/react-router": "1.170.41",
+    "@tanstack/react-start": "1.168.60",
+    "@tanstack/router-plugin": "1.168.42",
+    "@types/jsbarcode": "^3.11.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "date-fns": "^4.1.0",
+    "docxtemplater": "^3.71.1",
+    "embla-carousel-react": "^8.6.0",
+    "input-otp": "^1.4.2",
+    "jsbarcode": "^3.12.3",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.575.0",
+    "pizzip": "^3.3.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-day-picker": "^9.14.0",
+    "react-dom": "^19.2.0",
+    "react-hook-form": "^7.71.2",
+    "react-resizable-panels": "^4.6.5",
+    "recharts": "^2.15.4",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.1",
+    "tw-animate-css": "^1.3.4",
+    "vaul": "^1.1.2",
+    "vite-tsconfig-paths": "^6.0.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "@types/node": "^22.16.5",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "drizzle-kit": "0.x",
+    "drizzle-orm": "0.x",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^15.15.0",
+    "nitro": "3.0.260603-beta",
+    "postgres": "^3.4.9",
+    "prettier": "^3.7.3",
+    "supabase": "^2.122.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^8.2.0",
+    "vitest": "^5.0.4"
+  }
+}
+
+==========================================================================================
+FILE: .\src\components\DailyOperationsBriefing.tsx
+==========================================================================================
+import { useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { enableNotificationSound, isNotificationSoundEnabled, playNotificationSound } from "@/lib/notification-sound";
+
+function localDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function DailyOperationsBriefing() {
+  const announcedDays = useRef(new Set<string>());
+  const { data: session } = useSession();
+  const day = localDateKey(new Date());
+  const canViewObjectives = allows(session?.access, "objectives.view");
+  const canViewCalendar = allows(session?.access, "clients.view");
+  const canViewTasks = allows(session?.access, "tasks.view");
+
+  const briefing = useQuery({
+    queryKey: ["daily-operations-briefing", session?.userId, day],
+    enabled: Boolean(session?.userId && (canViewObjectives || canViewCalendar || canViewTasks)),
+    queryFn: async () => {
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 1);
+
+      const [objectivesResult, eventsResult, tasksResult] = await Promise.all([
+        canViewObjectives
+          ? supabase
+              .from("objectives")
+              .select("id,title,target_date,progress,status")
+              .is("archived_at", null)
+              .in("status", ["planned", "in_progress"])
+              .order("target_date", { ascending: true })
+              .limit(10)
+          : Promise.resolve({ data: [], error: null }),
+        canViewCalendar
+          ? supabase
+              .from("calendar_events")
+              .select("id,title,starts_at")
+              .gte("starts_at", start.toISOString())
+              .lt("starts_at", end.toISOString())
+              .order("starts_at", { ascending: true })
+              .limit(10)
+          : Promise.resolve({ data: [], error: null }),
+        canViewTasks
+          ? supabase
+              .from("tasks")
+              .select("id,title,due_date,status")
+              .eq("assigned_to", session!.userId)
+              .eq("due_date", day)
+              .is("archived_at", null)
+              .order("due_date", { ascending: true })
+              .limit(10)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+
+      const error = objectivesResult.error ?? eventsResult.error ?? tasksResult.error;
+      if (error) throw error;
+
+      return {
+        objectives: objectivesResult.data ?? [],
+        events: eventsResult.data ?? [],
+        tasks: (tasksResult.data ?? []).filter(
+          (task) => !["completed", "complete", "done"].includes(task.status.toLowerCase()),
+        ),
+      };
+    },
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    retry: 1,
+  });
+
+  useEffect(() => {
+    if (!session?.userId || !briefing.data) return;
+    const storageKey = `kalexi-daily-briefing-${session.userId}-${day}`;
+    if (announcedDays.current.has(storageKey)) return;
+    try {
+      if (window.localStorage.getItem(storageKey)) {
+        announcedDays.current.add(storageKey);
+        return;
+      }
+    } catch (error) {
+      console.warn("[daily briefing] Could not read the reminder preference.", error);
+    }
+
+    const { objectives, events, tasks } = briefing.data;
+    const lines = [
+      `${objectives.length} active company objective${objectives.length === 1 ? "" : "s"}`,
+      `${events.length} calendar event${events.length === 1 ? "" : "s"} today`,
+      `${tasks.length} task${tasks.length === 1 ? "" : "s"} due today`,
+    ];
+    const objectiveTitles = objectives.slice(0, 3).map((objective) => objective.title);
+    const eventTitles = events.slice(0, 3).map((event) => event.title);
+    const taskTitles = tasks.slice(0, 3).map((task) => task.title);
+    const details = [
+      ...objectiveTitles.map((title) => `Objective: ${title}`),
+      ...eventTitles.map((title) => `Event: ${title}`),
+      ...taskTitles.map((title) => `Due: ${title}`),
+    ];
+
+    announcedDays.current.add(storageKey);
+    try {
+      window.localStorage.setItem(storageKey, "shown");
+    } catch (error) {
+      console.warn("[daily briefing] Could not store the reminder date.", error);
+    }
+    if (isNotificationSoundEnabled()) playNotificationSound();
+    toast.info("Daily company briefing", {
+      description: `${lines.join(" Â· ")}${details.length ? `\n${details.join(" Â· ")}` : ""}`,
+      duration: 12_000,
+      action: isNotificationSoundEnabled()
+        ? undefined
+        : {
+            label: "Enable sound",
+            onClick: enableNotificationSound,
+          },
+    });
+  }, [briefing.data, day, session?.userId]);
+
+  useEffect(() => {
+    if (briefing.isError && briefing.error) {
+      console.error("[daily briefing] Could not load company reminders.", briefing.error);
+    }
+  }, [briefing.error, briefing.isError]);
+
+  return null;
+}
+
+==========================================================================================
+FILE: .\src\components\DashboardCalendarSummary.tsx
+==========================================================================================
+import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { format } from "date-fns";
+import { CalendarDays, Clock, ArrowRight, PartyPopper } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+type NextEvent = {
+  id: string;
+  title: string;
+  description: string | null;
+  starts_at: string;
+  ends_at: string | null;
+  event_type: string;
+};
+
+export function DashboardCalendarSummary() {
+  const [now, setNow] = useState(new Date());
+  const [nextEvent, setNextEvent] = useState<NextEvent | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    async function loadNextEvent() {
+      const result = await (supabase as any)
+        .from("calendar_events")
+        .select("id,title,description,starts_at,ends_at,event_type")
+        .gte("starts_at", new Date().toISOString())
+        .order("starts_at", { ascending: true })
+        .limit(1);
+
+      if (!alive) return;
+      if (result.error) setError("The next event is temporarily unavailable.");
+      else setNextEvent((result.data?.[0] ?? null) as NextEvent | null);
+      setLoading(false);
+    }
+    void loadNextEvent();
+    const refresh = window.setInterval(() => void loadNextEvent(), 60000);
+    return () => {
+      alive = false;
+      window.clearInterval(refresh);
+    };
+  }, []);
+
+  const date = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Africa/Kampala",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(now);
+
+  const time = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Africa/Kampala",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(now);
+
+  return (
+    <section className="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+      <div className="rounded-2xl border bg-gradient-to-br from-sky-50 to-violet-50 p-5 dark:from-slate-950 dark:to-violet-950">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground"><Clock color="#D97706" strokeWidth={2.2} className="h-4 w-4 shrink-0" /> Kampala, Uganda</div>
+        <div className="mt-3 text-3xl font-bold tabular-nums">{time}</div>
+        <p className="mt-2 text-sm">{date}</p>
+        <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><CalendarDays color="#7C3AED" strokeWidth={2.2} className="h-4 w-4 shrink-0" /> East Africa Time Â· UTC+3</div>
+      </div>
+
+      <div className="rounded-2xl border bg-card p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 font-semibold"><PartyPopper className="h-5 w-5 text-violet-500" /> Next company event</div>
+          <Link to="/calendar" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">Open calendar <ArrowRight className="h-4 w-4" /></Link>
+        </div>
+        {loading ? (
+          <p className="mt-5 text-sm text-muted-foreground">Checking the company scheduleâ€¦</p>
+        ) : error ? (
+          <p className="mt-5 text-sm text-muted-foreground">{error} Open the calendar to retry.</p>
+        ) : !nextEvent ? (
+          <div className="mt-5 rounded-xl border border-dashed p-4">
+            <p className="font-medium">No upcoming events scheduled ðŸŽ‰</p>
+            <p className="mt-1 text-sm text-muted-foreground">When a company event is added, its details will appear here.</p>
+          </div>
+        ) : (
+          <div className="mt-4 rounded-xl border bg-muted/20 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <h3 className="font-semibold">{nextEvent.title}</h3>
+              <span className="rounded-full border px-2.5 py-1 text-xs capitalize">{nextEvent.event_type}</span>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {format(new Date(nextEvent.starts_at), "EEEE, d MMMM yyyy")} Â· {format(new Date(nextEvent.starts_at), "HH:mm")}
+              {nextEvent.ends_at ? ` â€“ ${format(new Date(nextEvent.ends_at), "HH:mm")}` : ""}
+            </p>
+            {nextEvent.description && <p className="mt-3 whitespace-pre-wrap text-sm leading-6">{nextEvent.description}</p>}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+==========================================================================================
+FILE: .\src\integrations\supabase\types.ts
+==========================================================================================
+[File truncated after 700 lines]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.15";
+  };
+  public: {
+    Tables: {
+      company_branding: {
+        Row: {
+          accent_color: string;
+          id: string;
+          logo_path: string | null;
+          primary_color: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          accent_color?: string;
+          id?: string;
+          logo_path?: string | null;
+          primary_color?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          accent_color?: string;
+          id?: string;
+          logo_path?: string | null;
+          primary_color?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [];
+      };
+      calendar_events: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          ends_at: string | null;
+          event_type: string;
+          id: string;
+          location: string | null;
+          requirements: string | null;
+          starts_at: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          ends_at?: string | null;
+          event_type?: string;
+          id?: string;
+          location?: string | null;
+          requirements?: string | null;
+          starts_at: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          ends_at?: string | null;
+          event_type?: string;
+          id?: string;
+          location?: string | null;
+          requirements?: string | null;
+          starts_at?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      system_maintenance: {
+        Row: {
+          estimated_completion_time: string | null;
+          id: string;
+          maintenance_enabled: boolean;
+          maintenance_message: string | null;
+          maintenance_start_time: string | null;
+          maintenance_updated_at: string;
+          maintenance_updated_by: string | null;
+        };
+        Insert: {
+          estimated_completion_time?: string | null;
+          id: string;
+          maintenance_enabled?: boolean;
+          maintenance_message?: string | null;
+          maintenance_start_time?: string | null;
+          maintenance_updated_at?: string;
+          maintenance_updated_by?: string | null;
+        };
+        Update: {
+          estimated_completion_time?: string | null;
+          id?: string;
+          maintenance_enabled?: boolean;
+          maintenance_message?: string | null;
+          maintenance_start_time?: string | null;
+          maintenance_updated_at?: string;
+          maintenance_updated_by?: string | null;
+        };
+        Relationships: [];
+      };
+      agent_applications: {
+        Row: {
+          address: string | null;
+          application_ref: string;
+          campaign_id: string | null;
+          created_at: string;
+          date_of_birth: string | null;
+          declarations: Json;
+          district: string | null;
+          email: string;
+          full_name: string;
+          gender: string | null;
+          id: string;
+          id_back_path: string | null;
+          id_front_path: string | null;
+          id_number: string;
+          id_type: string;
+          nationality: string | null;
+          occupation: string | null;
+          payment_account_name: string | null;
+          payment_account_number: string | null;
+          payment_method: string;
+          payment_provider: string | null;
+          phone: string;
+          photo_path: string | null;
+          registry_id: string | null;
+          review_note: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: string;
+          updated_at: string;
+          user_id: string | null;
+          village: string | null;
+        };
+        Insert: {
+          address?: string | null;
+          application_ref?: string;
+          campaign_id?: string | null;
+          created_at?: string;
+          date_of_birth?: string | null;
+          declarations?: Json;
+          district?: string | null;
+          email: string;
+          full_name: string;
+          gender?: string | null;
+          id?: string;
+          id_back_path?: string | null;
+          id_front_path?: string | null;
+          id_number: string;
+          id_type: string;
+          nationality?: string | null;
+          occupation?: string | null;
+          payment_account_name?: string | null;
+          payment_account_number?: string | null;
+          payment_method: string;
+          payment_provider?: string | null;
+          phone: string;
+          photo_path?: string | null;
+          registry_id?: string | null;
+          review_note?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id?: string | null;
+          village?: string | null;
+        };
+        Update: {
+          address?: string | null;
+          application_ref?: string;
+          campaign_id?: string | null;
+          created_at?: string;
+          date_of_birth?: string | null;
+          declarations?: Json;
+          district?: string | null;
+          email?: string;
+          full_name?: string;
+          gender?: string | null;
+          id?: string;
+          id_back_path?: string | null;
+          id_front_path?: string | null;
+          id_number?: string;
+          id_type?: string;
+          nationality?: string | null;
+          occupation?: string | null;
+          payment_account_name?: string | null;
+          payment_account_number?: string | null;
+          payment_method?: string;
+          payment_provider?: string | null;
+          phone?: string;
+          photo_path?: string | null;
+          registry_id?: string | null;
+          review_note?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id?: string | null;
+          village?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_applications_campaign_id_fkey";
+            columns: ["campaign_id"];
+            isOneToOne: false;
+            referencedRelation: "agent_campaigns";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agent_campaigns: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          created_by: string | null;
+          expires_at: string | null;
+          id: string;
+          title: string;
+          token: string;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          title: string;
+          token?: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          title?: string;
+          token?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      agent_messages: {
+        Row: {
+          attachments: Json;
+          body: string;
+          created_at: string;
+          id: string;
+          owner_user_id: string;
+          sender_id: string;
+        };
+        Insert: {
+          attachments?: Json;
+          body?: string;
+          created_at?: string;
+          id?: string;
+          owner_user_id: string;
+          sender_id: string;
+        };
+        Update: {
+          attachments?: Json;
+          body?: string;
+          created_at?: string;
+          id?: string;
+          owner_user_id?: string;
+          sender_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_messages_owner_user_id_fkey";
+            columns: ["owner_user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agent_notices: {
+        Row: {
+          body: string;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          title: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          title: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          title?: string;
+        };
+        Relationships: [];
+      };
+      agent_redemptions: {
+        Row: {
+          agent_id: string;
+          amount: number;
+          created_at: string;
+          currency: string;
+          id: string;
+          processed_at: string | null;
+          processed_by: string | null;
+          status: string;
+          tokens_used: number;
+        };
+        Insert: {
+          agent_id: string;
+          amount?: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          processed_at?: string | null;
+          processed_by?: string | null;
+          status?: string;
+          tokens_used: number;
+        };
+        Update: {
+          agent_id?: string;
+          amount?: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          processed_at?: string | null;
+          processed_by?: string | null;
+          status?: string;
+          tokens_used?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_redemptions_agent_id_fkey";
+            columns: ["agent_id"];
+            isOneToOne: false;
+            referencedRelation: "agents";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agent_registry: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          district: string | null;
+          full_name: string;
+          id: string;
+          linked_application_id: string | null;
+          phone: string | null;
+          received_by: string | null;
+          reg_id: string;
+          registered_on: string | null;
+          signature_path: string | null;
+          status: string;
+          updated_at: string;
+          village: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          district?: string | null;
+          full_name: string;
+          id?: string;
+          linked_application_id?: string | null;
+          phone?: string | null;
+          received_by?: string | null;
+          reg_id: string;
+          registered_on?: string | null;
+          signature_path?: string | null;
+          status?: string;
+          updated_at?: string;
+          village?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          district?: string | null;
+          full_name?: string;
+          id?: string;
+          linked_application_id?: string | null;
+          phone?: string | null;
+          received_by?: string | null;
+          reg_id?: string;
+          registered_on?: string | null;
+          signature_path?: string | null;
+          status?: string;
+          updated_at?: string;
+          village?: string | null;
+        };
+        Relationships: [];
+      };
+      agents: {
+        Row: {
+          agent_code: string;
+          application_id: string | null;
+          commission_rate: number;
+          company_phone: string | null;
+          created_at: string;
+          created_by: string | null;
+          designation: string;
+          district: string | null;
+          email: string;
+          expires_at: string;
+          full_name: string;
+          id: string;
+          issued_at: string;
+          phone: string;
+          photo_path: string | null;
+          referral_code: string;
+          registry_id: string | null;
+          signature_path: string | null;
+          status: string;
+          updated_at: string;
+          user_id: string | null;
+          verification_token: string;
+          village: string | null;
+        };
+        Insert: {
+          agent_code?: string;
+          application_id?: string | null;
+          commission_rate?: number;
+          company_phone?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          designation?: string;
+          district?: string | null;
+          email: string;
+          expires_at?: string;
+          full_name: string;
+          id?: string;
+          issued_at?: string;
+          phone: string;
+          photo_path?: string | null;
+          referral_code?: string;
+          registry_id?: string | null;
+          signature_path?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id?: string | null;
+          verification_token?: string;
+          village?: string | null;
+        };
+        Update: {
+          agent_code?: string;
+          application_id?: string | null;
+          commission_rate?: number;
+          company_phone?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          designation?: string;
+          district?: string | null;
+          email?: string;
+          expires_at?: string;
+          full_name?: string;
+          id?: string;
+          issued_at?: string;
+          phone?: string;
+          photo_path?: string | null;
+          referral_code?: string;
+          registry_id?: string | null;
+          signature_path?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id?: string | null;
+          verification_token?: string;
+          village?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agents_application_id_fkey";
+            columns: ["application_id"];
+            isOneToOne: true;
+            referencedRelation: "agent_applications";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agent_commission_ledger: {
+        Row: {
+          agent_id: string;
+          agreement_reference: string;
+          calculation_notes: string | null;
+          client_id: string;
+          commission_rate: number;
+          created_at: string;
+          created_by: string | null;
+          currency: string;
+          deal_id: string | null;
+          eligible_fee_amount: number;
+          fee_transaction_id: string;
+          gross_commission: number;
+          id: string;
+          net_payable: number;
+          status: string;
+          withholding_tax: number;
+        };
+        Insert: {
+          agent_id: string;
+          agreement_reference: string;
+          calculation_notes?: string | null;
+          client_id: string;
+          commission_rate: number;
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          deal_id?: string | null;
+          eligible_fee_amount: number;
+          fee_transaction_id: string;
+          gross_commission: number;
+          id?: string;
+          net_payable: number;
+          status?: string;
+          withholding_tax?: number;
+        };
+        Update: {
+          agent_id?: string;
+          agreement_reference?: string;
+          calculation_notes?: string | null;
+          client_id?: string;
+          commission_rate?: number;
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          deal_id?: string | null;
+          eligible_fee_amount?: number;
+          fee_transaction_id?: string;
+          gross_commission?: number;
+          id?: string;
+          net_payable?: number;
+          status?: string;
+          withholding_tax?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_commission_ledger_agent_id_fkey";
+            columns: ["agent_id"];
+            isOneToOne: false;
+            referencedRelation: "agents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_commission_ledger_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_commission_ledger_deal_id_fkey";
+            columns: ["deal_id"];
+            isOneToOne: false;
+            referencedRelation: "deals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_commission_ledger_fee_transaction_id_fkey";
+            columns: ["fee_transaction_id"];
+            isOneToOne: true;
+            referencedRelation: "transactions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agent_commission_payouts: {
+        Row: {
+          agent_id: string;
+          amount: number;
+          created_at: string;
+          currency: string;
+          id: string;
+          processed_at: string | null;
+          processed_by: string | null;
+          status: string;
+        };
+        Insert: {
+          agent_id: string;
+          amount: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          processed_at?: string | null;
+          processed_by?: string | null;
+          status?: string;
+        };
+        Update: {
+          agent_id?: string;
+          amount?: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          processed_at?: string | null;
+          processed_by?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_commission_payouts_agent_id_fkey";
+            columns: ["agent_id"];
+            isOneToOne: false;
+            referencedRelation: "agents";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agent_commission_payout_items: {
+        Row: {
+          amount: number;
+          commission_id: string;
+          payout_id: string;
+        };
+        Insert: {
+          amount: number;
+          commission_id: string;
+          payout_id: string;
+        };
+        Update: {
+          amount?: number;
+          commission_id?: string;
+          payout_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agent_commission_payout_items_commission_id_fkey";
+            columns: ["commission_id"];
+            isOneToOne: false;
+            referencedRelation: "agent_commission_ledger";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "agent_commission_payout_items_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: false;
+            referencedRelation: "agent_commission_payouts";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      archive_records: {
+        Row: {
+          archived_at: string;
+          archived_by: string | null;
+          created_at: string;
+          created_by: string | null;
+          entity_id: string;
+          entity_ref: string | null;
+          entity_type: string;
+          id: string;
+          original_created_at: string | null;
+          original_created_by: string | null;
+          previous_status: string | null;
+          reason: string | null;
+          restore_reason: string | null;
+          restored_at: string | null;
+          restored_by: string | null;
+          snapshot: Json | null;
+          state: string;
+          title: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          archived_at?: string;
+          archived_by?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          entity_id: string;
+          entity_ref?: string | null;
+          entity_type: string;
+          id?: string;
+          original_created_at?: string | null;
+          original_created_by?: string | null;
+          previous_status?: string | null;
+          reason?: string | null;
+          restore_reason?: string | null;
+          restored_at?: string | null;
+          restored_by?: string | null;
+          snapshot?: Json | null;
+          state?: string;
+          title?: string | null;
+
+==========================================================================================
+FILE: .\src\lib\agents.functions.ts
+==========================================================================================
+[File truncated after 700 lines]
+import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+import { approximateReward, agentPermissions, validAgent } from "@/lib/agent-rules";
+import {
+  expectedApplicationUpdatedAtSchema,
+  updateAgentApplicationSchema,
+} from "@/lib/agent-application-validation";
+import {
+  AGENT_ID_THEME_ID,
+  parseAgentIdTheme,
+  type AgentIdTheme,
+} from "@/lib/agent-id-theme";
+
+const BUCKET = "kalexi-vault";
+const token = z.string().trim().min(10).max(200);
+
+async function admin() {
+  return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
+}
+
+async function openCampaign(t: string) {
+  const db = await admin();
+  const { data, error } = await db
+    .from("agent_campaigns")
+    .select("id, title, active, expires_at")
+    .eq("token", t)
+    .maybeSingle();
+  if (error) throw new Error("Could not verify this registration link.");
+  let campaign = data;
+  if (!campaign && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(t)) {
+    const legacy = await db
+      .from("agent_campaigns")
+      .select("id, title, active, expires_at")
+      .eq("id", t)
+      .maybeSingle();
+    if (legacy.error) throw new Error("Could not verify this registration link.");
+    campaign = legacy.data;
+  }
+  if (!campaign) return null;
+  const expired = !!campaign.expires_at && new Date(campaign.expires_at) < new Date();
+  return { ...campaign, open: campaign.active && !expired };
+}
+
+async function assertPerm(supabase: SupabaseClient<Database>, userId: string, perm: string) {
+  const { data, error } = await supabase.rpc("has_permission", { _user_id: userId, _perm: perm });
+  if (error) throw new Error("Could not verify Digital Agent Programme permissions.");
+  if (!data) throw new Error("Forbidden: you do not have Digital Agent Programme authority.");
+}
+
+async function assertAnyPerm(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  permissions: string[],
+) {
+  const checks = await Promise.all(
+    permissions.map((permission) =>
+      supabase.rpc("has_permission", { _user_id: userId, _perm: permission }),
+    ),
+  );
+  if (checks.some(({ error }) => error))
+    throw new Error("Could not verify Digital Agent Programme permissions.");
+  if (!checks.some(({ data }) => data))
+    throw new Error("Forbidden: you do not have Digital Agent Programme authority.");
+}
+
+async function audit(
+  actorId: string | null,
+  email: string | null,
+  action: string,
+  entityId: string,
+  value?: unknown,
+  entityType = "agent",
+) {
+  const db = await admin();
+  const { error } = await db.from("audit_logs").insert({
+    actor_id: actorId,
+    actor_email: email,
+    action,
+    entity_type: entityType,
+    entity_id: entityId,
+    new_value: (value ?? null) as never,
+  });
+  if (error) throw new Error("The action could not be recorded in the audit log.");
+}
+
+export const listAgentCampaigns = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertPerm(context.supabase, context.userId, "agents.manage");
+    const { data, error } = await (await admin())
+      .from("agent_campaigns")
+      .select("id, title, token, active, expires_at, created_at")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error("Could not load registration links.");
+    return data ?? [];
+  });
+
+export const listAgentApplications = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAnyPerm(context.supabase, context.userId, ["agents.view", "agents.manage"]);
+    const { data, error } = await (await admin())
+      .from("agent_applications")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error("Could not load agent applications.");
+    return data ?? [];
+  });
+
+export const updateAgentApplication = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => updateAgentApplicationSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertPerm(context.supabase, context.userId, "agents.manage");
+    
+    const db = await admin();
+const { id, expectedUpdatedAt, ...fields } = data;
+    const { data: current, error: currentError } = await db
+      .from("agent_applications")
+      .select("updated_at")
+      .eq("id", id)
+      .maybeSingle();
+    if (currentError) {
+      throw new Error(`Could not check the current application version: ${currentError.message}`);
+    }
+    if (!current) throw new Error("Application not found or unavailable to your account.");
+    const actualUpdatedAt = expectedApplicationUpdatedAtSchema.safeParse(current.updated_at);
+    if (!actualUpdatedAt.success) {
+      console.error("[agents] Invalid application updated_at returned by Supabase.", {
+        applicationId: id,
+        updatedAt: current.updated_at,
+      });
+      throw new Error("The application timestamp is invalid. Refresh the application and retry.");
+    }
+    if (actualUpdatedAt.data !== expectedUpdatedAt) {
+      throw new Error("This application changed while you were editing it. Refresh and retry.");
+    }
+
+    const { data: updated, error } = await db
+      .from("agent_applications")
+      .update(fields)
+      .eq("id", id)
+      .eq("updated_at", actualUpdatedAt.data)
+      .select("id, updated_at")
+      .maybeSingle();
+    if (error) {
+      if (error.code === "23505") {
+        throw new Error("That ID number is already on an active agent application.");
+      }
+      throw new Error(`Could not update the application: ${error.message}`);
+    }
+    if (!updated) {
+      throw new Error("This application changed while you were editing it. Refresh and retry.");
+    }
+
+    await audit(
+      context.userId,
+      (context.claims?.email as string) ?? null,
+      "agent.application_details_updated",
+      id,
+      {
+        changed_fields: Object.keys(fields),
+        sensitive_values_omitted: true,
+      },
+      "agent_application",
+    );
+    return { ok: true, updatedAt: updated.updated_at };
+  });
+
+export const isDigitalAgentAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await admin();
+    const [{ data: agent, error: agentError }, { data: application, error: applicationError }] =
+      await Promise.all([
+        db.from("agents").select("id").eq("user_id", context.userId).limit(1).maybeSingle(),
+        db
+          .from("agent_applications")
+          .select("id")
+          .eq("user_id", context.userId)
+          .limit(1)
+          .maybeSingle(),
+      ]);
+    if (agentError || applicationError)
+      throw new Error("Could not determine the correct workspace for this account.");
+    return !!agent || !!application;
+  });
+
+export const canViewCompanyCalendar = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: hasPermission, error: permissionError } = await context.supabase.rpc(
+      "has_permission",
+      { _user_id: context.userId, _perm: "clients.view" },
+    );
+    if (permissionError) throw new Error("Could not verify company calendar access.");
+    if (!hasPermission) return false;
+
+    const db = await admin();
+    const [{ data: agent, error: agentError }, { data: application, error: applicationError }] =
+      await Promise.all([
+        db
+          .from("agents")
+          .select("id,status,expires_at")
+          .eq("user_id", context.userId)
+          .maybeSingle(),
+        db
+          .from("agent_applications")
+          .select("id")
+          .eq("user_id", context.userId)
+          .maybeSingle(),
+      ]);
+    if (agentError || applicationError)
+      throw new Error("Could not verify company calendar access.");
+    if (agent) {
+      return agent.status === "active" && new Date(agent.expires_at).getTime() > Date.now();
+    }
+    return !application;
+  });
+
+export const getUpcomingAgentEvents = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await admin();
+    const { data: agent, error: agentError } = await db
+      .from("agents")
+      .select("id, status, expires_at")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (agentError) throw new Error(`Could not verify the agent account: ${agentError.message}`);
+    if (!agent || !validAgent(agent.status, agent.expires_at))
+      throw new Error("An active agent account is required to view upcoming events.");
+
+    const { data, error } = await db
+      .from("calendar_events")
+      .select("id, title, description, starts_at, ends_at, event_type, location, requirements")
+      .gte("starts_at", new Date().toISOString())
+      .order("starts_at", { ascending: true })
+      .limit(100);
+    if (error) throw new Error(`Could not load upcoming agent events: ${error.message}`);
+    return data ?? [];
+  });
+
+export const getAgentRecord = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAnyPerm(context.supabase, context.userId, ["agents.view", "agents.manage"]);
+    const { data: agent, error } = await (await admin())
+      .from("agents")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error("Could not load this agent ID card.");
+    if (!agent) throw new Error("Agent record not found or unavailable to your account.");
+    return agent;
+  });
+
+export const createAgentCampaign = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z.object({ title: z.string().trim().min(1).max(160) }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertPerm(context.supabase, context.userId, "agents.manage");
+    const db = await admin();
+    const { data: campaign, error } = await db
+      .from("agent_campaigns")
+      .insert({ title: data.title, created_by: context.userId })
+      .select("id, title, token, active, expires_at, created_at")
+      .single();
+    if (error) throw new Error("Could not create the registration link.");
+    await audit(
+      context.userId,
+      (context.claims?.email as string) ?? null,
+      "agent.campaign_created",
+      campaign.id,
+      { title: campaign.title },
+    );
+    return campaign;
+  });
+
+export const setAgentCampaignStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z.object({ id: z.string().uuid(), active: z.boolean() }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertPerm(context.supabase, context.userId, "agents.manage");
+    const db = await admin();
+    const { data: campaign, error } = await db
+      .from("agent_campaigns")
+      .update({ active: data.active })
+      .eq("id", data.id)
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error("Could not update the registration link.");
+    if (!campaign) throw new Error("Registration link not found.");
+    await audit(
+      context.userId,
+      (context.claims?.email as string) ?? null,
+      data.active ? "agent.campaign_enabled" : "agent.campaign_disabled",
+      data.id,
+    );
+    return { ok: true };
+  });
+
+export const getAgentCampaign = createServerFn({ method: "POST" })
+  .inputValidator((i: unknown) => z.object({ token }).parse(i))
+  .handler(async ({ data }) => {
+    const c = await openCampaign(data.token);
+    return c ? { title: c.title, open: c.open } : null;
+  });
+
+export const createAgentUpload = createServerFn({ method: "POST" })
+  .inputValidator((i: unknown) =>
+    z.object({
+      token,
+      fileName: z.string().trim().min(1).max(200),
+      fileType: z.enum(["image/jpeg", "image/png", "image/webp", "application/pdf"]),
+      fileSize: z.number().int().positive().max(50 * 1024 * 1024),
+      kind: z.enum(["photo", "idFront", "idBack"]),
+    }).parse(i),
+  )
+  .handler(async ({ data }) => {
+    const c = await openCampaign(data.token);
+    if (!c?.open) throw new Error("This registration link is closed.");
+    if (data.kind === "photo" && data.fileType === "application/pdf") {
+      throw new Error("Passport photo must be JPG, PNG or WebP.");
+    }
+    const extensions = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "application/pdf": "pdf",
+    };
+    const path = `agent-applications/${c.id}/${crypto.randomUUID()}.${extensions[data.fileType]}`;
+    const { data: slot, error } = await (await admin()).storage.from(BUCKET).createSignedUploadUrl(path);
+    if (error || !slot) throw new Error("Could not prepare the upload.");
+    return { path, uploadToken: slot.token, bucket: BUCKET, contentType: data.fileType };
+  });
+const path = z.string().trim().min(3).max(400).startsWith("agent-applications/");
+
+export const submitAgentApplication = createServerFn({ method: "POST" })
+  .inputValidator((i: unknown) =>
+    z
+      .object({
+        token,
+        fullName: z.string().trim().min(2).max(140),
+        phone: z.string().trim().min(7).max(40),
+        email: z.string().trim().email().max(255),
+        dateOfBirth: z.string().trim().max(20).nullish(),
+        gender: z.string().trim().max(30).nullish(),
+        nationality: z.string().trim().max(80).nullish(),
+        address: z.string().trim().max(300).nullish(),
+        district: z.string().trim().max(100).nullish(),
+        occupation: z.string().trim().max(120).nullish(),
+        idType: z.string().trim().min(2).max(60),
+        idNumber: z.string().trim().min(3).max(60),
+        photoPath: path,
+        idFrontPath: path,
+        idBackPath: path.nullish(),
+        paymentMethod: z.enum(["mobile_money", "bank"]),
+        paymentProvider: z.string().trim().max(100).nullish(),
+        paymentAccountName: z.string().trim().min(2).max(140),
+        paymentAccountNumber: z.string().trim().min(4).max(60),
+        password: z.string().min(8).max(72),
+        registryId: z.string().uuid().nullish(),
+        village: z.string().trim().max(100).nullish(),
+        declarations: z.object({
+          commissionPolicyVersion: z.literal("DAP-COMMISSION-2PCT-v1"),
+          commissionRate: z.literal(2),
+          accurate: z.literal(true),
+          terms: z.literal(true),
+          conduct: z.literal(true),
+          consent: z.literal(true),
+        }),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data }) => {
+    const c = await openCampaign(data.token);
+    if (!c?.open) throw new Error("This registration link is closed.");
+    const db = await admin();
+    const { data: dup } = await db
+      .from("agent_applications")
+      .select("id")
+      .eq("id_number", data.idNumber)
+      .in("status", ["pending", "approved"])
+      .maybeSingle();
+    if (dup) throw new Error("An application with this ID number is already on record.");
+    const { data: created, error: authErr } = await db.auth.admin.createUser({
+      email: data.email.toLowerCase(),
+      password: data.password,
+      email_confirm: true,
+      user_metadata: { full_name: data.fullName, job_title: "Digital Agent (pending)" },
+    });
+    if (authErr || !created.user)
+      throw new Error(
+        authErr?.message?.includes("already")
+          ? "This email already has an account. Sign in instead."
+          : "Could not create your sign-in.",
+      );
+    const { data: profile, error: profileError } = await db
+      .from("profiles")
+      .update({
+        job_title: "Digital Agent (pending)",
+        department: "Digital Agent Programme",
+        phone: data.phone,
+      })
+      .eq("id", created.user.id)
+      .select("id")
+      .maybeSingle();
+    if (profileError || !profile) {
+      await db.auth.admin.deleteUser(created.user.id);
+      throw new Error("Your phone number could not be linked to your account. Please try again.");
+    }
+    const { data: row, error } = await db
+      .from("agent_applications")
+      .insert({
+        campaign_id: c.id,
+        full_name: data.fullName,
+        phone: data.phone,
+        email: data.email.toLowerCase(),
+        date_of_birth: data.dateOfBirth || null,
+        gender: data.gender ?? null,
+        nationality: data.nationality ?? null,
+        address: data.address ?? null,
+        district: data.district ?? null,
+        occupation: data.occupation ?? null,
+        id_type: data.idType,
+        id_number: data.idNumber,
+        photo_path: data.photoPath,
+        id_front_path: data.idFrontPath,
+        id_back_path: data.idBackPath ?? null,
+        payment_method: data.paymentMethod,
+        payment_provider: data.paymentProvider ?? null,
+        payment_account_name: data.paymentAccountName,
+        payment_account_number: data.paymentAccountNumber,
+        user_id: created.user.id,
+        registry_id: data.registryId ?? null,
+        village: data.village ?? null,
+        declarations: { ...data.declarations, agreed_at: new Date().toISOString() } as never,
+      })
+      .select("id, application_ref")
+      .single();
+    if (error) {
+      await db.auth.admin.deleteUser(created.user.id);
+      throw new Error("Your application could not be recorded. Please try again.");
+    }
+    if (data.registryId)
+      await db
+        .from("agent_registry")
+        .update({ linked_application_id: row.id, status: "linked" })
+        .eq("id", data.registryId);
+    await audit(null, data.email, "agent.application_submitted", row.id);
+    return { reference: row.application_ref };
+  });
+
+export const reviewAgentApplication = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        decision: z.enum(["approved", "rejected", "more_info"]),
+        note: z.string().trim().max(1000).nullish(),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertPerm(context.supabase, context.userId, "agents.manage");
+    const db = await admin();
+    const { data: app, error: appError } = await db
+      .from("agent_applications")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (appError) throw new Error(`Could not load the application: ${appError.message}`);
+    if (!app) throw new Error("Application not found.");
+    if (data.decision === "rejected" && !data.note)
+      throw new Error("A reason is required to reject.");
+
+    if (app.status === "approved" && data.decision !== "approved")
+      throw new Error("An approved application cannot be changed to another decision.");
+    const wasApproved = app.status === "approved";
+
+    if (data.decision !== "approved") {
+      const { data: updated, error } = await db
+        .from("agent_applications")
+        .update({
+          status: data.decision,
+          review_note: data.note ?? null,
+          reviewed_by: context.userId,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", data.id)
+        .eq("status", app.status)
+        .select("id")
+        .maybeSingle();
+      if (error) throw new Error(`Could not save the application decision: ${error.message}`);
+      if (!updated)
+        throw new Error("This application changed while you were reviewing it. Refresh the list.");
+      await audit(
+        context.userId,
+        (context.claims?.email as string) ?? null,
+        `agent.application_${data.decision}`,
+        data.id,
+        { note: data.note },
+      );
+      return { agentId: null };
+    }
+
+    if (!app.user_id)
+      throw new Error("This applicant has no linked sign-in account. Resolve the account before approval.");
+
+    const { data: profile, error: profileError } = await db
+      .from("profiles")
+      .select("status, full_name, phone, department, job_title")
+      .eq("id", app.user_id)
+      .maybeSingle();
+    if (profileError) throw new Error(`Could not verify the applicant account: ${profileError.message}`);
+    if (!profile || profile.status !== "active")
+      throw new Error("The applicant's sign-in profile is not active. Resolve account access before approval.");
+
+    if (app.status !== "approved") {
+      const { data: updated, error } = await db
+        .from("agent_applications")
+        .update({
+          status: "approved",
+          review_note: data.note ?? null,
+          reviewed_by: context.userId,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", data.id)
+        .eq("status", app.status)
+        .select("id")
+        .maybeSingle();
+      if (error) throw new Error(`Could not approve the application: ${error.message}`);
+      if (!updated) {
+        const { data: latest, error: latestError } = await db
+          .from("agent_applications")
+          .select("status")
+          .eq("id", data.id)
+          .maybeSingle();
+        if (latestError) throw new Error(`Could not verify the application status: ${latestError.message}`);
+        if (latest?.status !== "approved")
+          throw new Error("This application changed while you were reviewing it. Refresh the list.");
+      }
+    }
+
+    const { data: existingAgent, error: agentReadError } = await db
+      .from("agents")
+      .select("id, user_id, status")
+      .eq("application_id", app.id)
+      .maybeSingle();
+    if (agentReadError) throw new Error(`Could not check the official agent record: ${agentReadError.message}`);
+
+    let agent = existingAgent;
+    let createdAgent = false;
+    let linkedAccount = false;
+    if (!agent) {
+      const { data: inserted, error } = await db
+        .from("agents")
+        .insert({
+          application_id: app.id,
+          commission_rate: 2,
+          full_name: app.full_name,
+          phone: app.phone,
+          email: app.email,
+          district: app.district,
+          village: app.village,
+          registry_id: app.registry_id,
+          user_id: app.user_id,
+          photo_path: app.photo_path,
+          created_by: context.userId,
+          status: "active",
+        })
+        .select("id, user_id, status")
+        .maybeSingle();
+
+      if (error || !inserted) {
+        const { data: existing, error: retryError } = await db
+          .from("agents")
+          .select("id, user_id, status")
+          .eq("application_id", app.id)
+          .maybeSingle();
+        if (retryError) throw new Error(`Could not verify the official agent record: ${retryError.message}`);
+        if (!existing) throw new Error(`Could not create the official agent record: ${error?.message ?? "No record was returned."}`);
+        agent = existing;
+      } else {
+        agent = inserted;
+        createdAgent = true;
+      }
+    }
+
+    if (agent.user_id && agent.user_id !== app.user_id)
+      throw new Error("The official agent record is linked to a different sign-in account. Resolve it before approval.");
+    if (agent.status !== "active")
+      throw new Error("An official agent record already exists but is not active. Review its status before proceeding.");
+    if (!agent.user_id) {
+      const { data: linked, error } = await db
+        .from("agents")
+        .update({ user_id: app.user_id })
+        .eq("id", agent.id)
+        .is("user_id", null)
+        .select("id")
+        .maybeSingle();
+      if (error) throw new Error(`Could not link the agent sign-in account: ${error.message}`);
+      if (!linked)
+        throw new Error("The agent record changed while linking its account. Refresh and retry approval.");
+      linkedAccount = true;
+    }
+
+    const profileNeedsUpdate =
+      profile.full_name !== app.full_name ||
+      profile.phone !== app.phone ||
+      profile.department !== "Digital Agent Programme" ||
+      profile.job_title !== "Digital Agent";
+    if (profileNeedsUpdate) {
+      const { data: updatedProfile, error } = await db
+        .from("profiles")
+        .update({
+          full_name: app.full_name,
+          phone: app.phone,
+          department: "Digital Agent Programme",
+          job_title: "Digital Agent",
+        })
+        .eq("id", app.user_id)
+        .eq("status", "active")
+        .select("id")
+        .maybeSingle();
+      if (error) throw new Error(`Could not update the agent sign-in profile: ${error.message}`);
+      if (!updatedProfile)
+        throw new Error("The applicant's sign-in profile changed during approval. Refresh and retry.");
+    }
+
+    if (!wasApproved || createdAgent || linkedAccount || profileNeedsUpdate) {
+      await audit(
+        context.userId,
+        (context.claims?.email as string) ?? null,
+        wasApproved ? "agent.application_approval_repaired" : "agent.application_approved",
+        data.id,
+        { note: data.note, agentId: agent.id },
+      );
+    }
+    return { agentId: agent.id };
+  });
+
+export const setAgentStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z
+      .object({ id: z.string().uuid(), status: z.enum(["active", "suspended", "revoked"]) })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertPerm(context.supabase, context.userId, "agents.manage");
+    await (await admin()).from("agents").update({ status: data.status }).eq("id", data.id);
+    await audit(
+      context.userId,
+      (context.claims?.email as string) ?? null,
+      `agent.${data.status}`,
+      data.id,
+    );
+    return { ok: true };
+  });
+
+export const signAgentFiles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ paths: z.array(path).max(10) }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAnyPerm(context.supabase, context.userId, ["agents.view", "agents.manage"]);
+    const db = await admin();
+    const out: Record<string, string> = {};
+    for (const p of data.paths) {
+      const { data: s } = await db.storage.from(BUCKET).createSignedUrl(p, 900);
+      if (s) out[p] = s.signedUrl;
+    }
+    return out;
+  });
+
+/** Public QR verification - returns only safe card details. */
+export const verifyAgent = createServerFn({ method: "POST" })
+  .inputValidator((i: unknown) => z.object({ token: z.string().trim().min(10).max(80) }).parse(i))
+  .handler(async ({ data }) => {
+    const db = await admin();
+    const { data: a } = await db
+      .from("agents")
+      .select(
+        "full_name, agent_code, district, status, issued_at, expires_at, photo_path, referral_code, designation, application_id",
+      )
+      .eq("verification_token", data.token)
+      .maybeSingle();
+    if (!a) return null;
+    let photoUrl: string | null = null;
+    if (a.photo_path)
+
+==========================================================================================
+FILE: .\src\lib\rbac.ts
+==========================================================================================
+export type AppRole =
+  | "super_admin"
+  | "receptionist"
+  | "onboarding_officer"
+  | "deals_manager"
+  | "verification_officer"
+  | "risk_officer"
+  | "finance_officer"
+  | "management"
+  | "auditor";
+
+export const ALL_ROLES: AppRole[] = [
+  "super_admin",
+  "receptionist",
+  "onboarding_officer",
+  "deals_manager",
+  "verification_officer",
+  "risk_officer",
+  "finance_officer",
+  "management",
+  "auditor",
+];
+
+export const ROLE_LABEL: Record<AppRole, string> = {
+  super_admin: "Super Admin",
+  receptionist: "Receptionist",
+  onboarding_officer: "Client Onboarding Officer",
+  deals_manager: "Deals Manager",
+  verification_officer: "Verification Officer",
+  risk_officer: "Risk Officer",
+  finance_officer: "Finance Officer",
+  management: "Management",
+  auditor: "Auditor",
+};
+
+export const WORKSPACE_LABEL: Record<AppRole, string> = {
+  super_admin: "Administration Workspace",
+  receptionist: "Reception Workspace",
+  onboarding_officer: "Onboarding Workspace",
+  deals_manager: "Deals Workspace",
+  verification_officer: "Verification Workspace",
+  risk_officer: "Risk Workspace",
+  finance_officer: "Finance Workspace",
+  management: "Management Workspace",
+  auditor: "Audit Workspace",
+};
+
+/** Granular permission catalogue - configurable per role by the Super Admin. */
+export const PERMISSION_GROUPS: { module: string; label: string; actions: string[] }[] = [
+  {
+    module: "clients",
+    label: "Clients",
+    actions: ["view", "create", "edit", "archive", "delete", "export"],
+  },
+  {
+    module: "properties",
+    label: "Properties & Assets",
+    actions: ["view", "create", "edit", "verify", "archive"],
+  },
+  {
+    module: "requirements",
+    label: "Requirements",
+    actions: ["view", "create", "edit", "archive", "export"],
+  },
+  {
+    module: "opportunities",
+    label: "Opportunities",
+    actions: ["view", "create", "edit", "archive", "export"],
+  },
+  {
+    module: "deals",
+    label: "Deals",
+    actions: ["view", "create", "edit", "close", "archive", "export"],
+  },
+  {
+    module: "verification",
+    label: "Verification & Due Diligence",
+    actions: ["view", "create", "edit", "close", "export"],
+  },
+  {
+    module: "risk",
+    label: "Risk & Investigation",
+    actions: ["view", "create", "edit", "close", "export"],
+  },
+  {
+    module: "research",
+    label: "Research",
+    actions: ["view", "create", "edit", "archive", "export"],
+  },
+  {
+    module: "documents",
+    label: "Documents & Media",
+    actions: ["view", "create", "edit", "download", "archive", "delete"],
+  },
+  {
+    module: "finance",
+    label: "Finance & Accounts",
+    actions: ["view", "create", "edit", "approve", "configure", "export"],
+  },
+  { module: "agents", label: "Digital Agents", actions: ["view", "manage"] },
+  { module: "forms", label: "Forms", actions: ["view", "create", "edit", "archive"] },
+  { module: "tasks", label: "Tasks", actions: ["view", "create", "edit"] },
+  {
+    module: "objectives",
+    label: "Objectives",
+    actions: ["view", "create", "edit", "archive", "export"],
+  },
+  { module: "archive", label: "Archive", actions: ["view", "restore"] },
+  { module: "audit", label: "Audit", actions: ["view"] },
+  { module: "admin", label: "Administration", actions: ["users", "roles", "settings"] },
+];
+
+export const ALL_PERMISSIONS: string[] = PERMISSION_GROUPS.flatMap((g) =>
+  g.actions.map((a) => `${g.module}.${a}`),
+);
+
+export const ACTION_LABEL: Record<string, string> = {
+  view: "View",
+  create: "Create",
+  edit: "Edit",
+  close: "Close",
+  archive: "Archive",
+  restore: "Restore",
+  delete: "Delete",
+  export: "Export",
+  download: "Download",
+  approve: "Approve",
+  configure: "Configure",
+  verify: "Verify",
+  users: "Manage users",
+  roles: "Manage roles & permissions",
+  settings: "System settings",
+};
+
+export interface AccessState {
+  roles: AppRole[];
+  permissions: Set<string>;
+  isSuperAdmin: boolean;
+}
+
+export function makeAccess(roles: AppRole[], permissions: string[]): AccessState {
+  const isSuperAdmin = roles.includes("super_admin");
+  return {
+    roles,
+    permissions: new Set(isSuperAdmin ? ALL_PERMISSIONS : permissions),
+    isSuperAdmin,
+  };
+}
+
+export function allows(access: AccessState | undefined | null, permission: string): boolean {
+  if (!access) return false;
+  return access.isSuperAdmin || access.permissions.has(permission);
+}
+
+export function primaryRole(roles: AppRole[]): AppRole | null {
+  for (const role of ALL_ROLES) if (roles.includes(role)) return role;
+  return null;
+}
+
+export function greeting(date = new Date()): string {
+  const h = date.getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+export interface NavLeaf {
+  to: string;
+  label: string;
+  permission: string;
+}
+export interface NavGroup {
+  label: string;
+  items: NavLeaf[];
+}
+
+export const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Company",
+    items: [{ to: "/calendar", label: "Company Calendar", permission: "clients.view" }],
+  },
+  {
+    label: "Reception",
+    items: [{ to: "/reception/scheduling", label: "Appointments & Officer Schedule", permission: "clients.view" }],
+  },
+  {
+    label: "My Workspace",
+    items: [
+      { to: "/my-availability", label: "My Schedule", permission: "clients.view" },
+    ],
+  },  {
+    label: "Overview",
+    items: [{ to: "/dashboard", label: "Dashboard", permission: "clients.view" }],
+  },
+  {
+    label: "Clients",
+    items: [
+      { to: "/clients", label: "All Clients", permission: "clients.view" },
+      { to: "/clients/new", label: "New Client", permission: "clients.create" },
+      { to: "/requirements", label: "Requirements", permission: "requirements.view" },
+      { to: "/forms", label: "Forms", permission: "forms.view" },
+    ],
+  },
+  {
+    label: "Properties",
+    items: [
+      { to: "/properties", label: "Property Register", permission: "properties.view" },
+      { to: "/properties/new", label: "Register Property", permission: "properties.create" },
+    ],
+  },
+  {
+    label: "Opportunities",
+    items: [
+      { to: "/opportunities", label: "All Opportunities", permission: "opportunities.view" },
+      { to: "/opportunities/new", label: "New Opportunity", permission: "opportunities.create" },
+      { to: "/matches", label: "Matches", permission: "requirements.view" },
+    ],
+  },
+  {
+    label: "Deals",
+    items: [
+      { to: "/deals", label: "Pipeline", permission: "deals.view" },
+      { to: "/deals/new", label: "New Deal", permission: "deals.create" },
+    ],
+  },
+  {
+    label: "Verification",
+    items: [{ to: "/verification", label: "Verification & KYC", permission: "verification.view" }],
+  },
+  {
+    label: "Risk & Intelligence",
+    items: [
+      { to: "/risk", label: "Risk & Investigations", permission: "risk.view" },
+      { to: "/risk/search", label: "Internal Search", permission: "risk.view" },
+      { to: "/research", label: "Research", permission: "research.view" },
+      { to: "/intelligence", label: "Intelligence & Analytics", permission: "admin.users" },
+    ],
+  },
+  {
+    label: "Documents",
+    items: [
+      { to: "/documents", label: "Document Vault", permission: "documents.view" },
+      { to: "/media", label: "Media Archive", permission: "documents.view" },
+    ],
+  },
+  {
+    label: "Finance & Accounts",
+    items: [
+      { to: "/finance", label: "Overview & Transactions", permission: "finance.view" },
+      { to: "/finance/approvals", label: "Approvals", permission: "finance.view" },
+      { to: "/finance/ledger", label: "General Ledger", permission: "finance.view" },
+      { to: "/finance/receipts", label: "Receipts", permission: "finance.view" },
+    ],
+  },
+  {
+    label: "Digital Agents",
+    items: [
+      { to: "/agents", label: "Agent Programme", permission: "agents.view" },
+      { to: "/agents/redemptions", label: "Token Redemptions", permission: "agents.view" },
+    ],
+  },
+  {
+    label: "Objectives",
+    items: [{ to: "/objectives", label: "Company Objectives", permission: "objectives.view" }],
+  },
+  {
+    label: "Archive",
+    items: [{ to: "/archive", label: "Kalexi Archive", permission: "archive.view" }],
+  },
+  {
+    label: "Administration",
+    items: [
+      { to: "/admin", label: "Control Centre", permission: "admin.users" },
+      { to: "/employee-intelligence", label: "Employee Intelligence", permission: "admin.users" },
+      { to: "/brand", label: "Brand Centre", permission: "admin.users" },
+      { to: "/admin/maintenance", label: "System Maintenance", permission: "admin.settings" },
+      { to: "/admin/users", label: "Users", permission: "admin.users" },
+      { to: "/admin/roles", label: "Roles & Permissions", permission: "admin.roles" },
+      { to: "/admin/audit", label: "Audit Logs", permission: "audit.view" },
+    ],
+  },
+];
+
+export function navFor(access: AccessState | undefined | null): NavGroup[] {
+  return NAV_GROUPS.map((g) => ({
+    label: g.label,
+    items: g.items.filter((i) => allows(access, i.permission)),
+  })).filter((g) => g.items.length > 0);
+}
+
+
+==========================================================================================
+FILE: .\src\routes\_authenticated\brand.tsx
+==========================================================================================
+import BrandTemplateManager from "@/components/BrandTemplateManager";
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
+import { FilePlus2, Save, Printer, Copy, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { KalexiMark } from "@/components/KalexiMark";
+import { BrandAppearanceSettings } from "@/components/BrandAppearanceSettings";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession, logAudit } from "@/hooks/useSession";
+import { NoAccess } from "@/components/records";
+import { supabase } from "@/integrations/supabase/client";
+import { createBrandSignatureUpload, getBrandSignature } from "@/lib/brand.functions";
+import type { Database } from "@/integrations/supabase/types";
+
+type Template = Database["public"]["Tables"]["brand_templates"]["Row"];
+type Draft = Pick<Template, "name" | "kind" | "heading" | "body" | "doc_date" | "signatory_name" | "signatory_title" | "signature_path" | "accent">;
+const fresh = (): Draft => ({ name: "", kind: "letter", heading: "", body: "", doc_date: new Date().toISOString().slice(0, 10), signatory_name: "", signatory_title: "", signature_path: null, accent: "gold" });
+const KIND_LABEL: Record<string, string> = { letter: "Official correspondence", notice: "Company notice", certificate: "Official certificate", memo: "Internal memo", appointment: "Letter of appointment", authorization: "Agent authorisation", invoice: "Invoice letterhead" };
+const PRESETS: Partial<Draft>[] = [
+  { name: "Agent authorisation", kind: "authorization", heading: "Letter of Authorisation", body: "This is to confirm that [Agent name], Agent ID [KBL-AG-000000], is an authorised Digital Agent of Kalexi Brokerage Ltd.\n\nThe agent may refer clients and share the official referral link. The agent may not receive payments, sign contracts or make guarantees on behalf of the company." },
+  { name: "Appointment letter", kind: "appointment", heading: "Letter of Appointment", body: "Dear [Name],\n\nWe are pleased to appoint you as [Position] with Kalexi Brokerage Ltd, effective [date].\n\nYours faithfully," },
+  { name: "Company notice", kind: "notice", heading: "Notice", body: "All staff and agents are hereby notified that..." },
+  { name: "Certificate", kind: "certificate", heading: "Certificate of Recognition", body: "Awarded to\n\n[Name]\n\nin recognition of outstanding performance." },
+  { name: "Internal memo", kind: "memo", heading: "Memo: [Subject]", body: "To: \nFrom: \nSubject: \n\n" },
+];
+export const Route = createFileRoute("/_authenticated/brand")({
+  head: () => ({ meta: [{ title: "Brand Centre - Kalexi Brokerage" }, { name: "description", content: "Design and save branded Kalexi letters, notices and certificates." }, { property: "og:title", content: "Brand Centre - Kalexi Brokerage" }, { property: "og:description", content: "Company templates with dates, signatures and printable letterheads." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
+  component: BrandCentre,
+});
+function BrandCentre() {
+  const { data: session } = useSession(); const qc = useQueryClient();
+  const [id, setId] = useState<string | null>(null); const [draft, setDraft] = useState<Draft>(fresh);
+  const [signature, setSignature] = useState<File | null>(null); const [preview, setPreview] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false); const [dirty, setDirty] = useState(false);
+  const upload = useServerFn(createBrandSignatureUpload); const sign = useServerFn(getBrandSignature);
+  const staff = !!session?.profile && session.profile.status === "active" && session.roles.length > 0;
+  const q = useQuery({ queryKey: ["brand-templates"], enabled: staff, queryFn: async () => { const { data, error } = await supabase.from("brand_templates").select("*").is("file_path", null).order("updated_at", { ascending: false }); if (error) throw error; return data; } });
+  const signed = useQuery({ queryKey: ["brand-signature", id, draft.signature_path], enabled: !!id && !!draft.signature_path, queryFn: () => id ? sign({ data: { id } }) : null });
+  useEffect(() => { if (!signature) { setPreview(null); return; } const url = URL.createObjectURL(signature); setPreview(url); return () => URL.revokeObjectURL(url); }, [signature]);
+  function update<K extends keyof Draft>(key: K, value: Draft[K]) { setDraft(p => ({ ...p, [key]: value })); setDirty(true); }
+  function choose(row?: Template) { if (dirty && !window.confirm("Discard unsaved changes?")) return; setId(row?.id ?? null); setDraft(row ?? fresh()); setSignature(null); setDirty(false); }
+  async function save() {
+    if (!session || !draft.name.trim()) { toast.error("Enter a template name."); return; }
+    setBusy(true);
+    try {
+      let signaturePath = draft.signature_path;
+      if (signature) {
+        if (!signature.type.startsWith("image/") || signature.size > 5 * 1024 * 1024) throw new Error("Choose a signature image under 5 MB.");
+        const slot = await upload({ data: { fileName: signature.name } });
+        const { error } = await supabase.storage.from("kalexi-vault").uploadToSignedUrl(slot.path, slot.token, signature); if (error) throw error;
+        signaturePath = slot.path;
+      }
+      const payload = { ...draft, name: draft.name.trim(), doc_date: draft.doc_date || null, signature_path: signaturePath };
+      const result = id ? await supabase.from("brand_templates").update(payload).eq("id", id).select().single() : await supabase.from("brand_templates").insert({ ...payload, created_by: session.userId }).select().single();
+      if (result.error) throw result.error;
+      setId(result.data.id); setDraft(result.data); setSignature(null); setDirty(false);
+      await logAudit({ actorId: session.userId, actorEmail: session.email, action: "brand.template_saved", entityType: "brand_template", entityId: result.data.id });
+      await qc.invalidateQueries({ queryKey: ["brand-templates"] }); toast.success("Template saved");
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Could not save template"); } finally { setBusy(false); }
+  }
+  async function remove() { if (!id || !window.confirm("Delete this saved template?")) return; setBusy(true); const { error } = await supabase.from("brand_templates").delete().eq("id", id); setBusy(false); if (error) { toast.error(error.message); return; } setDirty(false); setId(null); setDraft(fresh()); setSignature(null); qc.invalidateQueries({ queryKey: ["brand-templates"] }); toast.success("Template deleted"); }
+  const field = (key: "name" | "heading" | "doc_date" | "signatory_name" | "signatory_title", label: string, type = "text") => <div className="space-y-1"><Label htmlFor={`brand-${key}`}>{label}</Label><Input id={`brand-${key}`} type={type} value={draft[key] ?? ""} onChange={e => update(key, e.target.value)} /></div>;
+  const accent = draft.accent === "navy" ? "border-navy" : draft.accent === "green" ? "border-success" : "border-gold";
+  return <AppShell><div className="no-print"><PageHeader title="Brand Centre" actions={<Button variant="outline" onClick={() => choose()}><FilePlus2 />New template</Button>} /></div>
+    {!staff ? <NoAccess module="Brand Centre" /> : <>
+      {session?.access.isSuperAdmin ? <BrandAppearanceSettings /> : null}
+      <div className="grid gap-6 xl:grid-cols-[350px_minmax(0,1fr)]">
+      <section className="brand-editor space-y-5">
+        <div><Label htmlFor="template-select">Saved templates</Label><select id="template-select" value={id ?? ""} disabled={busy} className="mt-1 h-10 w-full rounded-md border bg-card px-3 text-sm" onChange={e => choose(q.data?.find(t => t.id === e.target.value))}><option value="">New template</option>{q.data?.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select>{q.isError ? <p role="alert" className="text-sm text-destructive">Could not load templates.</p> : null}</div>
+        <div className="space-y-4">{field("name", "Template name")}
+          <div><p className="mb-2 text-sm font-medium">Quick start</p><div className="flex flex-wrap gap-2">{PRESETS.map(p => <Button key={p.name} type="button" size="sm" variant="secondary" onClick={() => { setDraft(d => ({ ...d, ...p })); setDirty(true); }}>{p.name}</Button>)}</div></div>
+          <div className="grid grid-cols-2 gap-3"><div><Label htmlFor="brand-kind">Format</Label><select id="brand-kind" className="mt-1 h-9 w-full rounded-md border bg-card px-2 text-sm" value={draft.kind} onChange={e => update("kind", e.target.value)}>{Object.entries(KIND_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>{field("doc_date", "Document date", "date")}</div>
+          {field("heading", "Heading")}<div><Label htmlFor="brand-body">Document text</Label><Textarea id="brand-body" rows={7} value={draft.body ?? ""} onChange={e => update("body", e.target.value)} /></div>
+          {field("signatory_name", "Signatory name")}{field("signatory_title", "Signatory title")}
+          <div><Label htmlFor="brand-signature">Signature image</Label><Input id="brand-signature" type="file" accept="image/*" onChange={e => { setSignature(e.target.files?.[0] ?? null); setDirty(true); }} />{draft.signature_path || signature ? <Button size="sm" variant="ghost" onClick={() => { update("signature_path", null); setSignature(null); }}>Remove signature</Button> : null}</div>
+          <fieldset><legend className="mb-2 text-sm font-medium">Accent</legend><div className="flex gap-2">{(["gold", "navy", "green"] as const).map(c => <Button key={c} variant="outline" size="icon" title={c} aria-label={`${c} accent`} aria-pressed={draft.accent === c} className={draft.accent === c ? "ring-2 ring-ring" : ""} onClick={() => update("accent", c)}><span className={`h-4 w-4 rounded-full ${c === "gold" ? "bg-gold" : c === "navy" ? "bg-navy" : "bg-success"}`} /></Button>)}</div></fieldset>
+          <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={save}><Save />{busy ? "Saving..." : "Save template"}</Button><Button variant="outline" onClick={() => window.print()}><Printer />Print / PDF</Button>{id ? <><Button variant="outline" size="icon" title="Duplicate template" aria-label="Duplicate template" onClick={() => { setId(null); update("name", `${draft.name} copy`); }}><Copy /></Button><Button variant="outline" size="icon" disabled={busy} title="Delete template" aria-label="Delete template" onClick={remove}><Trash2 color="#DC2626" strokeWidth={2.2} /></Button></> : null}</div>
+        </div>
+      </section>
+      <section className={`brand-preview relative min-h-[700px] overflow-hidden rounded-sm border border-t-4 bg-card p-6 shadow-[var(--shadow-panel)] sm:p-12 ${accent} ${draft.kind === "certificate" ? "border-x-4 border-b-4" : ""}`} aria-label="Document preview">
+        <KalexiMark className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 opacity-[0.05]" />
+        <header className="relative flex flex-wrap items-center justify-between gap-4 border-b pb-6"><div className="flex items-center gap-4"><KalexiMark className="h-16 w-16" /><div><h2 className="font-display text-lg font-semibold sm:text-xl">KALEXI BROKERAGE LTD</h2><p className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">{KIND_LABEL[draft.kind] ?? "Official correspondence"}</p></div></div><div className="text-right text-xs leading-5 text-muted-foreground"><p>info@kalexibrokerage.com</p><p>www.kalexibrokerage.com</p></div></header>
+        <p className="relative mt-6 text-right text-sm text-muted-foreground">{draft.doc_date ? new Date(`${draft.doc_date}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}</p>
+        <h3 className={`relative mt-10 break-words font-display text-2xl font-semibold ${draft.kind === "certificate" ? "text-center text-3xl" : ""}`}>{draft.heading || ""}</h3>
+        <div className={`relative mt-6 min-h-64 whitespace-pre-wrap break-words text-sm leading-7 ${draft.kind === "certificate" ? "text-center" : ""}`}>{draft.body}</div>
+        <div className={`relative mt-12 ${draft.kind === "certificate" ? "flex flex-col items-center text-center" : ""}`}>{preview || signed.data ? <img src={preview ?? signed.data ?? ""} alt="Authorised signature" className="mb-3 h-16 max-w-48 object-contain object-left" /> : <div className="mb-3 h-12 w-48 border-b border-dashed" />}<p className="font-semibold">{draft.signatory_name}</p><p className="text-sm text-muted-foreground">{draft.signatory_title}</p></div>
+        <footer className="relative mt-10 flex flex-wrap justify-between gap-2 border-t pt-4 text-xs text-muted-foreground"><span>KALEXI BROKERAGE LTD | Brokerage | Facilitation | Advisory</span><span>Ref: KBL-{(id ?? "draft").slice(0, 8).toUpperCase()}</span></footer>
+      </section>
+      
+      <div className="xl:col-span-2">
+        <BrandTemplateManager />
+      </div>
+      </div>
+    </>}
+  </AppShell>;
+}
+
+==========================================================================================
+FILE: .\src\routes\_authenticated\calendar.tsx
+==========================================================================================
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { format, isSameDay, parseISO } from "date-fns";
+import { enGB } from "date-fns/locale";
+import { ArrowLeft, CalendarDays, Clock, Flag, PartyPopper, Plus, RefreshCw, Sparkles } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { canViewCompanyCalendar } from "@/lib/agents.functions";
+import { ALL_ROLES, ROLE_LABEL } from "@/lib/rbac";
+import { GlobalHolidaysPage } from "./holidays";
+
+type CompanyEvent = {
+  id: string;
+  title: string;
+  description: string | null;
+  location: string | null;
+  requirements: string | null;
+  starts_at: string;
+  ends_at: string | null;
+  event_type: string;
+  created_by: string | null;
+  notification_groups: string[];
+};
+
+type AudienceOption = { value: string; label: string };
+type CalendarEventClient = {
+  from: (table: "calendar_events") => {
+    select: (columns: string) => {
+      order: (
+        column: "starts_at",
+        options: { ascending: boolean },
+      ) => {
+        limit: (
+          count: number,
+        ) => PromiseLike<{ data: CompanyEvent[] | null; error: { message: string } | null }>;
+      };
+    };
+    insert: (event: {
+      title: string;
+      description: string | null;
+      location: string | null;
+      requirements: string | null;
+      starts_at: string;
+      ends_at: string;
+      event_type: string;
+      created_by: string;
+      notification_groups: string[];
+    }) => PromiseLike<{ error: { message: string } | null }>;
+  };
+};
+
+type PublicHoliday = {
+  date: string;
+  localName: string;
+  name: string;
+  countryCode: string;
+};
+
+const calendarDb = supabase as unknown as CalendarEventClient;
+
+const eventStyles: Record<string, string> = {
+  meeting: "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-200",
+  programme: "border-violet-200 bg-violet-50 text-violet-800 dark:border-violet-900 dark:bg-violet-950 dark:text-violet-200",
+  deadline: "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200",
+  training: "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200",
+  announcement: "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200",
+  other: "border-border bg-muted text-foreground",
+};
+
+export const Route = createFileRoute("/_authenticated/calendar")({
+  beforeLoad: async () => {
+    if (!(await canViewCompanyCalendar())) throw redirect({ to: "/agent-portal" });
+  },
+  component: CompanyCalendarPage,
+});
+
+function CompanyCalendarPage() {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [events, setEvents] = useState<CompanyEvent[]>([]);
+  const [holidays, setHolidays] = useState<PublicHoliday[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [holidayLoading, setHolidayLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState("");
+  const [holidayMessage, setHolidayMessage] = useState("");
+  const [notice, setNotice] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
+  const [requirements, setRequirements] = useState("");
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("10:00");
+  const [eventType, setEventType] = useState("meeting");
+  const [notificationGroups, setNotificationGroups] = useState<string[]>(["all"]);
+  const [now, setNow] = useState(new Date());
+
+  const staffOptions = useQuery({
+    queryKey: ["calendar-audience-departments"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("department")
+        .eq("status", "active");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const audienceOptions = useMemo<AudienceOption[]>(() => {
+    const presets: AudienceOption[] = [
+      { value: "all", label: "Everyone, including agents" },
+      { value: "employees", label: "Employees and staff" },
+      { value: "agents", label: "Digital agents" },
+      { value: "executive", label: "Executive" },
+      { value: "finance", label: "Finance" },
+      { value: "redemptions", label: "Redemptions" },
+      ...ALL_ROLES.map((role) => ({ value: `role:${role}`, label: ROLE_LABEL[role] })),
+    ];
+    const departments = Array.from(
+      new Set(
+        (staffOptions.data ?? [])
+          .map((profile) => profile.department?.trim())
+          .filter((department): department is string => Boolean(department)),
+      ),
+    )
+      .filter(
+        (department) =>
+          !["executive", "finance", "redemptions"].includes(department.toLowerCase()),
+      )
+      .sort((a, b) => a.localeCompare(b))
+      .map((department) => ({
+        value: `department:${department.toLowerCase().replace(/[^a-z0-9 _-]/g, "")}`,
+        label: department,
+      }))
+      .filter((department) => department.value.length > "department:".length);
+    return [...presets, ...departments];
+  }, [staffOptions.data]);
+
+  const loadEvents = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    const result = await calendarDb
+      .from("calendar_events")
+      .select(
+        "id,title,description,starts_at,ends_at,event_type,created_by,location,requirements,notification_groups",
+      )
+      .order("starts_at", { ascending: true })
+      .limit(500);
+
+    if (result.error) {
+      setError("Could not load company events. Check the database migration and your account permissions. " + result.error.message);
+    } else {
+      setEvents(result.data ?? []);
+    }
+    setLoading(false);
+  }, []);
+
+  async function loadHolidays() {
+    setHolidayLoading(true);
+    setHolidayMessage("");
+    const year = new Date().getFullYear();
+
+    try {
+      const results = await Promise.all([year, year + 1].map(async (y) => {
+        const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/UG`);
+        if (!response.ok) throw new Error(`Holiday service returned ${response.status}`);
+        return await response.json() as PublicHoliday[];
+      }));
+
+      const combined = results.flat();
+      const unique = Array.from(new Map(combined.map((holiday) => [holiday.date, holiday])).values());
+      setHolidays(unique);
+    } catch {
+      setHolidayMessage("Uganda public holidays could not be loaded. Check your internet connection and refresh.");
+    } finally {
+      setHolidayLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadEvents();
+    void loadHolidays();
+    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(timer);
+  }, [loadEvents]);
+
+  const dayEvents = useMemo(
+    () => events.filter((event) => isSameDay(new Date(event.starts_at), selectedDate)),
+    [events, selectedDate]
+  );
+
+  const dayHolidays = useMemo(
+    () => holidays.filter((holiday) => holiday.date === format(selectedDate, "yyyy-MM-dd")),
+    [holidays, selectedDate]
+  );
+
+  const eventDates = useMemo(
+    () => events.map((event) => new Date(event.starts_at)),
+    [events]
+  );
+
+  const holidayDates = useMemo(
+    () => holidays.map((holiday) => parseISO(holiday.date)),
+    [holidays]
+  );
+
+  async function createEvent(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    setNotice("");
+
+    const start = new Date(`${format(selectedDate, "yyyy-MM-dd")}T${startTime}:00`);
+    const end = new Date(`${format(selectedDate, "yyyy-MM-dd")}T${endTime}:00`);
+
+    if (end <= start) {
+      setError("The end time must be later than the start time.");
+      setSaving(false);
+      return;
+    }
+    if (staffOptions.isError) {
+      setError("Recipient departments could not be loaded. Refresh and try again.");
+      setSaving(false);
+      return;
+    }
+    if (!notificationGroups.length) {
+      setError("Choose at least one group to notify.");
+      setSaving(false);
+      return;
+    }
+
+    const { data: userResult, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      setError("Your account could not be verified. Sign in again.");
+      setSaving(false);
+      return;
+    }
+    if (!userResult.user) {
+      setError("Your session has expired. Sign in again.");
+      setSaving(false);
+      return;
+    }
+
+    const result = await calendarDb.from("calendar_events").insert({
+      title: title.trim(),
+      description: description.trim() || null,
+      location: location.trim() || null,
+      requirements: requirements.trim() || null,
+      starts_at: start.toISOString(),
+      ends_at: end.toISOString(),
+      event_type: eventType,
+      created_by: userResult.user.id,
+      notification_groups: notificationGroups,
+    });
+
+    if (result.error) {
+      setError("Event could not be saved. " + result.error.message);
+    } else {
+      setTitle("");
+      setDescription("");
+      setLocation("");
+      setRequirements("");
+      setNotificationGroups(["all"]);
+      setShowForm(false);
+      setNotice("Company event saved successfully.");
+      await loadEvents();
+    }
+    setSaving(false);
+  }
+
+  return (
+    <main className="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-7">
+<section className="overflow-hidden rounded-2xl border bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm dark:from-slate-950 dark:via-background dark:to-violet-950 md:p-8">
+        <Link to="/dashboard" className="mb-5 inline-flex items-center gap-2 rounded-lg border bg-background/80 px-3 py-2 text-sm font-medium hover:bg-muted">
+          <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+        </Link>
+        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 text-xs font-medium">
+              <Sparkles className="h-3.5 w-3.5 text-violet-500" /> KALEXI | PLAN TOGETHER
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+              <CalendarDays color="#7C3AED" strokeWidth={2.2} className="mr-2 inline h-7 w-7 align-[-4px] shrink-0" aria-hidden="true" />
+              Company Calendar
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground md:text-base">
+              Meetings, programmes, deadlines and Uganda public holidays in one shared place.
+            </p>
+          </div>
+          <div className="rounded-xl border bg-background/85 p-4 md:min-w-56">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock color="#D97706" strokeWidth={2.2} className="h-4 w-4 shrink-0" /> KAMPALA TIME
+            </div>
+            <div className="mt-2 text-2xl font-semibold tabular-nums">
+              {new Intl.DateTimeFormat("en-GB", {
+                timeZone: "Africa/Kampala",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+              }).format(now)}
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {new Intl.DateTimeFormat("en-GB", {
+                timeZone: "Africa/Kampala",
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }).format(now)}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {error && <div role="alert" className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm">{error}</div>}
+      {notice && <div role="status" className="rounded-lg border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100">{notice}</div>}
+
+      <section className="grid gap-6 lg:grid-cols-[minmax(300px,390px)_1fr]">
+        <div className="rounded-2xl border bg-card p-3 shadow-sm sm:p-5">
+          <div className="mb-2 flex items-center justify-between gap-3 px-2">
+            <h2 className="flex items-center gap-2 font-semibold">
+              <CalendarDays color="#7C3AED" strokeWidth={2.2} className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Pick a date
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => { setSelectedDate(new Date()); }}>
+              Today
+            </Button>
+          </div>
+          <Calendar color="#7C3AED" strokeWidth={2.2}
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date) => date && setSelectedDate(date)}
+            locale={enGB}
+            modifiers={{ hasEvent: eventDates, publicHoliday: holidayDates }}
+            modifiersClassNames={{
+              hasEvent: "font-bold underline decoration-2 decoration-blue-500 underline-offset-4",
+              publicHoliday: "rounded-md bg-rose-100 font-bold text-rose-800 dark:bg-rose-950 dark:text-rose-200",
+            }}
+            className="mx-auto"
+          />
+          <div className="mt-3 space-y-2 border-t pt-4 text-xs">
+            <p className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-blue-500" /> Company event or programme</p>
+            <p className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-rose-500" /> Uganda public holiday</p>
+            <p className="mt-3 text-muted-foreground">Select a date to see its schedule and holiday details.</p>
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-5">
+          <div className="rounded-2xl border bg-card p-5 shadow-sm md:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-sm text-muted-foreground">Selected day</p>
+                <h2 className="mt-1 text-xl font-bold md:text-2xl">{format(selectedDate, "EEEE, d MMMM yyyy", { locale: enGB })}</h2>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => { void loadEvents(); void loadHolidays(); }} disabled={loading || holidayLoading}>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Refresh
+                </Button>
+                <Button onClick={() => { setShowForm((v) => !v); setError(""); }}>
+                  <Plus color="#16A34A" strokeWidth={2.2} className="mr-2 h-4 w-4 shrink-0" /> Add event
+                </Button>
+              </div>
+            </div>
+
+            {dayHolidays.map((holiday) => (
+              <div key={holiday.date} className="mt-5 flex gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900 dark:bg-rose-950">
+                <div className="rounded-lg bg-white p-2 text-rose-600 dark:bg-rose-900"><Flag className="h-5 w-5" /></div>
+                <div>
+                  <p className="font-semibold text-rose-900 dark:text-rose-100">{holiday.localName || holiday.name}</p>
+                  <p className="mt-1 text-sm text-rose-800 dark:text-rose-200">Uganda public holiday</p>
+                </div>
+              </div>
+            ))}
+
+            {showForm && (
+              <form onSubmit={createEvent} className="mt-5 space-y-4 rounded-xl border bg-muted/30 p-4">
+                <h3 className="flex items-center gap-2 font-semibold">
+                  <Plus color="#16A34A" strokeWidth={2.2} className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  Create company event
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="event-title" className="text-sm font-medium">Event title</label>
+                    <Input id="event-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Weekly operations meeting" required maxLength={160} />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="event-type" className="text-sm font-medium">Category</label>
+                    <select id="event-type" value={eventType} onChange={(e) => setEventType(e.target.value)} className="h-10 w-full rounded-md border bg-background px-3 text-sm">
+                      <option value="meeting">Meeting</option>
+                      <option value="programme">Programme</option>
+                      <option value="deadline">Deadline</option>
+                      <option value="training">Training</option>
+                      <option value="announcement">Announcement</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="event-start" className="text-sm font-medium">Start time</label>
+                    <Input id="event-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="event-end" className="text-sm font-medium">End time</label>
+                    <Input id="event-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+                  </div>
+                </div>
+                <fieldset className="space-y-3 rounded-lg border bg-background p-4">
+                  <legend className="px-1 text-sm font-medium">Notify these groups</legend>
+                  {staffOptions.isLoading ? (
+                    <p className="text-sm text-muted-foreground">Loading staff departments...</p>
+                  ) : staffOptions.isError ? (
+                    <p role="alert" className="text-sm text-destructive">
+                      Recipient departments could not be loaded. Refresh before creating the event.
+                    </p>
+                  ) : (
+                    <>
+                      <p className="text-xs text-muted-foreground">
+                        Selected groups receive an in-app notification. People outside the selected
+                        groups cannot view this event.
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {audienceOptions.map((option) => (
+                          <label
+                            key={option.value}
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            <Checkbox
+                              checked={notificationGroups.includes(option.value)}
+                              onCheckedChange={(checked) => {
+                                setNotificationGroups((current) => {
+                                  if (checked) {
+                                    if (option.value === "all") return ["all"];
+                                    return [
+                                      ...current.filter((value) => value !== "all"),
+                                      option.value,
+                                    ];
+                                  }
+                                  return current.filter((value) => value !== option.value);
+                                });
+                              }}
+                            />
+                            {option.label}
+                          </label>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </fieldset>
+                <div className="space-y-2">
+                  <label htmlFor="event-description" className="text-sm font-medium">Details and instructions</label>
+                  <Textarea id="event-description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Location, preparation, participants or other useful details." rows={3} maxLength={4000} />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="event-location" className="text-sm font-medium">Event location</label>
+                    <Input id="event-location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Venue or online meeting details" maxLength={300} />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="event-requirements" className="text-sm font-medium">Attendee requirements</label>
+                    <Textarea id="event-requirements" value={requirements} onChange={(e) => setRequirements(e.target.value)} placeholder="Items, preparation or eligibility required from attendees." rows={3} maxLength={4000} />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" disabled={saving || !title.trim()}>{saving ? "Saving..." : "Save event"}</Button>
+                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                </div>
+              </form>
+            )}
+
+            {loading ? (
+              <p className="py-12 text-center text-sm text-muted-foreground">Loading company schedule...</p>
+            ) : dayEvents.length === 0 ? (
+              <div className="mt-5 rounded-xl border border-dashed px-5 py-10 text-center">
+                <PartyPopper className="mx-auto mb-3 h-8 w-8 text-violet-500" />
+                <h3 className="font-semibold">Your day is clear</h3>
+                <p className="mt-2 text-sm text-muted-foreground">No company events scheduled for this date.</p>
+              </div>
+            ) : (
+              <div className="mt-5 space-y-3">
+                {dayEvents.map((event) => (
+                  <article key={event.id} className={`rounded-xl border p-4 ${eventStyles[event.event_type] ?? eventStyles["other"]}`}>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <h3 className="font-semibold">{event.title}</h3>
+                      <span className="rounded-full border border-current/20 px-2.5 py-1 text-xs capitalize">{event.event_type}</span>
+                    </div>
+                    <p className="mt-2 text-xs opacity-80">
+                      Notifications:{" "}
+                      {event.notification_groups
+                        .map(
+                          (group) =>
+                            audienceOptions.find((option) => option.value === group)?.label ??
+                            group,
+                        )
+                        .join(", ")}
+                    </p>
+                    <p className="mt-2 flex items-center gap-2 text-sm">
+                      <Clock color="#D97706" strokeWidth={2.2} className="h-4 w-4 shrink-0 shrink-0" />
+                      {format(new Date(event.starts_at), "HH:mm")}
+                      {event.ends_at ? ` - ${format(new Date(event.ends_at), "HH:mm")}` : ""}
+                    </p>
+                    {event.description && <p className="mt-3 whitespace-pre-wrap text-sm leading-6">{event.description}</p>}
+                    {event.location && <p className="mt-2 text-sm"><strong>Location:</strong> {event.location}</p>}
+                    {event.requirements && <p className="mt-2 whitespace-pre-wrap text-sm leading-6"><strong>Requirements:</strong> {event.requirements}</p>}
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-xl border bg-muted/20 p-4 text-sm">
+            <p className="flex items-center gap-2 font-medium">
+              <Flag className="h-4 w-4" aria-hidden="true" />
+              Public holiday feed
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              {holidayLoading ? "Loading holidays for this year and next year..." :
+                holidayMessage || `Loaded ${holidays.length} public holidays from the Nager.Date public-holiday service.`}
+            </p>
+          </div>
+        </div>
+      </section>
+      <GlobalHolidaysPage />
+      <p className="text-xs text-muted-foreground">Company events are stored in Supabase. Public holidays are fetched from an external service and require an internet connection. Calendar display uses Kampala time.</p>
+    </main>
+  );
+}
+
+==========================================================================================
+FILE: .\src\routes\_authenticated\my-availability.tsx
+==========================================================================================
+[File truncated after 700 lines]
+import { useCallback, useEffect, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import {
+  CalendarDays,
+  Clock3,
+  Plus,
+  RefreshCw,
+  Trash2,
+  CalendarOff,
+  BriefcaseBusiness,
+  AlertCircle,
+  CheckCircle2,
+  UserRound,
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { BackButton } from "@/components/AppShell";
+
+export const Route = createFileRoute("/_authenticated/my-availability")({
+  component: MyAvailabilityPage,
+});
+
+type AvailabilityRule = {
+  id: string;
+  officer_id: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  slot_duration_minutes: number;
+  is_active: boolean;
+};
+
+type AvailabilityException = {
+  id: string;
+  officer_id: string;
+  exception_type: "available" | "unavailable";
+  starts_at: string;
+  ends_at: string;
+  reason: string | null;
+};
+
+type ScheduleItem = {
+  id: string;
+  title: string;
+  starts_at: string;
+  ends_at: string;
+  status: string;
+  kind: "appointment" | "programme";
+  description?: string | null;
+  location?: string | null;
+  customer_name?: string | null;
+};
+
+const db = supabase as any;
+
+const DAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+function localDateTime(value: string) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString("en-UG", {
+    timeZone: "Africa/Kampala",
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+function todayInput() {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
+function toIso(value: string) {
+  return new Date(value).toISOString();
+}
+
+function MyAvailabilityPage() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [officerId, setOfficerId] = useState("");
+  const [officerName, setOfficerName] = useState("");
+  const [rules, setRules] = useState<AvailabilityRule[]>([]);
+  const [exceptions, setExceptions] = useState<AvailabilityException[]>([]);
+  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+
+  const [ruleDay, setRuleDay] = useState("1");
+  const [ruleStart, setRuleStart] = useState("09:00");
+  const [ruleEnd, setRuleEnd] = useState("17:00");
+  const [slotDuration, setSlotDuration] = useState("30");
+
+  const [exceptionType, setExceptionType] = useState<"unavailable" | "available">("unavailable");
+  const [exceptionStart, setExceptionStart] = useState(todayInput());
+  const [exceptionEnd, setExceptionEnd] = useState("");
+  const [exceptionReason, setExceptionReason] = useState("");
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const { data: authData, error: authError } = await db.auth.getUser();
+
+      if (authError) throw authError;
+      const user = authData?.user;
+
+      if (!user) {
+        throw new Error("Your session has expired. Sign in again.");
+      }
+
+      const { data: activeStaff, error: staffError } = await db.rpc(
+        "is_active_staff",
+        { _user_id: user.id }
+      );
+
+      if (staffError) throw staffError;
+
+      if (!activeStaff) {
+        throw new Error("This page is only available to active staff members.");
+      }
+
+      setOfficerId(user.id);
+
+      const { data: profile, error: profileError } = await db
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+      setOfficerName(profile?.full_name || "Officer");
+
+      const now = new Date();
+      const future = new Date();
+      future.setDate(future.getDate() + 90);
+
+      const [rulesResult, exceptionsResult, appointmentsResult, programmesResult] =
+        await Promise.all([
+          db
+            .from("officer_availability_rules")
+            .select("*")
+            .eq("officer_id", user.id)
+            .order("day_of_week")
+            .order("start_time"),
+
+          db
+            .from("officer_availability_exceptions")
+            .select("*")
+            .eq("officer_id", user.id)
+            .gte("ends_at", now.toISOString())
+            .order("starts_at"),
+
+          db
+            .from("officer_appointments")
+            .select("id,title,starts_at,ends_at,status,description,location,customer_name")
+            .eq("officer_id", user.id)
+            .gte("ends_at", now.toISOString())
+            .lte("starts_at", future.toISOString())
+            .order("starts_at"),
+
+          db
+            .from("officer_programmes")
+            .select("id,title,starts_at,ends_at,status,details,location")
+            .eq("officer_id", user.id)
+            .gte("ends_at", now.toISOString())
+            .lte("starts_at", future.toISOString())
+            .order("starts_at"),
+        ]);
+
+      if (rulesResult.error) throw rulesResult.error;
+      if (exceptionsResult.error) throw exceptionsResult.error;
+      if (appointmentsResult.error) throw appointmentsResult.error;
+      if (programmesResult.error) throw programmesResult.error;
+
+      const appointments: ScheduleItem[] = (appointmentsResult.data || []).map(
+        (item: any) => ({
+          ...item,
+          kind: "appointment",
+        })
+      );
+
+      const programmes: ScheduleItem[] = (programmesResult.data || []).map(
+        (item: any) => ({
+          ...item,
+          description: item.details,
+          kind: "programme",
+        })
+      );
+
+      setRules(rulesResult.data || []);
+      setExceptions(exceptionsResult.data || []);
+      setSchedule(
+        [...appointments, ...programmes].sort(
+          (a, b) =>
+            new Date(a.starts_at).getTime() -
+            new Date(b.starts_at).getTime()
+        )
+      );
+    } catch (err: any) {
+      setError(err?.message || "Could not load your scheduling information.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
+
+  async function addRule(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!officerId) return;
+
+    if (ruleEnd <= ruleStart) {
+      setError("The closing time must be later than the opening time.");
+      return;
+    }
+
+    const duration = Number(slotDuration);
+
+    if (!Number.isInteger(duration) || duration < 5 || duration > 480) {
+      setError("Slot duration must be between 5 and 480 minutes.");
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const { error: insertError } = await db
+        .from("officer_availability_rules")
+        .insert({
+          officer_id: officerId,
+          day_of_week: Number(ruleDay),
+          start_time: ruleStart,
+          end_time: ruleEnd,
+          slot_duration_minutes: duration,
+          is_active: true,
+        });
+
+      if (insertError) throw insertError;
+
+      setMessage("Working hours added.");
+      await loadData();
+    } catch (err: any) {
+      setError(
+        err?.code === "23505"
+          ? "These working hours already exist for that day."
+          : err?.message || "Could not save working hours."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deleteRule(id: string) {
+    if (!window.confirm("Remove these working hours?")) return;
+
+    setError("");
+    setMessage("");
+
+    const { error: deleteError } = await db
+      .from("officer_availability_rules")
+      .delete()
+      .eq("id", id)
+      .eq("officer_id", officerId);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+
+    setMessage("Working hours removed.");
+    await loadData();
+  }
+
+  async function toggleRule(rule: AvailabilityRule) {
+    setError("");
+    setMessage("");
+
+    const { error: updateError } = await db
+      .from("officer_availability_rules")
+      .update({ is_active: !rule.is_active })
+      .eq("id", rule.id)
+      .eq("officer_id", officerId);
+
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+
+    setMessage(rule.is_active ? "Working hours paused." : "Working hours activated.");
+    await loadData();
+  }
+
+  async function addException(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!officerId) return;
+
+    if (!exceptionStart || !exceptionEnd) {
+      setError("Enter both the start and end date and time.");
+      return;
+    }
+
+    if (new Date(exceptionEnd) <= new Date(exceptionStart)) {
+      setError("The end time must be later than the start time.");
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const { error: insertError } = await db
+        .from("officer_availability_exceptions")
+        .insert({
+          officer_id: officerId,
+          exception_type: exceptionType,
+          starts_at: toIso(exceptionStart),
+          ends_at: toIso(exceptionEnd),
+          reason: exceptionReason.trim() || null,
+        });
+
+      if (insertError) throw insertError;
+
+      setMessage(
+        exceptionType === "unavailable"
+          ? "Unavailable period added."
+          : "Additional availability added."
+      );
+
+      setExceptionReason("");
+      setExceptionEnd("");
+      setExceptionStart(todayInput());
+      await loadData();
+    } catch (err: any) {
+      setError(err?.message || "Could not save this availability exception.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deleteException(id: string) {
+    if (!window.confirm("Remove this availability exception?")) return;
+
+    const { error: deleteError } = await db
+      .from("officer_availability_exceptions")
+      .delete()
+      .eq("id", id)
+      .eq("officer_id", officerId);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+
+    setMessage("Availability exception removed.");
+    await loadData();
+  }
+
+  const activeRules = rules.filter((rule) => rule.is_active).length;
+  const upcomingAppointments = schedule.filter(
+    (item) => item.kind === "appointment" && item.status !== "cancelled"
+  ).length;
+  const upcomingProgrammes = schedule.filter(
+    (item) => item.kind === "programme" && item.status !== "cancelled"
+  ).length;
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <RefreshCw className="mr-2 h-5 w-5 animate-spin" />
+        <span className="text-sm text-muted-foreground">Loading your schedule...</span>
+      </div>
+    );
+  }
+
+  return (
+    <main className="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-6">
+      <div className="mb-2">
+        <BackButton />
+      </div>
+      <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+            <CalendarDays color="#7C3AED" strokeWidth={2.2} className="h-4 w-4 shrink-0" />
+            Officer workspace
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            My Availability & Schedule
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage your working hours, unavailable periods and upcoming commitments.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => void loadData()}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Refresh
+        </button>
+      </header>
+
+      {error && (
+        <div role="alert" className="flex gap-2 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+          <AlertCircle className="h-5 w-5 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {message && (
+        <div role="status" className="flex gap-2 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-800">
+          <CheckCircle2 color="#16A34A" strokeWidth={2.2} className="h-5 w-5 shrink-0 shrink-0" />
+          <span>{message}</span>
+        </div>
+      )}
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard
+          icon={<UserRound className="h-5 w-5" />}
+          label="Officer"
+          value={officerName}
+        />
+        <SummaryCard
+          icon={<Clock3 className="h-5 w-5" />}
+          label="Active working periods"
+          value={String(activeRules)}
+        />
+        <SummaryCard
+          icon={<CalendarDays color="#7C3AED" strokeWidth={2.2} className="h-5 w-5 shrink-0" />}
+          label="Upcoming appointments"
+          value={String(upcomingAppointments)}
+        />
+        <SummaryCard
+          icon={<BriefcaseBusiness className="h-5 w-5" />}
+          label="Upcoming programmes"
+          value={String(upcomingProgrammes)}
+        />
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-2">
+        <div className="rounded-xl border bg-card p-5">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold">Weekly working hours</h2>
+            <p className="text-sm text-muted-foreground">
+              Add each period during which customers may request appointments.
+            </p>
+          </div>
+
+          <form onSubmit={addRule} className="grid gap-3 sm:grid-cols-2">
+            <label className="grid gap-1 text-sm">
+              Day
+              <select
+                value={ruleDay}
+                onChange={(event) => setRuleDay(event.target.value)}
+                className="h-10 rounded-md border bg-background px-3"
+              >
+                {DAYS.map((day, index) => (
+                  <option value={index} key={day}>{day}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="grid gap-1 text-sm">
+              Appointment slot duration
+              <select
+                value={slotDuration}
+                onChange={(event) => setSlotDuration(event.target.value)}
+                className="h-10 rounded-md border bg-background px-3"
+              >
+                {[15, 20, 30, 45, 60, 90, 120].map((minutes) => (
+                  <option key={minutes} value={minutes}>{minutes} minutes</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="grid gap-1 text-sm">
+              Start time
+              <input
+                type="time"
+                required
+                value={ruleStart}
+                onChange={(event) => setRuleStart(event.target.value)}
+                className="h-10 rounded-md border bg-background px-3"
+              />
+            </label>
+
+            <label className="grid gap-1 text-sm">
+              End time
+              <input
+                type="time"
+                required
+                value={ruleEnd}
+                onChange={(event) => setRuleEnd(event.target.value)}
+                className="h-10 rounded-md border bg-background px-3"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50 sm:col-span-2"
+            >
+              <Plus color="#16A34A" strokeWidth={2.2} className="h-4 w-4 shrink-0" />
+              Add working hours
+            </button>
+          </form>
+
+          <div className="mt-6 space-y-3">
+            {rules.length === 0 ? (
+              <EmptyState text="You have not added any weekly working hours." />
+            ) : (
+              rules.map((rule) => (
+                <div
+                  key={rule.id}
+                  className="flex flex-col justify-between gap-3 rounded-lg border p-3 sm:flex-row sm:items-center"
+                >
+                  <div>
+                    <div className="font-medium">{DAYS[rule.day_of_week]}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {rule.start_time.slice(0, 5)} - {rule.end_time.slice(0, 5)}
+                      {" Â· "}
+                      {rule.slot_duration_minutes} minute slots
+                    </div>
+                    <span className={`mt-1 inline-block text-xs ${rule.is_active ? "text-green-700" : "text-muted-foreground"}`}>
+                      {rule.is_active ? "Active" : "Paused"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void toggleRule(rule)}
+                      className="rounded-md border px-3 py-2 text-xs font-medium hover:bg-muted"
+                    >
+                      {rule.is_active ? "Pause" : "Activate"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void deleteRule(rule.id)}
+                      aria-label="Delete working hours"
+                      className="rounded-md border p-2 text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 color="#DC2626" strokeWidth={2.2} className="h-4 w-4 shrink-0" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold">Availability exceptions</h2>
+            <p className="text-sm text-muted-foreground">
+              Record leave, breaks, temporary closures or additional availability.
+            </p>
+          </div>
+
+          <form onSubmit={addException} className="space-y-3">
+            <label className="grid gap-1 text-sm">
+              Exception type
+              <select
+                value={exceptionType}
+                onChange={(event) => setExceptionType(event.target.value as "unavailable" | "available")}
+                className="h-10 rounded-md border bg-background px-3"
+              >
+                <option value="unavailable">Unavailable / Leave</option>
+                <option value="available">Additional availability</option>
+              </select>
+            </label>
+
+            <label className="grid gap-1 text-sm">
+              Start date and time
+              <input
+                type="datetime-local"
+                required
+                value={exceptionStart}
+                onChange={(event) => setExceptionStart(event.target.value)}
+                className="h-10 rounded-md border bg-background px-3"
+              />
+            </label>
+
+            <label className="grid gap-1 text-sm">
+              End date and time
+              <input
+                type="datetime-local"
+                required
+                min={exceptionStart}
+                value={exceptionEnd}
+                onChange={(event) => setExceptionEnd(event.target.value)}
+                className="h-10 rounded-md border bg-background px-3"
+              />
+            </label>
+
+            <label className="grid gap-1 text-sm">
+              Reason or notes
+              <textarea
+                value={exceptionReason}
+                onChange={(event) => setExceptionReason(event.target.value)}
+                rows={3}
+                maxLength={500}
+                placeholder="Optional notes"
+                className="rounded-md border bg-background px-3 py-2"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+            >
+              <Plus color="#16A34A" strokeWidth={2.2} className="h-4 w-4 shrink-0" />
+              Add availability exception
+            </button>
+          </form>
+
+          <div className="mt-6 space-y-3">
+            {exceptions.length === 0 ? (
+              <EmptyState text="No upcoming availability exceptions." />
+            ) : (
+              exceptions.map((item) => (
+                <div key={item.id} className="flex justify-between gap-3 rounded-lg border p-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 font-medium">
+                      <CalendarOff className="h-4 w-4 shrink-0" />
+                      {item.exception_type === "unavailable" ? "Unavailable" : "Additional availability"}
+                    </div>
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      {localDateTime(item.starts_at)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Until {localDateTime(item.ends_at)}
+                    </div>
+                    {item.reason && (
+                      <p className="mt-2 break-words text-sm">{item.reason}</p>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => void deleteException(item.id)}
+                    aria-label="Delete availability exception"
+                    className="h-fit rounded-md border p-2 text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 color="#DC2626" strokeWidth={2.2} className="h-4 w-4 shrink-0" />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-xl border bg-card p-5">
+        <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="text-lg font-semibold">My upcoming schedule</h2>
+            <p className="text-sm text-muted-foreground">
+              Appointments and programmes assigned to you over the next 90 days.
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground">Africa/Kampala</span>
+        </div>
+
+        {schedule.length === 0 ? (
+          <EmptyState text="No upcoming appointments or programmes were found." />
+        ) : (
+          <div className="space-y-3">
+            {schedule.map((item) => (
+              <article key={`${item.kind}-${item.id}`} className="rounded-lg border p-4">
+                <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+                  <div className="min-w-0">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${
+                        item.kind === "appointment"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-purple-100 text-purple-800"
+                      }`}>
+                        {item.kind === "appointment" ? "Appointment" : "Programme"}
+                      </span>
+                      <span className="rounded-full bg-muted px-2 py-1 text-xs">
+
+==========================================================================================
+FILE: .\src\routes\_authenticated\reception.scheduling.tsx
+==========================================================================================
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, CalendarDays, Clock3, Plus, RefreshCw, Search, UserRound, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+export const Route = createFileRoute("/_authenticated/reception/scheduling")({
+  beforeLoad: async () => {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) throw redirect({ to: "/" });
+    const { data: roleRows, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", auth.user.id);
+    if (error) throw new Error("Could not verify Reception scheduling permissions.");
+    const allowed = (roleRows ?? []).some((row) =>
+      ["receptionist", "management", "super_admin"].includes(row.role)
+    );
+    if (!allowed) throw redirect({ to: "/dashboard" });
+  },
+  component: ReceptionSchedulingPage,
+});
+
+type Officer = { id: string; full_name: string; department: string | null; job_title: string | null };
+type ScheduleRow = {
+  id: string; officer_id: string; title: string; starts_at: string; ends_at: string;
+  status: string; location: string | null; details?: string | null; description?: string | null;
+  customer_name?: string; customer_phone?: string; appointment_ref?: string;
+  request_type?: string; kind: "programme" | "appointment";
+};
+// The new tables are introduced by the migration installed alongside this route.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any;
+
+function localDateTime(value: Date) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}T${pad(value.getHours())}:${pad(value.getMinutes())}`;
+}
+
+function ReceptionSchedulingPage() {
+  const navigate = useNavigate();
+  const [officers, setOfficers] = useState<Officer[]>([]);
+  const [rows, setRows] = useState<ScheduleRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [formType, setFormType] = useState<"appointment" | "programme">("appointment");
+  const [showForm, setShowForm] = useState(false);
+  const [officerId, setOfficerId] = useState("");
+  const [title, setTitle] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [requestType, setRequestType] = useState("appointment");
+  const [meetingMethod, setMeetingMethod] = useState("in_person");
+  const [location, setLocation] = useState("");
+  const [details, setDetails] = useState("");
+  const [startsAt, setStartsAt] = useState(() => localDateTime(new Date(Date.now() + 3600000)));
+  const [endsAt, setEndsAt] = useState(() => localDateTime(new Date(Date.now() + 7200000)));
+  const [filterOfficer, setFilterOfficer] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+
+  const load = useCallback(async () => {
+    setLoading(true); setError("");
+    const [staffResult, programmeResult, appointmentResult] = await Promise.all([
+      supabase.from("profiles").select("id,full_name,department,job_title").eq("status", "active").order("full_name"),
+      db.from("officer_programmes").select("id,officer_id,title,starts_at,ends_at,status,location,details").gte("ends_at", new Date(Date.now() - 30 * 86400000).toISOString()).order("starts_at", { ascending: true }).limit(500),
+      db.from("officer_appointments").select("id,officer_id,title,starts_at,ends_at,status,location,customer_name,customer_phone,appointment_ref,request_type,description").gte("ends_at", new Date(Date.now() - 30 * 86400000).toISOString()).order("starts_at", { ascending: true }).limit(500),
+    ]);
+    if (staffResult.error || programmeResult.error || appointmentResult.error) {
+      setError([staffResult.error?.message, programmeResult.error?.message, appointmentResult.error?.message].filter(Boolean).join(" | "));
+    } else {
+      setOfficers((staffResult.data ?? []) as Officer[]);
+      const programmes = ((programmeResult.data ?? []) as Omit<ScheduleRow, "kind">[]).map((r) => ({ ...r, kind: "programme" as const }));
+      const appointments = ((appointmentResult.data ?? []) as Omit<ScheduleRow, "kind">[]).map((r) => ({ ...r, kind: "appointment" as const }));
+      setRows([...programmes, ...appointments].sort((a, b) => a.starts_at.localeCompare(b.starts_at)));
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const visibleRows = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    return rows.filter((r) => {
+      const matchesOfficer = filterOfficer === "all" || r.officer_id === filterOfficer;
+      const matchesType = filterType === "all" || r.kind === filterType;
+      const haystack = [r.title, r.customer_name, r.customer_phone, r.appointment_ref, r.location, (officers.find((o) => o.id === r.officer_id)?.full_name ?? "")]
+        .filter(Boolean).join(" ").toLowerCase();
+      return matchesOfficer && matchesType && (!query || haystack.includes(query));
+    });
+  }, [rows, filterOfficer, filterType, searchTerm, officers]);
+
+  const officerName = (id: string) => officers.find((o) => o.id === id)?.full_name ?? "Unknown officer";
+  const formatTime = (value: string) => new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Africa/Kampala", dateStyle: "medium", timeStyle: "short"
+  }).format(new Date(value));
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSaving(true); setError(""); setNotice("");
+    if (!officerId) { setError("Select the officer responsible for this time."); setSaving(false); return; }
+    const start = new Date(startsAt); const end = new Date(endsAt);
+    if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start) {
+      setError("The end date and time must be later than the start date and time."); setSaving(false); return;
+    }
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user) { setError("Your session could not be verified. Sign in again."); setSaving(false); return; }
+
+    const common = { officer_id: officerId, title: title.trim(), starts_at: start.toISOString(), ends_at: end.toISOString(), location: location.trim() || null, created_by: authData.user.id };
+    const result = formType === "programme"
+      ? await db.from("officer_programmes").insert({ ...common, programme_type: "programme", details: details.trim() || null, status: "scheduled" })
+      : await db.from("officer_appointments").insert({ ...common, customer_name: customerName.trim(), customer_phone: customerPhone.trim(), customer_email: customerEmail.trim() || null, request_type: requestType, meeting_method: meetingMethod, description: details.trim() || null, status: "pending", source: "internal" });
+
+    if (result.error) {
+      setError(result.error.message.includes("OFFICER_TIME_CONFLICT") || result.error.code === "23P01"
+        ? "DOUBLE BOOKING BLOCKED: This officer already has an appointment or programme during that time. Choose another time or officer."
+        : `Could not save the record: ${result.error.message}`);
+    } else {
+      setNotice(formType === "programme" ? "Officer programme added to the schedule." : "Appointment request saved as pending.");
+      setShowForm(false); setTitle(""); setCustomerName(""); setCustomerPhone(""); setCustomerEmail(""); setDetails(""); setLocation("");
+      await load();
+    }
+    setSaving(false);
+  }
+
+  async function updateAppointmentStatus(row: ScheduleRow, status: string) {
+    setError(""); setNotice("");
+    const result = await db.from("officer_appointments").update({ status }).eq("id", row.id);
+    if (result.error) setError(result.error.message.includes("OFFICER_TIME_CONFLICT") ? "That time is no longer available." : result.error.message);
+    else { setNotice(`Appointment marked ${status}.`); await load(); }
+  }
+
+  return (
+    <main className="mx-auto w-full max-w-7xl space-y-5 p-4 pb-10 md:p-7">
+      <div className="flex items-center justify-between gap-3">
+        <button type="button" onClick={() => navigate({ to: "/dashboard" })} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Back to dashboard">
+          <ArrowLeft className="h-4 w-4" /> Back to dashboard
+        </button>
+        <span className="hidden rounded-full border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground sm:inline-flex">Reception workspace</span>
+      </div>
+      <section className="overflow-hidden rounded-2xl border bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm dark:from-slate-950 dark:via-background dark:to-violet-950 md:p-7">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Kalexi Brokerage Â· Reception</p>
+            <h1 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">Officer Scheduling & Appointments</h1>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Manage officer programmes, customer appointments, meetings and bookings. The database blocks overlapping times for the same officer.</p>
+          </div>
+          <button onClick={() => { setShowForm((v) => !v); setError(""); }} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Plus color="#16A34A" strokeWidth={2.2} className="h-4 w-4 shrink-0" /> Add schedule item</button>
+        </div>
+      </section>
+
+      {error && <div role="alert" className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm shadow-sm">{error}</div>}
+      {notice && <div role="status" className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900 shadow-sm dark:bg-emerald-950 dark:text-emerald-100">{notice}</div>}
+
+      {showForm && <section className="rounded-2xl border bg-card p-5 shadow-sm md:p-6">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><h2 className="text-lg font-semibold">Create schedule record</h2><div className="flex gap-2"><button type="button" onClick={() => setFormType("appointment")} className={`rounded-lg border px-3 py-2 text-sm ${formType === "appointment" ? "bg-primary text-primary-foreground" : "bg-background"}`}>Appointment / Meeting</button><button type="button" onClick={() => setFormType("programme")} className={`rounded-lg border px-3 py-2 text-sm ${formType === "programme" ? "bg-primary text-primary-foreground" : "bg-background"}`}>Officer Programme</button></div></div>
+        <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
+          <label className="grid gap-1.5 text-sm font-medium md:col-span-2">Responsible officer<select required value={officerId} onChange={(e) => setOfficerId(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal"><option value="">Select officer</option>{officers.map((o) => <option key={o.id} value={o.id}>{o.full_name}{o.job_title ? ` Â· ${o.job_title}` : ""}{o.department ? ` Â· ${o.department}` : ""}</option>)}</select></label>
+          <label className="grid gap-1.5 text-sm font-medium md:col-span-2">{formType === "programme" ? "Programme title" : "Appointment / meeting title"}<input required minLength={2} maxLength={180} value={title} onChange={(e) => setTitle(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal" placeholder={formType === "programme" ? "e.g. Field inspection programme" : "e.g. Gold testing consultation"}/></label>
+          {formType === "appointment" && <>
+            <label className="grid gap-1.5 text-sm font-medium">Customer full name<input required value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal"/></label>
+            <label className="grid gap-1.5 text-sm font-medium">Customer telephone<input required value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal"/></label>
+            <label className="grid gap-1.5 text-sm font-medium">Customer email (optional)<input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal"/></label>
+            <label className="grid gap-1.5 text-sm font-medium">Request category<select value={requestType} onChange={(e) => setRequestType(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal"><option value="appointment">Appointment</option><option value="meeting">Meeting</option><option value="booking">Service booking</option><option value="consultation">Consultation</option></select></label>
+            <label className="grid gap-1.5 text-sm font-medium">Meeting method<select value={meetingMethod} onChange={(e) => setMeetingMethod(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal"><option value="in_person">In person</option><option value="online">Online</option><option value="telephone">Telephone</option></select></label>
+          </>}
+          <label className="grid gap-1.5 text-sm font-medium">Start date and time<input required type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal"/></label>
+          <label className="grid gap-1.5 text-sm font-medium">End date and time<input required type="datetime-local" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal"/></label>
+          <label className="grid gap-1.5 text-sm font-medium md:col-span-2">Location / online meeting details<input value={location} onChange={(e) => setLocation(e.target.value)} className="h-10 rounded-md border bg-background px-3 font-normal" placeholder="Office, address or meeting link"/></label>
+          <label className="grid gap-1.5 text-sm font-medium md:col-span-2">{formType === "programme" ? "Programme details" : "Purpose / additional notes"}<textarea rows={3} value={details} onChange={(e) => setDetails(e.target.value)} className="rounded-md border bg-background px-3 py-2 font-normal"/></label>
+          <div className="flex flex-wrap gap-2 md:col-span-2"><button disabled={saving} className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{saving ? "Saving..." : "Save schedule"}</button><button type="button" onClick={() => setShowForm(false)} className="rounded-lg border px-5 py-2.5 text-sm">Cancel</button></div>
+        </form>
+        <p className="mt-4 text-xs text-muted-foreground">Pending and confirmed appointments, plus scheduled programmes, reserve the officer's time. Cancelled or rejected appointments do not block availability.</p>
+      </section>}
+
+      <section className="grid gap-3 sm:grid-cols-3"><div className="rounded-2xl border bg-card p-4 shadow-sm transition hover:shadow-md"><div className="flex items-center justify-between"><p className="text-sm font-medium text-muted-foreground">Active officers</p><Users color="#0891B2" strokeWidth={2.2} className="h-4 w-4 text-muted-foreground shrink-0" /></div><p className="mt-2 text-3xl font-bold tracking-tight">{officers.length}</p><p className="mt-1 text-xs text-muted-foreground">Available staff profiles</p></div><div className="rounded-2xl border bg-card p-4 shadow-sm transition hover:shadow-md"><div className="flex items-center justify-between"><p className="text-sm font-medium text-muted-foreground">Appointments / meetings</p><CalendarDays color="#7C3AED" strokeWidth={2.2} className="h-4 w-4 text-muted-foreground shrink-0" /></div><p className="mt-2 text-3xl font-bold tracking-tight">{rows.filter((r) => r.kind === "appointment" && ["pending","confirmed"].includes(r.status)).length}</p><p className="mt-1 text-xs text-muted-foreground">Pending or confirmed</p></div><div className="rounded-2xl border bg-card p-4 shadow-sm transition hover:shadow-md"><div className="flex items-center justify-between"><p className="text-sm font-medium text-muted-foreground">Scheduled programmes</p><Clock3 className="h-4 w-4 text-muted-foreground" /></div><p className="mt-2 text-3xl font-bold tracking-tight">{rows.filter((r) => r.kind === "programme" && r.status === "scheduled").length}</p><p className="mt-1 text-xs text-muted-foreground">Officer commitments</p></div></section>
+
+      <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
+        <div className="space-y-3 border-b p-4 md:p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">Officer schedule</h2><p className="mt-1 text-xs text-muted-foreground">Times displayed in Kampala time (Africa/Kampala).</p></div><button type="button" onClick={() => void load()} className="inline-flex h-10 items-center gap-2 rounded-lg border bg-background px-3 text-sm font-medium transition hover:bg-muted"><RefreshCw className="h-3.5 w-3.5"/> Refresh schedule</button></div><div className="grid gap-2 md:grid-cols-[minmax(220px,1fr)_220px_180px]"><label className="relative block"><span className="sr-only">Search schedule</span><Search color="#64748B" strokeWidth={2.2} className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground shrink-0"/><input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search customer, officer, reference or title..." className="h-10 w-full rounded-lg border bg-background pl-9 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15" /></label><select aria-label="Filter by officer" value={filterOfficer} onChange={(e) => setFilterOfficer(e.target.value)} className="h-10 rounded-lg border bg-background px-3 text-sm"><option value="all">All officers</option>{officers.map((o) => <option key={o.id} value={o.id}>{o.full_name}</option>)}</select><select aria-label="Filter by record type" value={filterType} onChange={(e) => setFilterType(e.target.value)} className="h-10 rounded-lg border bg-background px-3 text-sm"><option value="all">All records</option><option value="appointment">Appointments</option><option value="programme">Programmes</option></select></div><p className="text-xs text-muted-foreground">Showing {visibleRows.length} of {rows.length} schedule records</p></div>
+        {loading ? <div className="p-8 text-center text-sm text-muted-foreground">Loading officer schedules...</div> : visibleRows.length === 0 ? <div className="p-10 text-center"><CalendarDays color="#7C3AED" strokeWidth={2.2} className="mx-auto h-8 w-8 text-muted-foreground shrink-0"/><p className="mt-2 font-medium">No matching schedule records</p><p className="mt-1 text-sm text-muted-foreground">Try changing the search or filters, or add a new appointment or officer programme.</p></div> : <div className="divide-y">{visibleRows.map((r) => <article key={`${r.kind}-${r.id}`} className="grid gap-4 p-4 transition-colors hover:bg-muted/30 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:p-5"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${r.kind === "appointment" ? "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200" : "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200"}`}>{r.kind === "appointment" ? r.request_type ?? "appointment" : "officer programme"}</span><span className="text-xs text-muted-foreground">{r.status}</span>{r.appointment_ref && <span className="font-mono text-xs text-muted-foreground">{r.appointment_ref}</span>}</div><h3 className="mt-2 break-words font-semibold">{r.title}</h3><p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"><span className="inline-flex items-center gap-1.5"><UserRound className="h-3.5 w-3.5"/>{officerName(r.officer_id)}</span><span className="text-border">â€¢</span><span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5"/>{formatTime(r.starts_at)} â€“ {formatTime(r.ends_at)}</span></p>{r.customer_name && <p className="mt-1 text-sm">Customer: {r.customer_name} Â· {r.customer_phone}</p>}{r.location && <p className="mt-1 text-sm text-muted-foreground">Location: {r.location}</p>}</div>{r.kind === "appointment" && <div className="flex flex-wrap gap-2">{r.status === "pending" && <button onClick={() => void updateAppointmentStatus(r, "confirmed")} className="min-h-9 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition hover:opacity-90">Confirm</button>}{["pending","confirmed"].includes(r.status) && <button onClick={() => void updateAppointmentStatus(r, "cancelled")} className="min-h-9 rounded-lg border bg-background px-3.5 py-2 text-xs font-medium transition hover:bg-muted">Cancel</button>}</div>}</article>)}</div>}
+      </section>
+      <p className="text-xs text-muted-foreground">Website-imported bookings can be added to this same schedule after the website API is connected. Original website record IDs will be retained in the integration layer; this page currently creates internal records.</p>
+    </main>
+  );
+}
+
+
+==========================================================================================
+FILE: .\supabase\migrations\20261028000000_company_calendar.sql
+==========================================================================================
+CREATE TABLE IF NOT EXISTS public.calendar_events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL CHECK (char_length(trim(title)) BETWEEN 1 AND 160),
+  description text,
+  starts_at timestamptz NOT NULL,
+  ends_at timestamptz,
+  event_type text NOT NULL DEFAULT 'meeting'
+    CHECK (event_type IN ('meeting', 'programme', 'deadline', 'training', 'announcement', 'other')),
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT calendar_events_valid_time CHECK (ends_at IS NULL OR ends_at > starts_at)
+);
+
+CREATE INDEX IF NOT EXISTS calendar_events_starts_at_idx
+  ON public.calendar_events (starts_at);
+
+ALTER TABLE public.calendar_events ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Authenticated users can view company calendar events"
+  ON public.calendar_events
+  FOR SELECT TO authenticated
+  USING (true);
+
+DROP POLICY IF EXISTS "Management can create company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Management can create company calendar events"
+  ON public.calendar_events
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    created_by = (SELECT auth.uid())
+    AND EXISTS (
+      SELECT 1
+      FROM public.user_roles ur
+      WHERE ur.user_id = (SELECT auth.uid())
+        AND ur.role::text IN ('super_admin', 'management')
+    )
+  );
+
+DROP POLICY IF EXISTS "Management can update company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Management can update company calendar events"
+  ON public.calendar_events
+  FOR UPDATE TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1
+      FROM public.user_roles ur
+      WHERE ur.user_id = (SELECT auth.uid())
+        AND ur.role::text IN ('super_admin', 'management')
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1
+      FROM public.user_roles ur
+      WHERE ur.user_id = (SELECT auth.uid())
+        AND ur.role::text IN ('super_admin', 'management')
+    )
+  );
+
+DROP POLICY IF EXISTS "Management can delete company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Management can delete company calendar events"
+  ON public.calendar_events
+  FOR DELETE TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1
+      FROM public.user_roles ur
+      WHERE ur.user_id = (SELECT auth.uid())
+        AND ur.role::text IN ('super_admin', 'management')
+    )
+  );
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.calendar_events TO authenticated;
+
+==========================================================================================
+FILE: .\supabase\migrations\20261102173000_agent_upcoming_events.sql
+==========================================================================================
+ALTER TABLE public.calendar_events
+  ADD COLUMN IF NOT EXISTS location text,
+  ADD COLUMN IF NOT EXISTS requirements text;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'calendar_events_location_length'
+      AND conrelid = 'public.calendar_events'::regclass
+  ) THEN
+    ALTER TABLE public.calendar_events
+      ADD CONSTRAINT calendar_events_location_length
+      CHECK (location IS NULL OR char_length(location) <= 300);
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'calendar_events_requirements_length'
+      AND conrelid = 'public.calendar_events'::regclass
+  ) THEN
+    ALTER TABLE public.calendar_events
+      ADD CONSTRAINT calendar_events_requirements_length
+      CHECK (requirements IS NULL OR char_length(requirements) <= 4000);
+  END IF;
+END;
+$$;
+
+DROP POLICY IF EXISTS "Authenticated users can view company calendar events"
+  ON public.calendar_events;
+DROP POLICY IF EXISTS "Staff with client permission can view company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Staff with client permission can view company calendar events"
+  ON public.calendar_events
+  FOR SELECT TO authenticated
+  USING (
+    public.has_permission((SELECT auth.uid()), 'clients.view')
+    AND NOT EXISTS (
+      SELECT 1
+      FROM public.agents a
+      WHERE a.user_id = (SELECT auth.uid())
+    )
+    AND NOT EXISTS (
+      SELECT 1
+      FROM public.agent_applications a
+      WHERE a.user_id = (SELECT auth.uid())
+    )
+  );
+
+==========================================================================================
+FILE: .\supabase\migrations\20261102210000_calendar_audiences_and_client_archiving.sql
+==========================================================================================
+ALTER TABLE public.calendar_events
+  ADD COLUMN IF NOT EXISTS notification_groups text[] NOT NULL DEFAULT ARRAY['all']::text[];
+
+CREATE OR REPLACE FUNCTION public.valid_calendar_notification_groups(_groups text[])
+RETURNS boolean
+LANGUAGE sql
+IMMUTABLE
+SET search_path = public
+AS $$
+  SELECT cardinality(_groups) > 0
+    AND NOT EXISTS (
+      SELECT 1
+      FROM unnest(_groups) AS selected(group_name)
+      WHERE selected.group_name IS NULL
+         OR (
+           selected.group_name !~ '^department:.{1,100}$'
+           AND selected.group_name NOT IN (
+             'all', 'employees', 'agents', 'executive', 'finance', 'redemptions',
+             'role:super_admin', 'role:receptionist', 'role:onboarding_officer',
+             'role:deals_manager', 'role:verification_officer', 'role:risk_officer',
+             'role:finance_officer', 'role:management', 'role:auditor'
+           )
+         )
+    );
+$$;
+
+UPDATE public.calendar_events
+SET notification_groups = ARRAY['employees']::text[]
+WHERE notification_groups = ARRAY['all']::text[];
+
+ALTER TABLE public.calendar_events
+  DROP CONSTRAINT IF EXISTS calendar_events_notification_groups_check;
+ALTER TABLE public.calendar_events
+  ADD CONSTRAINT calendar_events_notification_groups_check
+  CHECK (public.valid_calendar_notification_groups(notification_groups));
+
+CREATE OR REPLACE FUNCTION public.is_calendar_employee(_user_id uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT NOT EXISTS (
+    SELECT 1 FROM public.agents a WHERE a.user_id = _user_id
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM public.agent_applications a WHERE a.user_id = _user_id
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.can_view_calendar_event(_groups text[], _user_id uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT _user_id = auth.uid() AND EXISTS (
+    SELECT 1
+    FROM public.profiles p
+    LEFT JOIN public.user_roles ur ON ur.user_id = p.id
+    WHERE p.id = _user_id
+      AND p.status = 'active'
+      AND (
+        public.has_permission(_user_id, 'clients.view')
+        OR (
+          'all' = ANY(_groups)
+          AND (
+            public.is_calendar_employee(p.id)
+            OR EXISTS (
+              SELECT 1 FROM public.agents a
+              WHERE a.user_id = p.id AND a.status = 'active' AND a.expires_at > now()
+            )
+          )
+        )
+        OR (
+          'employees' = ANY(_groups)
+          AND public.is_calendar_employee(p.id)
+        )
+        OR (
+          'agents' = ANY(_groups)
+          AND EXISTS (
+            SELECT 1 FROM public.agents a
+            WHERE a.user_id = p.id AND a.status = 'active' AND a.expires_at > now()
+          )
+        )
+        OR (
+          public.is_calendar_employee(p.id)
+          AND (
+            (
+              'executive' = ANY(_groups)
+              AND (
+                lower(coalesce(p.department, '')) LIKE '%executive%'
+                OR ur.role::text IN ('super_admin', 'management')
+              )
+            )
+            OR (
+              'finance' = ANY(_groups)
+              AND (
+                lower(coalesce(p.department, '')) LIKE '%finance%'
+                OR ur.role::text = 'finance_officer'
+              )
+            )
+            OR (
+              'redemptions' = ANY(_groups)
+              AND lower(coalesce(p.department, '')) LIKE '%redemption%'
+            )
+            OR EXISTS (
+              SELECT 1
+              FROM unnest(_groups) AS selected(group_name)
+              WHERE selected.group_name = 'role:' || ur.role::text
+                 OR selected.group_name = 'department:' ||
+                   regexp_replace(lower(btrim(coalesce(p.department, ''))), '[^a-z0-9 _-]', '', 'g')
+            )
+          )
+        )
+      )
+  );
+$$;
+
+REVOKE ALL ON FUNCTION public.is_calendar_employee(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.can_view_calendar_event(text[], uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.can_view_calendar_event(text[], uuid) TO authenticated;
+
+DROP POLICY IF EXISTS "Authenticated users can view company calendar events"
+  ON public.calendar_events;
+DROP POLICY IF EXISTS "Staff with client permission can view company calendar events"
+  ON public.calendar_events;
+CREATE POLICY "Staff and selected agents can view company calendar events"
+  ON public.calendar_events
+  FOR SELECT TO authenticated
+  USING (public.can_view_calendar_event(notification_groups, auth.uid()));
+
+CREATE OR REPLACE FUNCTION public.notify_calendar_event_audience()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_body text;
+BEGIN
+  v_body := 'Scheduled for ' ||
+    to_char(NEW.starts_at AT TIME ZONE 'Africa/Kampala', 'DD Mon YYYY, HH24:MI') ||
+    ' Kampala time.';
+
+  INSERT INTO public.notifications (user_id, title, body, link)
+  SELECT recipients.user_id,
+         'Calendar event: ' || NEW.title,
+         v_body,
+         '/calendar?event=' || NEW.id::text
+  FROM (
+    SELECT DISTINCT p.id AS user_id
+    FROM public.profiles p
+    LEFT JOIN public.user_roles ur ON ur.user_id = p.id
+    WHERE p.status = 'active'
+      AND p.id IS DISTINCT FROM NEW.created_by
+      AND (
+        (
+          'all' = ANY(NEW.notification_groups)
+          AND (
+            public.is_calendar_employee(p.id)
+            OR EXISTS (
+              SELECT 1 FROM public.agents a
+              WHERE a.user_id = p.id AND a.status = 'active' AND a.expires_at > now()
+            )
+          )
+        )
+        OR (
+          'employees' = ANY(NEW.notification_groups)
+          AND public.is_calendar_employee(p.id)
+        )
+        OR (
+          'agents' = ANY(NEW.notification_groups)
+          AND EXISTS (
+            SELECT 1
+            FROM public.agents a
+            WHERE a.user_id = p.id
+              AND a.status = 'active'
+              AND a.expires_at > now()
+          )
+        )
+        OR (
+          public.is_calendar_employee(p.id)
+          AND (
+            (
+              'executive' = ANY(NEW.notification_groups)
+              AND (
+                lower(coalesce(p.department, '')) LIKE '%executive%'
+                OR ur.role::text IN ('super_admin', 'management')
+              )
+            )
+            OR (
+              'finance' = ANY(NEW.notification_groups)
+              AND (
+                lower(coalesce(p.department, '')) LIKE '%finance%'
+                OR ur.role::text = 'finance_officer'
+              )
+            )
+            OR (
+              'redemptions' = ANY(NEW.notification_groups)
+              AND lower(coalesce(p.department, '')) LIKE '%redemption%'
+            )
+            OR EXISTS (
+              SELECT 1
+              FROM unnest(NEW.notification_groups) AS selected_group(group_name)
+              WHERE selected_group.group_name = 'role:' || ur.role::text
+                 OR selected_group.group_name =
+                   'department:' ||
+                   regexp_replace(lower(btrim(coalesce(p.department, ''))), '[^a-z0-9 _-]', '', 'g')
+            )
+          )
+        )
+      )
+  ) AS recipients;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS calendar_event_audience_notifications ON public.calendar_events;
+CREATE TRIGGER calendar_event_audience_notifications
+  AFTER INSERT ON public.calendar_events
+  FOR EACH ROW EXECUTE FUNCTION public.notify_calendar_event_audience();
+
+CREATE OR REPLACE FUNCTION public.guard_client_archive_changes()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+BEGIN
+  IF ROW(NEW.archived_at, NEW.archived_by, NEW.archive_reason)
+       IS DISTINCT FROM ROW(OLD.archived_at, OLD.archived_by, OLD.archive_reason)
+     AND auth.uid() IS NOT NULL
+     AND NOT (
+       public.has_permission(auth.uid(), 'clients.archive')
+       OR public.has_permission(auth.uid(), 'archive.restore')
+     ) THEN
+    RAISE EXCEPTION 'You do not have permission to archive or restore client records.';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS clients_archive_permission_guard ON public.clients;
+CREATE TRIGGER clients_archive_permission_guard
+  BEFORE UPDATE ON public.clients
+  FOR EACH ROW EXECUTE FUNCTION public.guard_client_archive_changes();
+
+REVOKE ALL ON FUNCTION public.notify_calendar_event_audience() FROM PUBLIC;
+
+CREATE OR REPLACE FUNCTION public.archive_client(_client_id uuid, _reason text)
+RETURNS public.clients
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_actor uuid := auth.uid();
+  v_client public.clients%ROWTYPE;
+  v_previous_status text;
+BEGIN
+  IF v_actor IS NULL OR NOT public.has_permission(v_actor, 'clients.archive') THEN
+    RAISE EXCEPTION 'You do not have permission to archive client records.';
+  END IF;
+  IF char_length(btrim(coalesce(_reason, ''))) < 5
+     OR char_length(btrim(_reason)) > 1000 THEN
+    RAISE EXCEPTION 'Enter an archive reason between 5 and 1000 characters.';
+  END IF;
+
+  SELECT * INTO v_client
+  FROM public.clients
+  WHERE id = _client_id
+    AND archived_at IS NULL
+  FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Client record not found or already archived.';
+  END IF;
+  v_previous_status := v_client.status;
+
+  UPDATE public.clients
+  SET archived_at = now(),
+      archived_by = v_actor,
+      archive_reason = btrim(_reason),
+      status = 'archived'
+  WHERE id = _client_id
+    AND archived_at IS NULL
+  RETURNING * INTO v_client;
+
+  INSERT INTO public.archive_records (
+    entity_type, entity_id, entity_ref, title, original_created_at,
+    original_created_by, previous_status, reason, archived_by, state, snapshot, created_by
+  )
+  VALUES (
+    'clients', v_client.id, v_client.client_ref, v_client.full_name,
+    v_client.created_at, v_client.registered_by, v_previous_status,
+    btrim(_reason), v_actor, 'archived', to_jsonb(v_client), v_actor
+  );
+
+  INSERT INTO public.audit_logs (
+    actor_id, action, entity_type, entity_id, previous_value, new_value
+  )
+  VALUES (
+    v_actor, 'client.archived', 'clients', v_client.id::text,
+    jsonb_build_object('status', v_previous_status),
+    jsonb_build_object('client_ref', v_client.client_ref, 'reason', btrim(_reason))
+  );
+
+  RETURN v_client;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.archive_client(uuid, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.archive_client(uuid, text) TO authenticated;
+
+==========================================================================================
+FILE: .\supabase\migrations\20261107170000_reception_officer_scheduling.sql
+==========================================================================================
+-- Kalexi Reception: officer programmes and appointment scheduling.
+-- Overlap prevention is enforced in PostgreSQL, not only in the browser.
+CREATE TABLE IF NOT EXISTS public.officer_programmes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  officer_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE RESTRICT,
+  title text NOT NULL CHECK (char_length(trim(title)) BETWEEN 2 AND 180),
+  programme_type text NOT NULL DEFAULT 'programme',
+  details text,
+  location text,
+  starts_at timestamptz NOT NULL,
+  ends_at timestamptz NOT NULL,
+  status text NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled','cancelled','completed')),
+  created_by uuid NOT NULL REFERENCES auth.users(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT officer_programmes_valid_time CHECK (ends_at > starts_at)
+);
+
+CREATE TABLE IF NOT EXISTS public.officer_appointments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  appointment_ref text NOT NULL UNIQUE DEFAULT ('KAL-APT-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12))),
+  officer_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE RESTRICT,
+  customer_name text NOT NULL CHECK (char_length(trim(customer_name)) BETWEEN 2 AND 160),
+  customer_phone text NOT NULL,
+  customer_email text,
+  request_type text NOT NULL DEFAULT 'appointment' CHECK (request_type IN ('booking','meeting','appointment','consultation','website')),
+  title text NOT NULL CHECK (char_length(trim(title)) BETWEEN 2 AND 180),
+  description text,
+  meeting_method text NOT NULL DEFAULT 'in_person' CHECK (meeting_method IN ('in_person','telephone','online')),
+  location text,
+  starts_at timestamptz NOT NULL,
+  ends_at timestamptz NOT NULL,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','confirmed','completed','cancelled','rejected','missed')),
+  source text NOT NULL DEFAULT 'internal' CHECK (source IN ('internal','website')),
+  external_record_id text,
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT officer_appointments_valid_time CHECK (ends_at > starts_at),
+  CONSTRAINT officer_appointments_external_unique UNIQUE (source, external_record_id)
+);
+
+CREATE INDEX IF NOT EXISTS officer_programmes_officer_time_idx ON public.officer_programmes (officer_id, starts_at, ends_at);
+CREATE INDEX IF NOT EXISTS officer_appointments_officer_time_idx ON public.officer_appointments (officer_id, starts_at, ends_at);
+CREATE INDEX IF NOT EXISTS officer_appointments_status_time_idx ON public.officer_appointments (status, starts_at);
+
+CREATE OR REPLACE FUNCTION public.prevent_officer_schedule_overlap()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  conflict_found boolean := false;
+BEGIN
+  -- Serialize concurrent schedule writes for the same officer.
+  PERFORM pg_advisory_xact_lock(hashtextextended(NEW.officer_id::text, 0));
+
+  IF TG_TABLE_NAME = 'officer_appointments' THEN
+    IF NEW.status IN ('pending','confirmed') THEN
+      SELECT EXISTS (
+        SELECT 1 FROM public.officer_appointments a
+        WHERE a.officer_id = NEW.officer_id
+          AND a.id <> NEW.id
+          AND a.status IN ('pending','confirmed')
+          AND tstzrange(a.starts_at, a.ends_at, '[)') && tstzrange(NEW.starts_at, NEW.ends_at, '[)')
+      ) OR EXISTS (
+        SELECT 1 FROM public.officer_programmes p
+        WHERE p.officer_id = NEW.officer_id
+          AND p.status = 'scheduled'
+          AND tstzrange(p.starts_at, p.ends_at, '[)') && tstzrange(NEW.starts_at, NEW.ends_at, '[)')
+      ) INTO conflict_found;
+    END IF;
+  ELSE
+    IF NEW.status = 'scheduled' THEN
+      SELECT EXISTS (
+        SELECT 1 FROM public.officer_programmes p
+        WHERE p.officer_id = NEW.officer_id
+          AND p.id <> NEW.id
+          AND p.status = 'scheduled'
+          AND tstzrange(p.starts_at, p.ends_at, '[)') && tstzrange(NEW.starts_at, NEW.ends_at, '[)')
+      ) OR EXISTS (
+        SELECT 1 FROM public.officer_appointments a
+        WHERE a.officer_id = NEW.officer_id
+          AND a.status IN ('pending','confirmed')
+          AND tstzrange(a.starts_at, a.ends_at, '[)') && tstzrange(NEW.starts_at, NEW.ends_at, '[)')
+      ) INTO conflict_found;
+    END IF;
+  END IF;
+
+  IF conflict_found THEN
+    RAISE EXCEPTION 'OFFICER_TIME_CONFLICT: This officer already has a booking or programme during the selected time.'
+      USING ERRCODE = '23P01';
+  END IF;
+  NEW.updated_at := now();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS officer_appointments_prevent_overlap ON public.officer_appointments;
+CREATE TRIGGER officer_appointments_prevent_overlap
+BEFORE INSERT OR UPDATE OF officer_id, starts_at, ends_at, status
+ON public.officer_appointments
+FOR EACH ROW EXECUTE FUNCTION public.prevent_officer_schedule_overlap();
+
+DROP TRIGGER IF EXISTS officer_programmes_prevent_overlap ON public.officer_programmes;
+CREATE TRIGGER officer_programmes_prevent_overlap
+BEFORE INSERT OR UPDATE OF officer_id, starts_at, ends_at, status
+ON public.officer_programmes
+FOR EACH ROW EXECUTE FUNCTION public.prevent_officer_schedule_overlap();
+
+ALTER TABLE public.officer_programmes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.officer_appointments ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS officer_programmes_staff_read ON public.officer_programmes;
+CREATE POLICY officer_programmes_staff_read ON public.officer_programmes
+FOR SELECT TO authenticated
+USING (public.is_active_staff(auth.uid()));
+
+DROP POLICY IF EXISTS officer_programmes_reception_insert ON public.officer_programmes;
+CREATE POLICY officer_programmes_reception_insert ON public.officer_programmes
+FOR INSERT TO authenticated
+WITH CHECK (
+  created_by = auth.uid() AND (
+    public.has_role(auth.uid(), 'receptionist'::public.app_role) OR
+    public.has_role(auth.uid(), 'management'::public.app_role) OR
+    public.has_role(auth.uid(), 'super_admin'::public.app_role)
+  )
+);
+
+DROP POLICY IF EXISTS officer_programmes_reception_update ON public.officer_programmes;
+CREATE POLICY officer_programmes_reception_update ON public.officer_programmes
+FOR UPDATE TO authenticated
+USING (
+  public.has_role(auth.uid(), 'receptionist'::public.app_role) OR
+  public.has_role(auth.uid(), 'management'::public.app_role) OR
+  public.has_role(auth.uid(), 'super_admin'::public.app_role)
+)
+WITH CHECK (
+  public.has_role(auth.uid(), 'receptionist'::public.app_role) OR
+  public.has_role(auth.uid(), 'management'::public.app_role) OR
+  public.has_role(auth.uid(), 'super_admin'::public.app_role)
+);
+
+DROP POLICY IF EXISTS officer_appointments_staff_read ON public.officer_appointments;
+CREATE POLICY officer_appointments_staff_read ON public.officer_appointments
+FOR SELECT TO authenticated
+USING (
+  officer_id = auth.uid() OR
+  public.has_role(auth.uid(), 'receptionist'::public.app_role) OR
+  public.has_role(auth.uid(), 'management'::public.app_role) OR
+  public.has_role(auth.uid(), 'super_admin'::public.app_role)
+);
+
+DROP POLICY IF EXISTS officer_appointments_reception_insert ON public.officer_appointments;
+CREATE POLICY officer_appointments_reception_insert ON public.officer_appointments
+FOR INSERT TO authenticated
+WITH CHECK (
+  created_by = auth.uid() AND (
+    public.has_role(auth.uid(), 'receptionist'::public.app_role) OR
+    public.has_role(auth.uid(), 'management'::public.app_role) OR
+    public.has_role(auth.uid(), 'super_admin'::public.app_role)
+  )
+);
+
+DROP POLICY IF EXISTS officer_appointments_reception_update ON public.officer_appointments;
+CREATE POLICY officer_appointments_reception_update ON public.officer_appointments
+FOR UPDATE TO authenticated
+USING (
+  public.has_role(auth.uid(), 'receptionist'::public.app_role) OR
+  public.has_role(auth.uid(), 'management'::public.app_role) OR
+  public.has_role(auth.uid(), 'super_admin'::public.app_role)
+)
+WITH CHECK (
+  public.has_role(auth.uid(), 'receptionist'::public.app_role) OR
+  public.has_role(auth.uid(), 'management'::public.app_role) OR
+  public.has_role(auth.uid(), 'super_admin'::public.app_role)
+);
+
+GRANT SELECT, INSERT, UPDATE ON public.officer_programmes TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.officer_appointments TO authenticated;
+GRANT ALL ON public.officer_programmes, public.officer_appointments TO service_role;

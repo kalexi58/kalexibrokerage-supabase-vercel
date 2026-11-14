@@ -12,9 +12,11 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "../components/ui/sonner";
+import { CalendarNotificationListener } from "@/components/CalendarNotificationListener";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { getMaintenanceAccess, getMaintenanceStatus } from "@/lib/maintenance.functions";
+import { useInterfaceTheme } from "@/hooks/useInterfaceTheme";
 
 function NotFoundComponent() {
   return (
@@ -126,12 +128,19 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <InterfaceThemeSync />
+      <CalendarNotificationListener />
       <MaintenanceClientGuard />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-right" richColors />
     </QueryClientProvider>
   );
+}
+
+function InterfaceThemeSync() {
+  useInterfaceTheme();
+  return null;
 }
 
 function MaintenanceClientGuard() {

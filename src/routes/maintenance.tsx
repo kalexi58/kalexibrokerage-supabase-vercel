@@ -475,6 +475,12 @@ function MaintenanceRoute({ embedded = false }: { embedded?: boolean }) {
             </p>
           ) : null}
         </section>
+        <p className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm text-muted-foreground">
+          Only application/database reachability and database response time are currently
+          measured. Storage consumption, query-error rates, Vercel deployments, traffic analytics,
+          CPU, and RAM are unavailable from the configured integrations; they are not zero-valued
+          measurements.
+        </p>
 
         <div className="mt-6 grid gap-5">
           <div className="space-y-1.5">

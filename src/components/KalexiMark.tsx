@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCompanyBranding } from "@/lib/brand.functions";
@@ -13,16 +13,16 @@ export function KalexiMark({ className = "h-8 w-8" }: { className?: string }) {
 
   useEffect(() => {
     if (!branding) return;
-    document.documentElement.style.setProperty("--primary", branding.primaryColor);
-    document.documentElement.style.setProperty("--accent", branding.accentColor);
+    document.documentElement.style.setProperty("--company-primary", branding.primaryColor);
+    document.documentElement.style.setProperty("--company-accent", branding.accentColor);
   }, [branding]);
 
   return (
-    <img
-      src={branding?.logoUrl ?? "/favicon.png"}
+    <img crossOrigin="anonymous" src={branding?.logoUrl ?? "/favicon.png"}
       alt="Kalexi Brokerage Ltd"
       className={`${className} rounded-md object-contain`}
       loading="eager"
     />
   );
 }
+

@@ -1,0 +1,200 @@
+﻿/* Kalexi Intelligence: clean, animated investigation workspace */
+
+.risk-intelligence-shell {
+  --kalexi-ink: #15263d;
+  --kalexi-muted: #687b91;
+  --kalexi-border: #dce6f0;
+  --kalexi-teal: #0e9f9a;
+  --kalexi-blue: #3678f6;
+  color: var(--kalexi-ink);
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(14,159,154,.09), transparent 34%),
+    radial-gradient(ellipse at 100% 0%, rgba(54,120,246,.08), transparent 32%),
+    #f5f8fc;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.risk-intelligence-shell .ri-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #b9c9da transparent;
+}
+
+.risk-intelligence-shell .ri-scroll::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.risk-intelligence-shell .ri-scroll::-webkit-scrollbar-thumb {
+  background: #bdccdc;
+  border-radius: 20px;
+}
+
+.risk-intelligence-shell button,
+.risk-intelligence-shell input,
+.risk-intelligence-shell textarea,
+.risk-intelligence-shell select {
+  transition: color .18s ease, background-color .18s ease,
+    border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.risk-intelligence-shell button {
+  cursor: pointer;
+}
+
+.risk-intelligence-shell button:focus-visible,
+.risk-intelligence-shell input:focus-visible,
+.risk-intelligence-shell textarea:focus-visible,
+.risk-intelligence-shell select:focus-visible {
+  outline: 3px solid rgba(54,120,246,.28);
+  outline-offset: 2px;
+}
+
+.risk-intelligence-shell input:focus,
+.risk-intelligence-shell textarea:focus,
+.risk-intelligence-shell select:focus {
+  border-color: var(--kalexi-blue);
+  box-shadow: 0 0 0 3px rgba(54,120,246,.10);
+}
+
+.risk-intelligence-shell .ri-button {
+  border-radius: 11px;
+  font-weight: 650;
+}
+
+.risk-intelligence-shell .ri-primary {
+  color: white;
+  background: linear-gradient(120deg, #0e9f9a, #3678f6);
+  border: 0;
+  box-shadow: 0 5px 16px rgba(42,116,180,.18);
+}
+
+.risk-intelligence-shell .ri-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(42,116,180,.24);
+}
+
+.risk-intelligence-shell .ri-tab-active {
+  color: #087c79;
+  background: #e4f7f5;
+  border-color: #b7e9e4;
+  box-shadow: inset 0 -2px 0 #0e9f9a;
+}
+
+.risk-intelligence-shell .ri-panel {
+  background: rgba(255,255,255,.96);
+  border: 1px solid var(--kalexi-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(22,47,77,.045);
+}
+
+.risk-intelligence-shell .ri-panel:hover {
+  border-color: #c5d8e9;
+}
+
+.risk-intelligence-shell .ri-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: white;
+  background: linear-gradient(115deg, #11213a 0%, #174263 56%, #087f83 100%);
+}
+
+.risk-intelligence-shell .ri-hero::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  opacity: .15;
+  background-image:
+    linear-gradient(rgba(255,255,255,.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.25) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: linear-gradient(90deg, black, transparent);
+}
+
+.risk-intelligence-shell .ri-scan-dot {
+  position: relative;
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #2ce0bf;
+  box-shadow: 0 0 0 4px rgba(44,224,191,.13);
+}
+
+.risk-intelligence-shell .ri-scan-dot::after {
+  position: absolute;
+  inset: -5px;
+  content: "";
+  border: 1px solid rgba(44,224,191,.6);
+  border-radius: 50%;
+  animation: kalexi-scan-pulse 2s ease-out infinite;
+}
+
+.risk-intelligence-shell .ri-icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #087f83;
+  background: linear-gradient(145deg, #e3f8f5, #eaf0ff);
+  border: 1px solid #d6eeed;
+  border-radius: 12px;
+}
+
+.risk-intelligence-shell .ri-status-verified {
+  color: #087a53;
+  background: #e7f8ef;
+  border: 1px solid #b8ebcf;
+}
+
+.risk-intelligence-shell .ri-status-pending {
+  color: #925b0a;
+  background: #fff5df;
+  border: 1px solid #f1dda8;
+}
+
+.risk-intelligence-shell .ri-status-critical {
+  color: #b42332;
+  background: #fff0f1;
+  border: 1px solid #fac4ca;
+}
+
+.risk-intelligence-shell .ri-status-unknown {
+  color: #526276;
+  background: #edf2f7;
+  border: 1px solid #d8e1eb;
+}
+
+.risk-intelligence-shell .ri-card-enter {
+  animation: kalexi-card-enter .35s ease-out both;
+}
+
+@keyframes kalexi-card-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes kalexi-scan-pulse {
+  0% { transform: scale(.75); opacity: .8; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+@media (max-width: 640px) {
+  .risk-intelligence-shell .ri-hero {
+    border-radius: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .risk-intelligence-shell *,
+  .risk-intelligence-shell *::before,
+  .risk-intelligence-shell *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}

@@ -1,4 +1,4 @@
-import { n as __exportAll } from "../_runtime.mjs";
+import { r as __exportAll } from "../_runtime.mjs";
 import { t as FunctionsClient } from "./supabase__functions-js.mjs";
 import { t as PostgrestClient } from "./supabase__postgrest-js.mjs";
 import { t as RealtimeClient } from "./supabase__realtime-js.mjs";

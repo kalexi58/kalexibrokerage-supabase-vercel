@@ -17,6 +17,7 @@ const loginIdentifierSchema = z.object({
     .trim()
     .min(3)
     .max(255)
+    .transform((value) => (value.includes("@") ? value.toLowerCase() : value))
     .refine(
       (value) =>
         value.includes("@")
@@ -108,6 +109,53 @@ export const signInWithPhone = createServerFn({ method: "POST" })
     return { session: auth.session };
   });
 
+const passwordResetRequestSchema = z.object({
+  identifier: loginIdentifierSchema.shape.identifier,
+  redirectTo: z.string().url().refine((value) => {
+    const url = new URL(value);
+    return (
+      url.pathname === "/reset-password" &&
+      (url.protocol === "https:" || url.hostname === "localhost" || url.hostname === "127.0.0.1")
+    );
+  }),
+});
+
+export const requestPasswordReset = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => passwordResetRequestSchema.parse(input))
+  .handler(async ({ data }) => {
+    const supabaseUrl = process.env["SUPABASE_URL"];
+    const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
+    if (!supabaseUrl || !publishableKey) {
+      throw new Error("Missing Supabase URL or publishable key.");
+    }
+
+    let email = data.identifier;
+    if (!email.includes("@")) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: rows, error } = await supabaseAdmin.rpc("login_email_by_phone", {
+        _phone: data.identifier,
+      });
+      if (error) {
+        console.error("[phone password reset lookup error]", error.message, error.code);
+        throw new Error("Unable to process the password reset request right now.");
+      }
+      const row = Array.isArray(rows) ? rows[0] : null;
+      if (!row?.email) return { accepted: true };
+      email = row.email;
+    }
+
+    const { createClient } = await import("@supabase/supabase-js");
+    const authClient = createClient(supabaseUrl, publishableKey);
+    const { error } = await authClient.auth.resetPasswordForEmail(email, {
+      redirectTo: data.redirectTo,
+    });
+    if (error) {
+      console.error("[password reset email error]", error.message, error.code);
+      throw new Error("Unable to send a password reset link right now.");
+    }
+    return { accepted: true };
+  });
+
 async function assertSuperAdmin(supabase: any, userId: string) {
   const { data, error } = await supabase
     .from("user_roles")
@@ -127,7 +175,7 @@ async function writeAudit(
   newValue?: Record<string, unknown>,
 ) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  await supabaseAdmin.from("audit_logs").insert({
+  const { error } = await supabaseAdmin.from("audit_logs").insert({
     actor_id: actorId,
     actor_email: actorEmail ?? null,
     action,
@@ -135,6 +183,7 @@ async function writeAudit(
     entity_id: entityId,
     new_value: (newValue ?? null) as never,
   });
+  if (error) throw new Error(`The action succeeded, but its audit record could not be saved: ${error.message}`);
 }
 
 function temporaryPassword(): string {
@@ -172,7 +221,7 @@ export const adminCreateUser = createServerFn({ method: "POST" })
     });
     if (error || !created.user) throw new Error(error?.message ?? "Could not create the account.");
 
-    await supabaseAdmin
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from("profiles")
       .update({
         full_name: data.fullName,
@@ -182,7 +231,13 @@ export const adminCreateUser = createServerFn({ method: "POST" })
         must_change_password: true,
         status: "active",
       })
-      .eq("id", created.user.id);
+      .eq("id", created.user.id)
+      .select("id")
+      .maybeSingle();
+    if (profileError || !profile) {
+      await supabaseAdmin.auth.admin.deleteUser(created.user.id);
+      throw new Error("Could not save the staff profile and phone number.");
+    }
 
     await supabaseAdmin
       .from("user_roles")
@@ -288,13 +343,117 @@ export const adminTerminateSessions = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.auth.admin.signOut(data.userId);
+    const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(data.userId);
+    if (signOutError) {
+      throw new Error("The account is disabled, but active sessions could not be terminated. Retry deletion.");
+    }
     await writeAudit(
       context.userId,
       context.claims?.email as string,
       "user.sessions_terminated",
       "user",
       data.userId,
+    );
+    return { ok: true };
+  });
+
+export const adminDeleteUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ userId: z.string().uuid(), confirmation: z.literal("DELETE") }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    if (data.userId === context.userId) {
+      throw new Error("You cannot delete your own account.");
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [{ data: profile, error: profileError }, { data: targetRoles, error: rolesError }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("profiles")
+          .select("id, email, photo_url")
+          .eq("id", data.userId)
+          .maybeSingle(),
+        supabaseAdmin.from("user_roles").select("role").eq("user_id", data.userId),
+      ]);
+    if (profileError) throw new Error("Could not verify the selected user's profile.");
+    if (rolesError) throw new Error("Could not verify the selected user's access roles.");
+    if (!profile) throw new Error("User profile not found.");
+
+    if ((targetRoles ?? []).some((role) => role.role === "super_admin")) {
+      const { count, error } = await supabaseAdmin
+        .from("user_roles")
+        .select("user_id", { count: "exact", head: true })
+        .eq("role", "super_admin");
+      if (error) throw new Error("Could not verify the remaining Super Admin accounts.");
+      if ((count ?? 0) <= 1) {
+        throw new Error("The last Super Admin account cannot be deleted.");
+      }
+    }
+
+    const tombstoneEmail = `deleted+${data.userId}@deleted.invalid`;
+    const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+      email: tombstoneEmail,
+      password: temporaryPassword(),
+      email_confirm: true,
+      ban_duration: "876000h",
+      user_metadata: { account_status: "deleted" },
+    });
+    if (authError) throw new Error(`Could not revoke the user's sign-in: ${authError.message}`);
+
+    const { error: profileUpdateError } = await supabaseAdmin
+      .from("profiles")
+      .update({
+        full_name: "Deleted user",
+        email: tombstoneEmail,
+        phone: null,
+        department: null,
+        job_title: null,
+        photo_url: null,
+        status: "disabled",
+        must_change_password: true,
+        last_login_at: null,
+      })
+      .eq("id", data.userId);
+    if (profileUpdateError) {
+      throw new Error("Sign-in was revoked, but the profile could not be anonymized. Retry the deletion.");
+    }
+
+    const { error: rolesDeleteError } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", data.userId);
+    if (rolesDeleteError) {
+      throw new Error("Sign-in was revoked, but the user's roles could not be removed.");
+    }
+
+    const { error: assignmentsDeleteError } = await supabaseAdmin
+      .from("user_role_assignments")
+      .delete()
+      .eq("user_id", data.userId);
+    if (assignmentsDeleteError) {
+      throw new Error("Sign-in was revoked, but the user's assigned permissions could not be removed.");
+    }
+
+    if (profile.photo_url && !/^https?:\/\//i.test(profile.photo_url)) {
+      const { error: photoError } = await supabaseAdmin.storage
+        .from("kalexi-avatars")
+        .remove([profile.photo_url]);
+      if (photoError) {
+        throw new Error("Sign-in was revoked, but the user's profile photo could not be removed.");
+      }
+    }
+
+    await supabaseAdmin.auth.admin.signOut(data.userId);
+    await writeAudit(
+      context.userId,
+      context.claims?.email as string,
+      "user.access_deleted_and_profile_anonymized",
+      "user",
+      data.userId,
+      { retainedBusinessAndAuditHistory: true },
     );
     return { ok: true };
   });

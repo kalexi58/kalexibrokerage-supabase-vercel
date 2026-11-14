@@ -1,3 +1,4 @@
+import BrandTemplateManager from "@/components/BrandTemplateManager";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -24,12 +25,12 @@ const KIND_LABEL: Record<string, string> = { letter: "Official correspondence", 
 const PRESETS: Partial<Draft>[] = [
   { name: "Agent authorisation", kind: "authorization", heading: "Letter of Authorisation", body: "This is to confirm that [Agent name], Agent ID [KBL-AG-000000], is an authorised Digital Agent of Kalexi Brokerage Ltd.\n\nThe agent may refer clients and share the official referral link. The agent may not receive payments, sign contracts or make guarantees on behalf of the company." },
   { name: "Appointment letter", kind: "appointment", heading: "Letter of Appointment", body: "Dear [Name],\n\nWe are pleased to appoint you as [Position] with Kalexi Brokerage Ltd, effective [date].\n\nYours faithfully," },
-  { name: "Company notice", kind: "notice", heading: "Notice", body: "All staff and agents are hereby notified that…" },
+  { name: "Company notice", kind: "notice", heading: "Notice", body: "All staff and agents are hereby notified that..." },
   { name: "Certificate", kind: "certificate", heading: "Certificate of Recognition", body: "Awarded to\n\n[Name]\n\nin recognition of outstanding performance." },
   { name: "Internal memo", kind: "memo", heading: "Memo: [Subject]", body: "To: \nFrom: \nSubject: \n\n" },
 ];
 export const Route = createFileRoute("/_authenticated/brand")({
-  head: () => ({ meta: [{ title: "Brand Centre — Kalexi Brokerage" }, { name: "description", content: "Design and save branded Kalexi letters, notices and certificates." }, { property: "og:title", content: "Brand Centre — Kalexi Brokerage" }, { property: "og:description", content: "Company templates with dates, signatures and printable letterheads." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Brand Centre - Kalexi Brokerage" }, { name: "description", content: "Design and save branded Kalexi letters, notices and certificates." }, { property: "og:title", content: "Brand Centre - Kalexi Brokerage" }, { property: "og:description", content: "Company templates with dates, signatures and printable letterheads." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: BrandCentre,
 });
 function BrandCentre() {
@@ -39,7 +40,7 @@ function BrandCentre() {
   const [busy, setBusy] = useState(false); const [dirty, setDirty] = useState(false);
   const upload = useServerFn(createBrandSignatureUpload); const sign = useServerFn(getBrandSignature);
   const staff = !!session?.profile && session.profile.status === "active" && session.roles.length > 0;
-  const q = useQuery({ queryKey: ["brand-templates"], enabled: staff, queryFn: async () => { const { data, error } = await supabase.from("brand_templates").select("*").order("updated_at", { ascending: false }); if (error) throw error; return data; } });
+  const q = useQuery({ queryKey: ["brand-templates"], enabled: staff, queryFn: async () => { const { data, error } = await supabase.from("brand_templates").select("*").is("file_path", null).order("updated_at", { ascending: false }); if (error) throw error; return data; } });
   const signed = useQuery({ queryKey: ["brand-signature", id, draft.signature_path], enabled: !!id && !!draft.signature_path, queryFn: () => id ? sign({ data: { id } }) : null });
   useEffect(() => { if (!signature) { setPreview(null); return; } const url = URL.createObjectURL(signature); setPreview(url); return () => URL.revokeObjectURL(url); }, [signature]);
   function update<K extends keyof Draft>(key: K, value: Draft[K]) { setDraft(p => ({ ...p, [key]: value })); setDirty(true); }
@@ -79,7 +80,7 @@ function BrandCentre() {
           {field("signatory_name", "Signatory name")}{field("signatory_title", "Signatory title")}
           <div><Label htmlFor="brand-signature">Signature image</Label><Input id="brand-signature" type="file" accept="image/*" onChange={e => { setSignature(e.target.files?.[0] ?? null); setDirty(true); }} />{draft.signature_path || signature ? <Button size="sm" variant="ghost" onClick={() => { update("signature_path", null); setSignature(null); }}>Remove signature</Button> : null}</div>
           <fieldset><legend className="mb-2 text-sm font-medium">Accent</legend><div className="flex gap-2">{(["gold", "navy", "green"] as const).map(c => <Button key={c} variant="outline" size="icon" title={c} aria-label={`${c} accent`} aria-pressed={draft.accent === c} className={draft.accent === c ? "ring-2 ring-ring" : ""} onClick={() => update("accent", c)}><span className={`h-4 w-4 rounded-full ${c === "gold" ? "bg-gold" : c === "navy" ? "bg-navy" : "bg-success"}`} /></Button>)}</div></fieldset>
-          <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={save}><Save />{busy ? "Saving…" : "Save template"}</Button><Button variant="outline" onClick={() => window.print()}><Printer />Print / PDF</Button>{id ? <><Button variant="outline" size="icon" title="Duplicate template" aria-label="Duplicate template" onClick={() => { setId(null); update("name", `${draft.name} copy`); }}><Copy /></Button><Button variant="outline" size="icon" disabled={busy} title="Delete template" aria-label="Delete template" onClick={remove}><Trash2 /></Button></> : null}</div>
+          <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={save}><Save />{busy ? "Saving..." : "Save template"}</Button><Button variant="outline" onClick={() => window.print()}><Printer />Print / PDF</Button>{id ? <><Button variant="outline" size="icon" title="Duplicate template" aria-label="Duplicate template" onClick={() => { setId(null); update("name", `${draft.name} copy`); }}><Copy /></Button><Button variant="outline" size="icon" disabled={busy} title="Delete template" aria-label="Delete template" onClick={remove}><Trash2 color="#DC2626" strokeWidth={2.2} /></Button></> : null}</div>
         </div>
       </section>
       <section className={`brand-preview relative min-h-[700px] overflow-hidden rounded-sm border border-t-4 bg-card p-6 shadow-[var(--shadow-panel)] sm:p-12 ${accent} ${draft.kind === "certificate" ? "border-x-4 border-b-4" : ""}`} aria-label="Document preview">
@@ -89,8 +90,12 @@ function BrandCentre() {
         <h3 className={`relative mt-10 break-words font-display text-2xl font-semibold ${draft.kind === "certificate" ? "text-center text-3xl" : ""}`}>{draft.heading || ""}</h3>
         <div className={`relative mt-6 min-h-64 whitespace-pre-wrap break-words text-sm leading-7 ${draft.kind === "certificate" ? "text-center" : ""}`}>{draft.body}</div>
         <div className={`relative mt-12 ${draft.kind === "certificate" ? "flex flex-col items-center text-center" : ""}`}>{preview || signed.data ? <img src={preview ?? signed.data ?? ""} alt="Authorised signature" className="mb-3 h-16 max-w-48 object-contain object-left" /> : <div className="mb-3 h-12 w-48 border-b border-dashed" />}<p className="font-semibold">{draft.signatory_name}</p><p className="text-sm text-muted-foreground">{draft.signatory_title}</p></div>
-        <footer className="relative mt-10 flex flex-wrap justify-between gap-2 border-t pt-4 text-xs text-muted-foreground"><span>KALEXI BROKERAGE LTD · Brokerage · Facilitation · Advisory</span><span>Ref: KBL-{(id ?? "draft").slice(0, 8).toUpperCase()}</span></footer>
+        <footer className="relative mt-10 flex flex-wrap justify-between gap-2 border-t pt-4 text-xs text-muted-foreground"><span>KALEXI BROKERAGE LTD | Brokerage | Facilitation | Advisory</span><span>Ref: KBL-{(id ?? "draft").slice(0, 8).toUpperCase()}</span></footer>
       </section>
+      
+      <div className="xl:col-span-2">
+        <BrandTemplateManager />
+      </div>
       </div>
     </>}
   </AppShell>;

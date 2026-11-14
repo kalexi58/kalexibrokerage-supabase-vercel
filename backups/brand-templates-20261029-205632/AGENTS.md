@@ -1,0 +1,3 @@
+- Keep the existing email-based two-stage identity sign-in; reference-screen changes are presentation-only so staff and agents retain compatible credentials.
+- Brand Centre uses the existing brand_templates data with RLS and staff-checked signed signature uploads; private signatures are only loaded through accessible saved templates.
+- Reward processing validates state transitions server-side and updates against the previous status to prevent duplicate reviews and distinguish approval from recorded payment.

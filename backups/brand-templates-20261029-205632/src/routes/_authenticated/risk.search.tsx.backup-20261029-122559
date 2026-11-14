@@ -1,0 +1,381 @@
+﻿import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+type Dataset = {
+  table: string;
+  label: string;
+  columns: string[];
+  select: string;
+};
+
+type Finding = {
+  id: string;
+  table: string;
+  label: string;
+  title: string;
+  details: string;
+};
+
+type Stage = {
+  label: string;
+  status: "waiting" | "running" | "completed" | "failed";
+  count: number;
+  error?: string;
+};
+
+type Activity = {
+  id: string;
+  title: string;
+  status: string;
+  details: string | null;
+  items_found: number;
+  items_saved: number;
+  created_at: string;
+};
+
+const DATASETS: Dataset[] = [
+  { table: "clients", label: "Clients", columns: ["full_name", "company_name", "phone", "email", "client_ref"], select: "id,client_ref,full_name,company_name,phone,email" },
+  { table: "companies", label: "Companies", columns: ["name", "registration_number", "country"], select: "id,name,registration_number,country,status" },
+  { table: "contacts", label: "Contacts", columns: ["full_name", "role", "phone", "email"], select: "id,full_name,role,phone,email,company_id" },
+  { table: "risk_cases", label: "Risk cases", columns: ["case_ref", "subject_name", "subject_company", "subject_phone", "subject_email", "subject_identifier"], select: "id,case_ref,case_kind,subject_name,subject_company,subject_phone,subject_email,subject_identifier,severity,status" },
+  { table: "research_cases", label: "Research cases", columns: ["case_ref", "subject", "related_party", "research_question"], select: "id,case_ref,subject,related_party,research_question,status" },
+  { table: "opportunities", label: "Opportunities", columns: ["opportunity_ref", "title", "owner_name", "owner_contact"], select: "id,opportunity_ref,title,owner_name,owner_contact" },
+  { table: "documents", label: "Documents", columns: ["document_ref", "title", "document_type"], select: "id,document_ref,title,document_type,verification_status,status" },
+];
+
+export const Route = createFileRoute("/_authenticated/risk/search")({
+  component: RiskIntelligenceSearch,
+});
+
+function RiskIntelligenceSearch() {
+  const [query, setQuery] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [results, setResults] = useState<Finding[]>([]);
+  const [stages, setStages] = useState<Stage[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [message, setMessage] = useState("Ready for a search.");
+  const [activeTask, setActiveTask] = useState("Waiting for a search");
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const [logWarning, setLogWarning] = useState("");
+  const [lastCompleted, setLastCompleted] = useState("");
+  const taskId = useRef<string | null>(null);
+  const cancelRequested = useRef(false);
+
+  const loadActivity = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("intelligence_activity")
+      .select("id,title,status,details,items_found,items_saved,created_at")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (error) {
+      setLogWarning("Persistent activity log unavailable: " + error.message);
+      return;
+    }
+    setActivities((data ?? []) as Activity[]);
+    setLogWarning("");
+  }, []);
+
+  useEffect(() => {
+    void loadActivity();
+
+    const channel = supabase.channel("risk-search-live-activity")
+      .on("postgres_changes", {
+        event: "*", schema: "public", table: "intelligence_activity",
+      }, () => { void loadActivity(); })
+      .subscribe();
+
+    const poll = window.setInterval(() => {
+      void loadActivity();
+      if (startedAt !== null) {
+        setElapsed(Math.floor((Date.now() - startedAt) / 1000));
+      }
+    }, 1500);
+
+    return () => {
+      window.clearInterval(poll);
+      void supabase.removeChannel(channel);
+    };
+  }, [loadActivity, startedAt]);
+
+  async function writeProgress(
+    id: string | null,
+    patch: Record<string, unknown>
+  ) {
+    if (!id) return;
+    const { error } = await supabase
+      .from("intelligence_activity")
+      .update(patch)
+      .eq("id", id);
+
+    if (error) setLogWarning("Live screen works, but saving activity failed: " + error.message);
+  }
+
+  async function runSearch(event: React.FormEvent) {
+    event.preventDefault();
+    const term = query.trim();
+
+    if (term.length < 2) {
+      setMessage("Enter at least two characters.");
+      return;
+    }
+    if (busy) return;
+
+    cancelRequested.current = false;
+    setBusy(true);
+    setResults([]);
+    setElapsed(0);
+    setStartedAt(Date.now());
+    setLastCompleted("");
+    setMessage("Starting internal intelligence search...");
+    setLogWarning("");
+    taskId.current = null;
+
+    setStages(DATASETS.map(d => ({
+      label: d.label, status: "waiting", count: 0,
+    })));
+
+    const { data: authData } = await supabase.auth.getUser();
+    const userId = authData.user?.id ?? null;
+
+    const { data: job, error: startError } = await supabase
+      .from("intelligence_activity")
+      .insert({
+        task_type: "internal_search",
+        status: "running",
+        title: `Live search: ${term}`,
+        details: "Initializing internal search pipeline.",
+        items_found: 0,
+        items_saved: 0,
+        started_at: new Date().toISOString(),
+        created_by: userId,
+      })
+      .select("id")
+      .maybeSingle();
+
+    if (startError) {
+      setLogWarning("Could not create persistent task record: " + startError.message);
+    }
+    taskId.current = job?.id ?? null;
+
+    const gathered: Finding[] = [];
+    const failures: string[] = [];
+    const safeTerm = term.replace(/[%_,]/g, " ").replace(/\s+/g, " ").trim();
+
+    try {
+      for (let i = 0; i < DATASETS.length; i++) {
+        if (cancelRequested.current) break;
+
+        const dataset = DATASETS[i];
+        setActiveTask(`Searching ${dataset.label}`);
+        setMessage(`Step ${i + 1} of ${DATASETS.length}: searching ${dataset.label}...`);
+
+        setStages(old => old.map((s, index) => index === i
+          ? { ...s, status: "running" }
+          : s
+        ));
+
+        await writeProgress(taskId.current, {
+          title: `Live search: ${term}`,
+          details: `Step ${i + 1}/${DATASETS.length}: searching ${dataset.label}.`,
+          items_found: gathered.length,
+        });
+
+        try {
+          const { data, error } = await supabase
+            .from(dataset.table as any)
+            .select(dataset.select)
+            .or(dataset.columns.map(c => `${c}.ilike.%${safeTerm}%`).join(","))
+            .limit(20);
+
+          if (error) throw error;
+
+          const rows = (data ?? []) as unknown as Record<string, any>[];
+          for (const row of rows) {
+            const title = String(
+              row.full_name ?? row.subject_name ?? row.subject ??
+              row.name ?? row.title ?? row.case_ref ?? row.client_ref ??
+              row.document_ref ?? row.opportunity_ref ?? "Record"
+            );
+            const details = Object.entries(row)
+              .filter(([key, value]) => key !== "id" && value != null)
+              .map(([key, value]) => `${key.replaceAll("_", " ")}: ${String(value)}`)
+              .slice(0, 6).join(" · ");
+
+            gathered.push({
+              id: String(row.id ?? `${dataset.table}-${gathered.length}`),
+              table: dataset.table,
+              label: dataset.label,
+              title,
+              details,
+            });
+          }
+
+          setStages(old => old.map((s, index) => index === i
+            ? { ...s, status: "completed", count: rows.length }
+            : s
+          ));
+        } catch (error) {
+          const reason = error instanceof Error ? error.message : String(error);
+          failures.push(`${dataset.label}: ${reason}`);
+          setStages(old => old.map((s, index) => index === i
+            ? { ...s, status: "failed", error: reason }
+            : s
+          ));
+        }
+
+        // Update the visible results after each dataset, not only at the end.
+        setResults([...gathered]);
+        await writeProgress(taskId.current, {
+          details: `Processed ${dataset.label}. ${gathered.length} matches collected so far.` +
+            (failures.length ? ` Errors: ${failures.join(" | ")}` : ""),
+          items_found: gathered.length,
+        });
+        await loadActivity();
+      }
+
+      const cancelled = cancelRequested.current;
+      const finalStatus = cancelled ? "needs_review" : failures.length ? "needs_review" : "completed";
+      const finalDetails =
+        `${cancelled ? "Stopped by user." : "Search finished."} ` +
+        `${gathered.length} matching records. ` +
+        `${DATASETS.length - failures.length} of ${DATASETS.length} datasets searched successfully.` +
+        (failures.length ? ` Dataset errors: ${failures.join(" | ")}` : "");
+
+      await writeProgress(taskId.current, {
+        status: finalStatus,
+        title: `Search ${cancelled ? "stopped" : "finished"}: ${term}`,
+        details: finalDetails,
+        items_found: gathered.length,
+        items_saved: 0,
+        finished_at: new Date().toISOString(),
+      });
+
+      setActiveTask(cancelled ? "Search stopped" : "Search finished");
+      setLastCompleted(new Date().toLocaleTimeString());
+      setMessage(`${gathered.length} matches found. ${failures.length} dataset errors.`);
+      await loadActivity();
+    } finally {
+      setBusy(false);
+      setStartedAt(null);
+    }
+  }
+
+  function stopSearch() {
+    cancelRequested.current = true;
+    setMessage("Stop requested. Finishing the current dataset...");
+  }
+
+  const completedStages = stages.filter(s => s.status === "completed" || s.status === "failed").length;
+  const progress = stages.length ? Math.round(completedStages / stages.length * 100) : 0;
+  const elapsedLabel = `${Math.floor(elapsed / 60)}m ${elapsed % 60}s`;
+
+  const card: React.CSSProperties = {
+    background: "var(--card, #fff)",
+    border: "1px solid #e2e8f0",
+    borderRadius: 12,
+    padding: 18,
+    minWidth: 0,
+  };
+
+  const button: React.CSSProperties = {
+    background: "#123c55", color: "#fff", border: 0,
+    borderRadius: 8, padding: "12px 17px", cursor: "pointer",
+    fontWeight: 700,
+  };
+
+  return (
+    <main style={{ maxWidth: 1450, padding: 24, margin: "0 auto", color: "var(--foreground, #172033)" }}>
+      <header style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <div>
+          <div style={{ color: "#64748b", letterSpacing: 2, fontSize: 12 }}>KALEXI BROKERAGE · RISK INTELLIGENCE</div>
+          <h1 style={{ fontSize: 30, margin: "8px 0" }}>Live Intelligence Search</h1>
+          <p style={{ color: "#64748b", margin: 0 }}>Internal search with live pipeline progress and persistent activity tracking.</p>
+        </div>
+        <button style={button} onClick={() => void loadActivity()}>Refresh activity</button>
+      </header>
+
+      <section style={{ ...card, marginTop: 20 }}>
+        <form onSubmit={runSearch} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <input value={query} onChange={e => setQuery(e.target.value)}
+            placeholder="Name, company, phone, identifier, case or document"
+            style={{ flex: "1 1 320px", padding: 13, border: "1px solid #cbd5e1", borderRadius: 8, minWidth: 0 }} />
+          <button disabled={busy} style={{ ...button, opacity: busy ? .5 : 1 }}>
+            {busy ? "Searching..." : "Start intelligence search"}
+          </button>
+          {busy && <button type="button" onClick={stopSearch} style={{ ...button, background: "#991b1b" }}>Stop</button>}
+        </form>
+        <p role="status" style={{ background: "#f1f5f9", padding: 12, borderRadius: 8, overflowWrap: "anywhere" }}>{message}</p>
+        {logWarning && <p style={{ color: "#b91c1c", overflowWrap: "anywhere" }}>{logWarning}</p>}
+      </section>
+
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginTop: 14 }}>
+        <div style={card}><small>Current operation</small><h3>{activeTask}</h3></div>
+        <div style={card}><small>Pipeline progress</small><h3>{busy ? progress : stages.length ? progress : 0}%</h3></div>
+        <div style={card}><small>Records found so far</small><h3>{results.length}</h3></div>
+        <div style={card}><small>Elapsed time</small><h3>{elapsedLabel}</h3></div>
+        <div style={card}><small>Last completed</small><h3>{lastCompleted || "Not yet"}</h3></div>
+      </section>
+
+      <section style={{ ...card, marginTop: 14 }}>
+        <h2 style={{ marginTop: 0 }}>Live processing pipeline</h2>
+        <div style={{ height: 10, background: "#e2e8f0", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${busy ? progress : progress}%`, background: "#16805d", transition: "width .25s" }} />
+        </div>
+        <p style={{ color: "#64748b" }}>
+          {busy ? "A dataset is being queried now. Progress advances when each dataset returns." :
+            stages.length ? "Last search pipeline finished." : "Start a search to watch each dataset run."}
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
+          {stages.map(s => (
+            <article key={s.label} style={{ border: "1px solid #e2e8f0", borderRadius: 9, padding: 12 }}>
+              <strong>{s.label}</strong>
+              <p style={{ margin: "8px 0", color:
+                s.status === "failed" ? "#b91c1c" :
+                s.status === "completed" ? "#15803d" :
+                s.status === "running" ? "#a16207" : "#64748b" }}>
+                {s.status === "running" ? "● Processing now" :
+                 s.status === "completed" ? "✓ Completed" :
+                 s.status === "failed" ? "✕ Failed" : "○ Waiting"}
+              </p>
+              {s.status === "completed" && <small>{s.count} rows returned</small>}
+              {s.error && <small style={{ display: "block", overflowWrap: "anywhere" }}>{s.error}</small>}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ ...card, marginTop: 14 }}>
+        <h2 style={{ marginTop: 0 }}>Search findings ({results.length})</h2>
+        {results.map((r, i) => (
+          <article key={`${r.table}-${r.id}-${i}`} style={{ borderBottom: "1px solid #e2e8f0", padding: "12px 0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+              <strong>{r.title}</strong><small>{r.label}</small>
+            </div>
+            <p style={{ color: "#64748b", overflowWrap: "anywhere" }}>{r.details}</p>
+            <small>Dataset: {r.table}</small>
+          </article>
+        ))}
+        {!results.length && <p>No results yet. Results appear as each dataset finishes.</p>}
+      </section>
+
+      <section style={{ ...card, marginTop: 14 }}>
+        <h2 style={{ marginTop: 0 }}>Recent activity history</h2>
+        <p style={{ color: "#64748b" }}>
+          This history reflects real recorded searches and task outcomes. It does not claim AI model training.
+          New facts should be reviewed and verified before being retained as trusted intelligence.
+        </p>
+        {activities.map(a => (
+          <article key={a.id} style={{ borderBottom: "1px solid #e2e8f0", padding: "12px 0" }}>
+            <strong>{a.title}</strong> · {a.status}
+            <p style={{ overflowWrap: "anywhere" }}>{a.details}</p>
+            <small>{a.items_found} matches · {new Date(a.created_at).toLocaleString()}</small>
+          </article>
+        ))}
+        {!activities.length && <p>No persistent activity records available yet.</p>}
+      </section>
+    </main>
+  );
+}

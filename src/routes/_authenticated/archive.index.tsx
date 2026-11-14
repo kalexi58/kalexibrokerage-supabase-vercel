@@ -97,9 +97,15 @@ function ArchivePage() {
       if (!session) throw new Error("No session.");
       const reason = window.prompt("Reason for restoring this record?");
       if (!reason) throw new Error("Restore cancelled.");
+      const restoreValues = {
+        archived_at: null,
+        archived_by: null,
+        archive_reason: null,
+        ...(row.entity_type === "clients" ? { status: row.previous_status ?? "registered" } : {}),
+      };
       const { error: srcError } = await supabase
         .from(row.entity_type as ArchivableTable)
-        .update({ archived_at: null, archived_by: null, archive_reason: null } as never)
+        .update(restoreValues as never)
         .eq("id", row.entity_id);
       if (srcError) throw srcError;
       const { error } = await supabase
