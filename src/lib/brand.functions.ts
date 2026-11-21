@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { supabase } from "@/integrations/supabase/client";
 
 const brandAppearanceInput = z.object({
   logoPath: z.string().max(300).nullable(),
@@ -21,8 +22,7 @@ async function assertSuperAdmin(supabase: SupabaseClient<Database>, userId: stri
 }
 
 export const getCompanyBranding = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from("company_branding")
     .select("logo_path, primary_color, accent_color")
     .eq("id", "default")
@@ -32,7 +32,7 @@ export const getCompanyBranding = createServerFn({ method: "GET" }).handler(asyn
     throw new Error("Company branding could not be loaded.");
   }
   const logoUrl = data.logo_path
-    ? supabaseAdmin.storage.from("company-branding").getPublicUrl(data.logo_path).data.publicUrl
+    ? supabase.storage.from("company-branding").getPublicUrl(data.logo_path).data.publicUrl
     : null;
   return {
     logoPath: data.logo_path,
