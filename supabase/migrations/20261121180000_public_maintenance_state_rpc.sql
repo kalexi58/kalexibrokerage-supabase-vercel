@@ -20,7 +20,15 @@ as $function$
     m.maintenance_start_time,
     m.estimated_completion_time,
     m.maintenance_updated_at,
-    m.maintenance_updated_by
+    case
+      when exists (
+        select 1
+        from public.user_roles ur
+        where ur.user_id = auth.uid()
+          and ur.role = 'super_admin'::public.app_role
+      ) then m.maintenance_updated_by
+      else null::uuid
+    end
   from public.system_maintenance m
   where m.id = 'global'
   limit 1;
