@@ -1,4 +1,5 @@
 import type { Database } from "@/integrations/supabase/types";
+import { supabase } from "@/integrations/supabase/client";
 import { createMiddleware } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { renderMaintenancePage } from "@/lib/maintenance-page";
@@ -61,15 +62,17 @@ export function isProtectedApplicationPath(pathname: string): boolean {
 export async function readMaintenanceState(
   db: SupabaseClient<Database>,
 ): Promise<MaintenanceState> {
-  const { data, error } = await db
-    .from("system_maintenance")
-    .select(
-      "maintenance_enabled, maintenance_message, maintenance_start_time, estimated_completion_time, maintenance_updated_at, maintenance_updated_by",
-    )
-    .eq("id", MAINTENANCE_ROW_ID)
-    .single();
+  // This narrowly scoped SECURITY DEFINER RPC exposes only the global
+  // maintenance banner state. It avoids requiring a service-role secret
+  // for ordinary public requests and preserves fail-closed behavior.
+  const rpcClient = db as unknown as {
+    rpc: (name: string) => Promise<{ data: MaintenanceState[] | null; error: { message: string } | null }>;
+  };
+  const { data, error } = await rpcClient.rpc("get_public_maintenance_state");
   if (error) throw new Error(`Could not read maintenance configuration: ${error.message}`);
-  return data;
+  const row = Array.isArray(data) ? data[0] : null;
+  if (!row) throw new Error("Could not read maintenance configuration: no global row returned.");
+  return row;
 }
 
 export async function isSuperAdminRequest(request: Request): Promise<boolean> {
@@ -164,8 +167,7 @@ export const maintenanceRequestMiddleware = createMiddleware({ type: "request" }
     let state: MaintenanceState | null = null;
     let configurationAvailable = true;
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      state = await readMaintenanceState(supabaseAdmin);
+      state = await readMaintenanceState(supabase);
     } catch (error) {
       configurationAvailable = false;
       console.error("[maintenance] Configuration could not be loaded.", error);
