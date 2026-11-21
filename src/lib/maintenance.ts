@@ -4,8 +4,6 @@ import { createMiddleware } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { renderMaintenancePage } from "@/lib/maintenance-page";
 
-export const MAINTENANCE_ROW_ID = "global";
-
 export type MaintenanceRow = Database["public"]["Tables"]["system_maintenance"]["Row"];
 
 export type MaintenanceState = Pick<
