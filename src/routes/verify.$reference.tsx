@@ -55,6 +55,9 @@ function VerifyPage() {
                 <Row k="Reference" v={result.data.reference} />
                 <Row k="Status" v={result.data.status} />
                 <Row k="Issued" v={new Date(result.data.issuedAt).toLocaleDateString()} />
+                <Row k="Registered by" v={result.data.officer.fullName} />
+                <Row k="Officer designation" v={result.data.officer.jobTitle} />
+                <Row k="Department" v={result.data.officer.department} />
               </dl>
               <p className="mt-6 text-xs text-muted-foreground">
                 This confirms the document was issued by Kalexi Brokerage Ltd. No client details are

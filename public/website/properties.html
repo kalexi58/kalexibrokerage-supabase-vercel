@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Available Properties | Kalexi Brokerage</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+<style>
+.public-listings{padding:65px 0}.listing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.listing-card{border:1px solid #ddd;border-radius:12px;overflow:hidden;background:white;color:#182538}
+.listing-card img{width:100%;height:220px;object-fit:cover;background:#eee}
+.listing-card .body{padding:18px}.listing-card h3{margin:5px 0 10px}.listing-card p{font-size:14px}
+.listing-card a{color:inherit;text-decoration:none}.listing-price{font-weight:700;color:#173b63}
+.public-empty{padding:35px;text-align:center;background:#f4f6f8;border-radius:12px}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container nav-wrap">
+<a class="brand" href="index.html"><img class="brand__mark" src="assets/images/kalexi-emblem.svg" width="66" height="33" alt=""><span>KALEXI BROKERAGE<small>UGANDA</small></span></a>
+<nav class="nav-links"><a href="index.html">Home</a><a href="properties.html">Available Properties</a><a href="showroom.html">Deal Showroom</a><a href="contact.html">Contact</a></nav>
+<a class="nav-login" href="/">LOGIN</a>
+</div></header>
+<main class="public-listings"><div class="container">
+<div class="eyebrow">Kalexi Brokerage</div><h1>Available Properties & Opportunities</h1>
+<p>Explore opportunities approved for public display by Kalexi Brokerage.</p>
+<div id="listing-grid" class="listing-grid" data-property-list="all"><div class="public-empty">Loading published listings...</div></div>
+</div></main>
+<script src="assets/js/kalexi-properties.js" defer></script>
+</body></html>

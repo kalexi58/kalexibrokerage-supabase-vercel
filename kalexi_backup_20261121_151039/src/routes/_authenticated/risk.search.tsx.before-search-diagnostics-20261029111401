@@ -1,0 +1,225 @@
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { useSession } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { EmptyState, NoAccess, StatusPill, Panel } from "@/components/records";
+import { titleCase } from "@/lib/records";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+export const Route = createFileRoute("/_authenticated/risk/search")({
+  head: () => ({
+    meta: [
+      { title: "Internal Intelligence Search - Kalexi Brokerage" },
+      { name: "description", content: "Cross-reference internal Kalexi records." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: RiskSearchPage,
+});
+
+function escapeFilterValue(value: string) {
+  return value.replace(/[\\,().]/g, "\\$&");
+}
+
+function pattern(value: string) {
+  return `%${escapeFilterValue(value.trim())}%`;
+}
+
+function RiskSearchPage() {
+  const { data: session } = useSession();
+  const access = session?.access;
+  const [term, setTerm] = useState("");
+  const [query, setQuery] = useState("");
+  const canSearch = allows(access, "risk.view");
+
+  const results = useQuery({
+    queryKey: ["risk-search-v2", query],
+    enabled: canSearch && query.trim().length >= 2,
+    retry: 1,
+    queryFn: async () => {
+      const p = pattern(query);
+      const archived = (table: string) => table;
+
+      const [risk, clients, opportunities, companies, contacts, research, documents] =
+        await Promise.all([
+          supabase.from("risk_cases")
+            .select("id,case_ref,case_kind,subject_name,subject_company,subject_phone,subject_email,subject_identifier,severity,status")
+            .is("archived_at", null)
+            .or([`case_ref.ilike.${p}`,`subject_full_name.ilike.${p}`,`subject_company.ilike.${p}`,`subject_phone.ilike.${p}`,`subject_email.ilike.${p}`,`subject_identifier.ilike.${p}`].join(","))
+            .limit(30),
+
+          supabase.from("clients")
+            .select("id,client_ref,full_name,company_name,phone,email")
+            .is("archived_at", null)
+            .or([`client_ref.ilike.${p}`,`full_full_name.ilike.${p}`,`company_full_name.ilike.${p}`,`phone.ilike.${p}`,`email.ilike.${p}`].join(","))
+            .limit(30),
+
+          supabase.from("opportunities")
+            .select("id,opportunity_ref,title,owner_name,owner_contact")
+            .is("archived_at", null)
+            .or([`opportunity_ref.ilike.${p}`,`title.ilike.${p}`,`owner_full_name.ilike.${p}`,`owner_contact.ilike.${p}`].join(","))
+            .limit(30),
+
+          supabase.from("companies")
+            .select("id,name,registration_number,country,status")
+            .is("archived_at", null)
+            .or([`full_name.ilike.${p}`,`registration_number.ilike.${p}`,`country.ilike.${p}`].join(","))
+            .limit(30),
+
+          supabase.from("contacts")
+            .select("id,full_name,role,phone,email,company_id,client_id")
+            .is("archived_at", null)
+            .or([`full_name.ilike.${p}`,`role.ilike.${p}`,`phone.ilike.${p}`,`email.ilike.${p}`].join(","))
+            .limit(30),
+
+          supabase.from("research_cases")
+            .select("id,case_ref,subject,related_party,status,research_question")
+            .is("archived_at", null)
+            .or([`case_ref.ilike.${p}`,`subject.ilike.${p}`,`related_party.ilike.${p}`,`research_question.ilike.${p}`].join(","))
+            .limit(30),
+
+          supabase.from("documents")
+            .select("id,document_ref,title,document_type,parent_type,parent_id,verification_status,status")
+            .is("archived_at", null)
+            .or([`document_ref.ilike.${p}`,`title.ilike.${p}`,`document_type.ilike.${p}`].join(","))
+            .limit(30),
+        ]);
+
+      const failed = [
+        ["risk cases",risk.error],["clients",clients.error],
+        ["opportunities",opportunities.error],["companies",companies.error],
+        ["contacts",contacts.error],["research cases",research.error],
+        ["documents",documents.error],
+      ].filter((item) => item[1]);
+
+      if (failed.length) {
+        console.error("Intelligence search errors:", failed);
+        throw new Error(
+          `Search failed for ${failed.map((item) => item[0]).join(", ")}. Check table permissions and database schema.`,
+        );
+      }
+
+      return {
+        risk: risk.data ?? [],
+        clients: clients.data ?? [],
+        opportunities: opportunities.data ?? [],
+        companies: companies.data ?? [],
+        contacts: contacts.data ?? [],
+        research: research.data ?? [],
+        documents: documents.data ?? [],
+      };
+    },
+  });
+
+  if (!canSearch) {
+    return <AppShell><PageHeader title="Internal intelligence search" /><NoAccess module="Risk & Investigation" /></AppShell>;
+  }
+
+  const data = results.data;
+  const total = data
+    ? data.risk.length + data.clients.length + data.opportunities.length +
+      data.companies.length + data.contacts.length + data.research.length +
+      data.documents.length
+    : 0;
+
+  return (
+    <AppShell>
+      <PageHeader
+        title="Internal intelligence search"
+        description="Search risk cases, clients, companies, contacts, opportunities, research cases and document records. External sources are not included."
+      />
+
+      <form className="mb-5 flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); if (term.trim().length >= 2) setQuery(term.trim()); }}>
+        <Input className="max-w-md" value={term} maxLength={160}
+          onChange={(e) => setTerm(e.target.value)}
+          placeholder="Name, company, phone, email, document or reference"
+          aria-label="Search Kalexi internal records" />
+        <Button type="submit" disabled={term.trim().length < 2 || results.isFetching}>
+          {results.isFetching ? "Searching..." : "Search"}
+        </Button>
+      </form>
+
+      {!query ? (
+        <EmptyState title="Search internal records" hint="Enter at least two characters to begin." />
+      ) : results.isFetching ? (
+        <p className="py-6 text-sm text-muted-foreground">Searching internal records...</p>
+      ) : results.isError ? (
+        <div role="alert" className="rounded-md border border-destructive/40 p-4">
+          <p className="font-medium">Search failed</p>
+          <p className="mt-1 text-sm text-muted-foreground">{results.error instanceof Error ? results.error.message : "Unexpected database error."}</p>
+          <Button className="mt-3" variant="outline" onClick={() => results.refetch()}>Retry</Button>
+        </div>
+      ) : data && total === 0 ? (
+        <EmptyState title="No matching internal records" hint="This does not establish that the subject has no adverse history." />
+      ) : data ? (
+        <div className="space-y-5">
+          <p className="text-sm text-muted-foreground">{total} matching records returned across seven record types.</p>
+
+          <Panel title={`Risk cases (${data.risk.length})`}>
+            {data.risk.map((r) => <div key={r.id} className="flex flex-wrap justify-between gap-3 border-b p-3">
+              <div><Link to="/risk/$caseId" params={{caseId:r.id}} className="font-medium hover:underline">{r.subject_name || "Unnamed subject"}</Link>
+                <p className="text-xs text-muted-foreground">{r.case_ref} · {titleCase(r.case_kind)} · {r.subject_company || "Company not recorded"}</p>
+                <p className="text-xs text-muted-foreground">{r.subject_phone || ""} {r.subject_email || ""} {r.subject_identifier || ""}</p>
+              </div><StatusPill value={r.severity} />
+            </div>)}
+            {!data.risk.length && <p className="p-3 text-sm text-muted-foreground">No matches.</p>}
+          </Panel>
+
+          <Panel title={`Clients (${data.clients.length})`}>
+            {data.clients.map((c) => <div key={c.id} className="border-b p-3">
+              <Link to="/clients/$clientId" params={{clientId:c.id}} className="font-medium hover:underline">{c.full_name || c.company_name || "Unnamed client"}</Link>
+              <p className="text-xs text-muted-foreground">{c.client_ref} · {c.company_name || ""} · {c.phone || ""} · {c.email || ""}</p>
+            </div>)}
+            {!data.clients.length && <p className="p-3 text-sm text-muted-foreground">No matches.</p>}
+          </Panel>
+
+          <Panel title={`Companies (${data.companies.length})`}>
+            {data.companies.map((c) => <div key={c.id} className="border-b p-3">
+              <p className="font-medium">{c.full_name}</p>
+              <p className="text-xs text-muted-foreground">Registration: {c.registration_number || "Not recorded"} · {c.country || "Country unknown"} · {c.status || "Status unknown"}</p>
+            </div>)}
+            {!data.companies.length && <p className="p-3 text-sm text-muted-foreground">No matches.</p>}
+          </Panel>
+
+          <Panel title={`Contacts (${data.contacts.length})`}>
+            {data.contacts.map((c) => <div key={c.id} className="border-b p-3">
+              <p className="font-medium">{c.full_name}</p>
+              <p className="text-xs text-muted-foreground">{c.role || "Role not recorded"} · {c.phone || ""} · {c.email || ""}</p>
+            </div>)}
+            {!data.contacts.length && <p className="p-3 text-sm text-muted-foreground">No matches.</p>}
+          </Panel>
+
+          <Panel title={`Opportunities (${data.opportunities.length})`}>
+            {data.opportunities.map((o) => <div key={o.id} className="border-b p-3">
+              <Link to="/opportunities/$opportunityId" params={{opportunityId:o.id}} className="font-medium hover:underline">{o.title}</Link>
+              <p className="text-xs text-muted-foreground">{o.opportunity_ref} · {o.owner_name || ""} · {o.owner_contact || ""}</p>
+            </div>)}
+            {!data.opportunities.length && <p className="p-3 text-sm text-muted-foreground">No matches.</p>}
+          </Panel>
+
+          <Panel title={`Research cases (${data.research.length})`}>
+            {data.research.map((r) => <div key={r.id} className="border-b p-3">
+              <Link to="/research/$caseId" params={{caseId:r.id}} className="font-medium hover:underline">{r.subject}</Link>
+              <p className="text-xs text-muted-foreground">{r.case_ref} · {r.related_party || ""} · {titleCase(r.status)}</p>
+              {r.research_question && <p className="mt-1 text-sm text-muted-foreground">{r.research_question}</p>}
+            </div>)}
+            {!data.research.length && <p className="p-3 text-sm text-muted-foreground">No matches.</p>}
+          </Panel>
+
+          <Panel title={`Document records (${data.documents.length})`}>
+            {data.documents.map((d) => <div key={d.id} className="border-b p-3">
+              <p className="font-medium">{d.title}</p>
+              <p className="text-xs text-muted-foreground">{d.document_ref} · {d.document_type || "Type unknown"} · {d.parent_type || "Unlinked"} · {titleCase(d.verification_status)}</p>
+            </div>)}
+            {!data.documents.length && <p className="p-3 text-sm text-muted-foreground">No matches.</p>}
+          </Panel>
+        </div>
+      ) : null}
+    </AppShell>
+  );
+}
+

@@ -1,4 +1,4 @@
-﻿import { createServerFn } from "@tanstack/react-start";
+import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { ALL_ROLES, type AppRole } from "@/lib/rbac";
@@ -501,17 +501,50 @@ export const verifyDocument = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row } = await supabaseAdmin
+
+    const { data: row, error } = await supabaseAdmin
       .from("clients")
-      .select("client_ref, status, created_at")
+      .select("client_ref, status, created_at, registered_by")
       .eq("verification_ref", data.reference)
       .maybeSingle();
+
+    if (error) {
+      console.error("[verifyDocument] Document lookup failed:", error);
+      throw new Error("Document verification is temporarily unavailable.");
+    }
+
     if (!row) return { valid: false as const };
+
+    let officer = {
+      fullName: "Not available",
+      jobTitle: "Not available",
+      department: "Not available",
+    };
+
+    if (row.registered_by) {
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .select("full_name, job_title, department, status")
+        .eq("id", row.registered_by)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error("[verifyDocument] Officer lookup failed:", profileError);
+      } else if (profile && profile.status === "active") {
+        officer = {
+          fullName: profile.full_name || "Not available",
+          jobTitle: profile.job_title || "Not available",
+          department: profile.department || "Not available",
+        };
+      }
+    }
+
     return {
       valid: true as const,
       documentType: "Client Registration Acknowledgement",
       reference: row.client_ref,
       status: row.status,
       issuedAt: row.created_at,
+      officer,
     };
   });

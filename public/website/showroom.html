@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalexi Deal Showroom</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#071526;color:#fff;font-family:Arial,sans-serif;overflow:hidden}
+header{height:9vh;padding:20px 4vw;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff22}
+header img{height:48px;max-width:200px;object-fit:contain}
+main{height:82vh;display:grid;grid-template-columns:1.4fr 1fr;gap:4vw;padding:4vh 5vw;align-items:center}
+#photo{width:100%;height:72vh;object-fit:cover;border-radius:16px;background:#142b40;transition:opacity .6s}
+#details h1{font-size:clamp(28px,4vw,58px);line-height:1.08;margin:15px 0}
+#details p{font-size:clamp(16px,1.6vw,23px);line-height:1.5;color:#d0d9e3}
+#price{font-size:clamp(22px,2.5vw,36px);color:#d7b56d;font-weight:bold}
+footer{height:9vh;padding:18px 5vw;display:flex;justify-content:space-between;color:#c2ccd7;border-top:1px solid #ffffff22}
+@media(max-width:700px){main{grid-template-columns:1fr;height:82vh;padding:2vh 4vw;gap:10px}#photo{height:42vh}#details h1{font-size:25px}#details p{font-size:14px}header img{height:35px}}
+</style></head>
+<body>
+<header><strong>KALEXI BROKERAGE</strong><span>PROPERTY & DEAL SHOWROOM</span></header>
+<main><img id="photo" alt="Featured Kalexi property"><section id="details"><p>KALEXI BROKERAGE</p><h1>Loading available opportunities...</h1><p>Verified opportunities from our brokerage portfolio.</p></section></main>
+<footer><span>Making the transaction secure is our mission.</span><span id="counter">Preparing showroom</span></footer>
+<script src="assets/js/kalexi-properties.js"></script>
+</body></html>

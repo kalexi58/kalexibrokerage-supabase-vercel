@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="436 128 826 412" role="img" aria-label="Kalexi Brokerage emblem"><defs>
+    <linearGradient id="emblemTop" x1="521" y1="0" x2="996" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#082F55"/><stop offset="0.45" stop-color="#0B5689"/><stop offset="1" stop-color="#168BC7"/>
+    </linearGradient>
+    <linearGradient id="emblemSweep" x1="438" y1="300" x2="1260" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#082F55"/><stop offset="0.58" stop-color="#0B5689"/><stop offset="1" stop-color="#168BC7"/>
+    </linearGradient>
+    <linearGradient id="emblemLeg" x1="720" y1="420" x2="1065" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A3B68"/><stop offset="1" stop-color="#116E9F"/>
+    </linearGradient>
+  </defs><g id="symbol">
+    <path d="M 525,409 L 595,355 L 690,298 L 744,272 L 805,247 L 909,214 L 994,135 L 825,135 L 653,296 L 652,134 L 526,134 Z" fill="url(#emblemTop)" fill-rule="evenodd"/>
+    <path d="M 1259,217 L 1218,208 L 1165,202 L 1110,201 L 1045,206 L 976,217 L 913,232 L 792,273 L 737,297 L 682,325 L 634,353 L 588,384 L 543,419 L 496,463 L 467,496 L 440,536 L 579,536 L 599,492 L 627,452 L 670,407 L 697,384 L 739,353 L 792,320 L 840,295 L 908,266 L 1001,236 L 1108,215 L 1149,211 L 1208,211 Z" fill="url(#emblemSweep)" fill-rule="evenodd"/>
+    <path d="M 721,390 L 866,536 L 1063,536 L 830,320 L 784,346 Z" fill="url(#emblemLeg)" fill-rule="evenodd"/>
+  </g></svg>

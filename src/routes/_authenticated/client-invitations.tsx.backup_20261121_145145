@@ -1,0 +1,120 @@
+﻿import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell, PageHeader } from "@/components/AppShell";
+import { useSession } from "@/hooks/useSession";
+import { allows } from "@/lib/rbac";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+type InviteRpc = {
+  rpc: (name: "create_client_registration_invite") =>
+    Promise<{ data: string | null; error: { message: string } | null }>;
+};
+
+export const Route = createFileRoute("/_authenticated/client-invitations")({
+  component: ClientInvitations,
+});
+
+function ClientInvitations() {
+  const { data: session } = useSession();
+  const [busy, setBusy] = useState(false);
+  const [url, setUrl] = useState("");
+  const client = supabase as unknown as InviteRpc;
+
+  async function generate() {
+    if (!session || !allows(session.access, "clients.create")) {
+      toast.error("You are not authorised to generate invitations.");
+      return;
+    }
+
+    setBusy(true);
+    setUrl("");
+
+    try {
+      const { data, error } = await client.rpc(
+        "create_client_registration_invite"
+      );
+
+      if (error) throw error;
+      if (!data) throw new Error("No invitation token was returned.");
+
+      const link = `${window.location.origin}/client-register/${data}`;
+      setUrl(link);
+
+      try {
+        await navigator.clipboard.writeText(link);
+        toast.success("Invitation generated and copied.");
+      } catch {
+        toast.success("Invitation generated. Copy the link below.");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not generate invitation.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!allows(session?.access, "clients.create")) {
+    return (
+      <AppShell>
+        <PageHeader title="Access restricted" />
+        <p className="text-sm text-muted-foreground">
+          You do not have permission to generate client invitations.
+        </p>
+      </AppShell>
+    );
+  }
+
+  return (
+    <AppShell>
+      <PageHeader
+        title="Client registration invitations"
+        description="Invite clients to register themselves directly into Kalexi."
+      />
+
+      <Card className="max-w-2xl shadow-[var(--shadow-panel)]">
+        <CardContent className="space-y-5 p-6">
+          <div>
+            <h2 className="font-semibold">Generate invitation</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Each invitation is unique, expires after seven days and can only
+              be used once.
+            </p>
+          </div>
+
+          <Button onClick={generate} disabled={busy}>
+            {busy ? "Generating..." : "Generate client registration link"}
+          </Button>
+
+          {url ? (
+            <div className="space-y-3 rounded-lg border p-4">
+              <p className="text-sm font-medium">Client registration link</p>
+              <input
+                readOnly
+                value={url}
+                className="w-full rounded-md border bg-muted p-3 text-sm"
+                onFocus={(event) => event.currentTarget.select()}
+              />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  void navigator.clipboard.writeText(url).then(
+                    () => toast.success("Link copied."),
+                    () => toast.error("Select and copy the link manually.")
+                  );
+                }}
+              >
+                Copy invitation link
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Send this link privately to the intended client.
+              </p>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+    </AppShell>
+  );
+}

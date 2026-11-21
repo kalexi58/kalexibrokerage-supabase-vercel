@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive } from "lucide-react";
 import { toast } from "sonner";
@@ -22,7 +22,7 @@ type ArchiveClientRpc = {
 export const Route = createFileRoute("/_authenticated/clients/")({
   head: () => ({
     meta: [
-      { title: "Client Register — Kalexi Brokerage" },
+      { title: "Client Register â€” Kalexi Brokerage" },
       { name: "description", content: "Search and review officially registered Kalexi clients." },
       { name: "robots", content: "noindex" },
     ],
@@ -85,9 +85,14 @@ function ClientsPage() {
         description="Every client officially registered in Kalexi's records."
         actions={
           allows(access, "clients.create") ? (
-            <Button asChild>
-              <Link to="/clients/new">Register new client</Link>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline">
+                <Link to="/client-invitations">Invite a client</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/clients/new">Register new client</Link>
+              </Button>
+            </div>
           ) : null
         }
       />
@@ -141,7 +146,7 @@ function ClientsPage() {
                   </td>
                   <td className="px-4 py-2.5">{c.full_name}</td>
                   <td className="px-4 py-2.5">{c.phone}</td>
-                  <td className="px-4 py-2.5">{c.company_name ?? "—"}</td>
+                  <td className="px-4 py-2.5">{c.company_name ?? "â€”"}</td>
                   <td className="px-4 py-2.5">{c.sector}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">
                     {new Date(c.created_at).toLocaleDateString()}
@@ -188,3 +193,4 @@ function ClientsPage() {
     </AppShell>
   );
 }
+

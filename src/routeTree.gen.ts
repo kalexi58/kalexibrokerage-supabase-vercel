@@ -17,6 +17,7 @@ import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAgentPortalRouteImport } from './routes/_authenticated/agent-portal'
 import { Route as AuthenticatedBrandRouteImport } from './routes/_authenticated/brand'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedClientInvitationsRouteImport } from './routes/_authenticated/client-invitations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEmployeeIntelligenceRouteImport } from './routes/_authenticated/employee-intelligence'
 import { Route as AuthenticatedHolidaysRouteImport } from './routes/_authenticated/holidays'
@@ -24,6 +25,10 @@ import { Route as AuthenticatedIntelligenceRouteImport } from './routes/_authent
 import { Route as AuthenticatedIntelligenceMonitorRouteImport } from './routes/_authenticated/intelligence-monitor'
 import { Route as AuthenticatedMyAvailabilityRouteImport } from './routes/_authenticated/my-availability'
 import { Route as AuthenticatedPageDirectoryRouteImport } from './routes/_authenticated/page-directory'
+import { Route as AuthenticatedWebsiteManagementRouteImport } from './routes/_authenticated/website-management'
+import { Route as ApiContactRouteImport } from './routes/api.contact'
+import { Route as ApiWebsiteRouteImport } from './routes/api.website'
+import { Route as ClientRegisterTokenRouteImport } from './routes/client-register.$token'
 import { Route as FTokenRouteImport } from './routes/f.$token'
 import { Route as JoinTokenRouteImport } from './routes/join.$token'
 import { Route as RCodeRouteImport } from './routes/r.$code'
@@ -119,6 +124,12 @@ const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
   path: '/calendar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedClientInvitationsRoute =
+  AuthenticatedClientInvitationsRouteImport.update({
+    id: '/client-invitations',
+    path: '/client-invitations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -159,6 +170,27 @@ const AuthenticatedPageDirectoryRoute =
     path: '/page-directory',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedWebsiteManagementRoute =
+  AuthenticatedWebsiteManagementRouteImport.update({
+    id: '/website-management',
+    path: '/website-management',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiContactRoute = ApiContactRouteImport.update({
+  id: '/api/contact',
+  path: '/api/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebsiteRoute = ApiWebsiteRouteImport.update({
+  id: '/api/website',
+  path: '/api/website',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientRegisterTokenRoute = ClientRegisterTokenRouteImport.update({
+  id: '/client-register/$token',
+  path: '/client-register/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FTokenRoute = FTokenRouteImport.update({
   id: '/f/$token',
   path: '/f/$token',
@@ -476,6 +508,7 @@ export interface FileRoutesByFullPath {
   '/agent-portal': typeof AuthenticatedAgentPortalRoute
   '/brand': typeof AuthenticatedBrandRoute
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/client-invitations': typeof AuthenticatedClientInvitationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employee-intelligence': typeof AuthenticatedEmployeeIntelligenceRoute
   '/holidays': typeof AuthenticatedHolidaysRoute
@@ -483,6 +516,10 @@ export interface FileRoutesByFullPath {
   '/intelligence-monitor': typeof AuthenticatedIntelligenceMonitorRoute
   '/my-availability': typeof AuthenticatedMyAvailabilityRoute
   '/page-directory': typeof AuthenticatedPageDirectoryRoute
+  '/website-management': typeof AuthenticatedWebsiteManagementRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/website': typeof ApiWebsiteRoute
+  '/client-register/$token': typeof ClientRegisterTokenRoute
   '/f/$token': typeof FTokenRoute
   '/join/$token': typeof JoinTokenRoute
   '/r/$code': typeof RCodeRoute
@@ -546,6 +583,7 @@ export interface FileRoutesByTo {
   '/agent-portal': typeof AuthenticatedAgentPortalRoute
   '/brand': typeof AuthenticatedBrandRoute
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/client-invitations': typeof AuthenticatedClientInvitationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employee-intelligence': typeof AuthenticatedEmployeeIntelligenceRoute
   '/holidays': typeof AuthenticatedHolidaysRoute
@@ -553,6 +591,10 @@ export interface FileRoutesByTo {
   '/intelligence-monitor': typeof AuthenticatedIntelligenceMonitorRoute
   '/my-availability': typeof AuthenticatedMyAvailabilityRoute
   '/page-directory': typeof AuthenticatedPageDirectoryRoute
+  '/website-management': typeof AuthenticatedWebsiteManagementRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/website': typeof ApiWebsiteRoute
+  '/client-register/$token': typeof ClientRegisterTokenRoute
   '/f/$token': typeof FTokenRoute
   '/join/$token': typeof JoinTokenRoute
   '/r/$code': typeof RCodeRoute
@@ -618,6 +660,7 @@ export interface FileRoutesById {
   '/_authenticated/agent-portal': typeof AuthenticatedAgentPortalRoute
   '/_authenticated/brand': typeof AuthenticatedBrandRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/_authenticated/client-invitations': typeof AuthenticatedClientInvitationsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/employee-intelligence': typeof AuthenticatedEmployeeIntelligenceRoute
   '/_authenticated/holidays': typeof AuthenticatedHolidaysRoute
@@ -625,6 +668,10 @@ export interface FileRoutesById {
   '/_authenticated/intelligence-monitor': typeof AuthenticatedIntelligenceMonitorRoute
   '/_authenticated/my-availability': typeof AuthenticatedMyAvailabilityRoute
   '/_authenticated/page-directory': typeof AuthenticatedPageDirectoryRoute
+  '/_authenticated/website-management': typeof AuthenticatedWebsiteManagementRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/website': typeof ApiWebsiteRoute
+  '/client-register/$token': typeof ClientRegisterTokenRoute
   '/f/$token': typeof FTokenRoute
   '/join/$token': typeof JoinTokenRoute
   '/r/$code': typeof RCodeRoute
@@ -690,6 +737,7 @@ export interface FileRouteTypes {
     | '/agent-portal'
     | '/brand'
     | '/calendar'
+    | '/client-invitations'
     | '/dashboard'
     | '/employee-intelligence'
     | '/holidays'
@@ -697,6 +745,10 @@ export interface FileRouteTypes {
     | '/intelligence-monitor'
     | '/my-availability'
     | '/page-directory'
+    | '/website-management'
+    | '/api/contact'
+    | '/api/website'
+    | '/client-register/$token'
     | '/f/$token'
     | '/join/$token'
     | '/r/$code'
@@ -760,6 +812,7 @@ export interface FileRouteTypes {
     | '/agent-portal'
     | '/brand'
     | '/calendar'
+    | '/client-invitations'
     | '/dashboard'
     | '/employee-intelligence'
     | '/holidays'
@@ -767,6 +820,10 @@ export interface FileRouteTypes {
     | '/intelligence-monitor'
     | '/my-availability'
     | '/page-directory'
+    | '/website-management'
+    | '/api/contact'
+    | '/api/website'
+    | '/client-register/$token'
     | '/f/$token'
     | '/join/$token'
     | '/r/$code'
@@ -831,6 +888,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agent-portal'
     | '/_authenticated/brand'
     | '/_authenticated/calendar'
+    | '/_authenticated/client-invitations'
     | '/_authenticated/dashboard'
     | '/_authenticated/employee-intelligence'
     | '/_authenticated/holidays'
@@ -838,6 +896,10 @@ export interface FileRouteTypes {
     | '/_authenticated/intelligence-monitor'
     | '/_authenticated/my-availability'
     | '/_authenticated/page-directory'
+    | '/_authenticated/website-management'
+    | '/api/contact'
+    | '/api/website'
+    | '/client-register/$token'
     | '/f/$token'
     | '/join/$token'
     | '/r/$code'
@@ -899,6 +961,9 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   MaintenanceRoute: typeof MaintenanceRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiContactRoute: typeof ApiContactRoute
+  ApiWebsiteRoute: typeof ApiWebsiteRoute
+  ClientRegisterTokenRoute: typeof ClientRegisterTokenRoute
   FTokenRoute: typeof FTokenRoute
   JoinTokenRoute: typeof JoinTokenRoute
   RCodeRoute: typeof RCodeRoute
@@ -964,6 +1029,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCalendarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/client-invitations': {
+      id: '/_authenticated/client-invitations'
+      path: '/client-invitations'
+      fullPath: '/client-invitations'
+      preLoaderRoute: typeof AuthenticatedClientInvitationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -1012,6 +1084,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/page-directory'
       preLoaderRoute: typeof AuthenticatedPageDirectoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/website-management': {
+      id: '/_authenticated/website-management'
+      path: '/website-management'
+      fullPath: '/website-management'
+      preLoaderRoute: typeof AuthenticatedWebsiteManagementRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/contact': {
+      id: '/api/contact'
+      path: '/api/contact'
+      fullPath: '/api/contact'
+      preLoaderRoute: typeof ApiContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/website': {
+      id: '/api/website'
+      path: '/api/website'
+      fullPath: '/api/website'
+      preLoaderRoute: typeof ApiWebsiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/client-register/$token': {
+      id: '/client-register/$token'
+      path: '/client-register/$token'
+      fullPath: '/client-register/$token'
+      preLoaderRoute: typeof ClientRegisterTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/f/$token': {
       id: '/f/$token'
@@ -1399,6 +1499,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentPortalRoute: typeof AuthenticatedAgentPortalRoute
   AuthenticatedBrandRoute: typeof AuthenticatedBrandRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
+  AuthenticatedClientInvitationsRoute: typeof AuthenticatedClientInvitationsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmployeeIntelligenceRoute: typeof AuthenticatedEmployeeIntelligenceRoute
   AuthenticatedHolidaysRoute: typeof AuthenticatedHolidaysRoute
@@ -1406,6 +1507,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIntelligenceMonitorRoute: typeof AuthenticatedIntelligenceMonitorRoute
   AuthenticatedMyAvailabilityRoute: typeof AuthenticatedMyAvailabilityRoute
   AuthenticatedPageDirectoryRoute: typeof AuthenticatedPageDirectoryRoute
+  AuthenticatedWebsiteManagementRoute: typeof AuthenticatedWebsiteManagementRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminMaintenanceRoute: typeof AuthenticatedAdminMaintenanceRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
@@ -1462,6 +1564,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentPortalRoute: AuthenticatedAgentPortalRoute,
   AuthenticatedBrandRoute: AuthenticatedBrandRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
+  AuthenticatedClientInvitationsRoute: AuthenticatedClientInvitationsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmployeeIntelligenceRoute:
     AuthenticatedEmployeeIntelligenceRoute,
@@ -1470,6 +1573,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIntelligenceMonitorRoute: AuthenticatedIntelligenceMonitorRoute,
   AuthenticatedMyAvailabilityRoute: AuthenticatedMyAvailabilityRoute,
   AuthenticatedPageDirectoryRoute: AuthenticatedPageDirectoryRoute,
+  AuthenticatedWebsiteManagementRoute: AuthenticatedWebsiteManagementRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminMaintenanceRoute: AuthenticatedAdminMaintenanceRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
@@ -1539,6 +1643,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   MaintenanceRoute: MaintenanceRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiContactRoute: ApiContactRoute,
+  ApiWebsiteRoute: ApiWebsiteRoute,
+  ClientRegisterTokenRoute: ClientRegisterTokenRoute,
   FTokenRoute: FTokenRoute,
   JoinTokenRoute: JoinTokenRoute,
   RCodeRoute: RCodeRoute,
