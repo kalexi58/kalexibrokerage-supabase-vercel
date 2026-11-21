@@ -37,3 +37,9 @@ dist-ssr
 !.env.example
 .vercel
 .env*
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+.vercel/
