@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabase } from "@/integrations/supabase/client";
 import { ALL_ROLES, type AppRole } from "@/lib/rbac";
 
 const phoneSchema = z
@@ -41,16 +42,9 @@ export interface LoginIdentity {
 export const lookupLoginIdentity = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => loginIdentifierSchema.parse(input))
   .handler(async ({ data }): Promise<LoginIdentity | null> => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const supabaseUrl = process.env["SUPABASE_URL"];
-    const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
-
-    if (!supabaseUrl || !publishableKey) {
-      throw new Error("Missing Supabase URL or publishable key.");
-    }
-
-    const supabaseLookup = createClient(supabaseUrl, publishableKey);
-    const { data: rows, error } = await supabaseLookup.rpc("login_identity", {
+    // Reuse the configured client so new sb_publishable_ keys are sent
+    // using the API-key header handling defined in integrations/supabase/client.ts.
+    const { data: rows, error } = await supabase.rpc("login_identity", {
       _email: data.identifier,
     });
     if (error) {
@@ -80,8 +74,7 @@ export const signInWithPhone = createServerFn({ method: "POST" })
     z.object({ phone: phoneSchema, password: z.string().min(1).max(256) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error: lookupError } = await supabaseAdmin.rpc("login_email_by_phone", {
+    const { data: rows, error: lookupError } = await supabase.rpc("login_email_by_phone", {
       _phone: data.phone,
     });
     if (lookupError) {
@@ -91,14 +84,7 @@ export const signInWithPhone = createServerFn({ method: "POST" })
     const row = Array.isArray(rows) ? rows[0] : null;
     if (!row?.email) throw new Error("Incorrect phone number or password.");
 
-    const supabaseUrl = process.env["SUPABASE_URL"];
-    const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
-    if (!supabaseUrl || !publishableKey) {
-      throw new Error("Missing Supabase URL or publishable key.");
-    }
-    const { createClient } = await import("@supabase/supabase-js");
-    const authClient = createClient(supabaseUrl, publishableKey);
-    const { data: auth, error } = await authClient.auth.signInWithPassword({
+    const { data: auth, error } = await supabase.auth.signInWithPassword({
       email: row.email,
       password: data.password,
     });
@@ -123,16 +109,9 @@ const passwordResetRequestSchema = z.object({
 export const requestPasswordReset = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => passwordResetRequestSchema.parse(input))
   .handler(async ({ data }) => {
-    const supabaseUrl = process.env["SUPABASE_URL"];
-    const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
-    if (!supabaseUrl || !publishableKey) {
-      throw new Error("Missing Supabase URL or publishable key.");
-    }
-
     let email = data.identifier;
     if (!email.includes("@")) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: rows, error } = await supabaseAdmin.rpc("login_email_by_phone", {
+      const { data: rows, error } = await supabase.rpc("login_email_by_phone", {
         _phone: data.identifier,
       });
       if (error) {
@@ -144,9 +123,7 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
       email = row.email;
     }
 
-    const { createClient } = await import("@supabase/supabase-js");
-    const authClient = createClient(supabaseUrl, publishableKey);
-    const { error } = await authClient.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: data.redirectTo,
     });
     if (error) {
