@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { supabase } from "@/integrations/supabase/client";
 import { MAINTENANCE_ROW_ID, readMaintenanceState } from "@/lib/maintenance";
 
 const settingsInput = z.object({
@@ -24,8 +25,7 @@ async function assertSuperAdmin(supabase: SupabaseClient<Database>, userId: stri
 export const getMaintenanceAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const state = await readMaintenanceState(supabaseAdmin);
+    const state = await readMaintenanceState(context.supabase);
     const { data, error } = await context.supabase
       .from("user_roles")
       .select("user_id")
@@ -37,8 +37,7 @@ export const getMaintenanceAccess = createServerFn({ method: "GET" })
   });
 
 export const getMaintenanceStatus = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const state = await readMaintenanceState(supabaseAdmin);
+  const state = await readMaintenanceState(supabase);
   return {
     maintenanceEnabled: state.maintenance_enabled,
     maintenanceMessage: state.maintenance_message,
@@ -52,7 +51,7 @@ export const getMaintenanceSettings = createServerFn({ method: "GET" })
     await assertSuperAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [state, historyResult] = await Promise.all([
-      readMaintenanceState(supabaseAdmin),
+      readMaintenanceState(context.supabase),
       supabaseAdmin
         .from("audit_logs")
         .select("id, created_at, actor_email, action")
@@ -89,28 +88,7 @@ export const getMaintenanceHealth = createServerFn({ method: "GET" })
     const startedAt = Date.now();
 
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data, error } = await supabaseAdmin
-        .from("system_maintenance")
-        .select("id")
-        .eq("id", MAINTENANCE_ROW_ID)
-        .maybeSingle();
-
-      if (error || !data) {
-        if (error) {
-          console.error(
-            "[maintenance] Administrator health check could not reach the database.",
-            error,
-          );
-        }
-        return {
-          application: "healthy" as const,
-          version: getApplicationVersion(),
-          database: "unavailable" as const,
-          checkedAt,
-          durationMs: Date.now() - startedAt,
-        };
-      }
+      await readMaintenanceState(context.supabase);
 
       return {
         application: "healthy" as const,
@@ -146,7 +124,7 @@ export const saveMaintenanceSettings = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const before = await readMaintenanceState(supabaseAdmin);
+    const before = await readMaintenanceState(context.supabase);
     const now = new Date().toISOString();
     const startedAt = data.maintenanceEnabled
       ? before.maintenance_enabled
